@@ -128,8 +128,8 @@ function Library:Create(config)
     self.Sections = {}
     self.CurrentSection = nil
     self.Minimized = false
-    self.MinSize = Vector2.new(500, 400)
-    self.MaxSize = Vector2.new(800, 600)
+    self.MinSize = Vector2.new(350, 300)
+    self.MaxSize = Vector2.new(450, 400)
     
     -- Create ScreenGui
     self.ScreenGui = CreateInstance("ScreenGui", {
@@ -141,8 +141,8 @@ function Library:Create(config)
     -- Main Frame with transparency effect
     self.MainFrame = CreateInstance("Frame", {
         Name = "MainFrame",
-        Size = UDim2.new(0, 650, 0, 450),
-        Position = UDim2.new(0.5, -325, 0.5, -225),
+        Size = UDim2.new(0, 380, 0, 320),
+        Position = UDim2.new(0.5, -190, 0.5, -160),
         BackgroundColor3 = self.Theme.Background,
         BackgroundTransparency = 0.05,
         BorderSizePixel = 0,
@@ -505,7 +505,7 @@ function Library:CreateButton(section, config)
     local button = {}
     
     button.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 35),
+        Size = UDim2.new(1, 0, 0, 28),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
@@ -552,7 +552,7 @@ function Library:CreateToggle(section, config)
     toggle.Enabled = config.Default or false
     
     toggle.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 35),
+        Size = UDim2.new(1, 0, 0, 28),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
@@ -637,7 +637,7 @@ function Library:CreateSlider(section, config)
     slider.Value = config.Default or slider.Min
     
     slider.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 55),
+        Size = UDim2.new(1, 0, 0, 45),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
@@ -648,8 +648,8 @@ function Library:CreateSlider(section, config)
     }, slider.Frame)
     
     slider.Label = CreateInstance("TextLabel", {
-        Size = UDim2.new(1, -70, 0, 20),
-        Position = UDim2.new(0, 10, 0, 5),
+        Size = UDim2.new(1, -70, 0, 18),
+        Position = UDim2.new(0, 10, 0, 3),
         BackgroundTransparency = 1,
         Text = config.Text or "Slider",
         TextColor3 = self.Theme.Text,
@@ -659,8 +659,8 @@ function Library:CreateSlider(section, config)
     }, slider.Frame)
     
     slider.ValueLabel = CreateInstance("TextLabel", {
-        Size = UDim2.new(0, 50, 0, 20),
-        Position = UDim2.new(1, -60, 0, 5),
+        Size = UDim2.new(0, 50, 0, 18),
+        Position = UDim2.new(1, -60, 0, 3),
         BackgroundTransparency = 1,
         Text = tostring(slider.Value),
         TextColor3 = self.Theme.Text,
@@ -670,7 +670,7 @@ function Library:CreateSlider(section, config)
     
     slider.SliderFrame = CreateInstance("Frame", {
         Size = UDim2.new(1, -20, 0, 4),
-        Position = UDim2.new(0, 10, 0, 33),
+        Position = UDim2.new(0, 10, 0, 26),
         BackgroundColor3 = self.Theme.Tertiary,
         BorderSizePixel = 0
     }, slider.Frame)
@@ -759,7 +759,7 @@ function Library:CreateInput(section, config)
     local input = {}
     
     input.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 35),
+        Size = UDim2.new(1, 0, 0, 28),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
@@ -824,7 +824,7 @@ function Library:CreateDropdown(section, config)
     dropdown.Open = false
     
     dropdown.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 35),
+        Size = UDim2.new(1, 0, 0, 28),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0,
@@ -836,7 +836,7 @@ function Library:CreateDropdown(section, config)
     }, dropdown.Frame)
     
     dropdown.Label = CreateInstance("TextLabel", {
-        Size = UDim2.new(0.35, -10, 0, 35),
+        Size = UDim2.new(0.35, -10, 0, 28),
         Position = UDim2.new(0, 10, 0, 0),
         BackgroundTransparency = 1,
         Text = config.Text or "Dropdown",
@@ -847,7 +847,7 @@ function Library:CreateDropdown(section, config)
     }, dropdown.Frame)
     
     dropdown.Button = CreateInstance("TextButton", {
-        Size = UDim2.new(0.65, -10, 0, 27),
+        Size = UDim2.new(0.65, -10, 0, 20),
         Position = UDim2.new(0.35, 5, 0, 4),
         BackgroundColor3 = self.Theme.Tertiary,
         BackgroundTransparency = 0.3,
@@ -875,7 +875,7 @@ function Library:CreateDropdown(section, config)
     
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(0.65, -10, 0, 0),
-        Position = UDim2.new(0.35, 5, 0, 35),
+        Position = UDim2.new(0.35, 5, 0, 28),
         BackgroundColor3 = self.Theme.Tertiary,
         BackgroundTransparency = 0.3,
         BorderSizePixel = 0,
@@ -986,7 +986,7 @@ function Library:CreateSearchBox(section, config)
     search.FilteredItems = {}
     
     search.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 35),
+        Size = UDim2.new(1, 0, 0, 28),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0,
@@ -998,7 +998,7 @@ function Library:CreateSearchBox(section, config)
     }, search.Frame)
     
     search.SearchBox = CreateInstance("TextBox", {
-        Size = UDim2.new(1, -20, 0, 27),
+        Size = UDim2.new(1, -20, 0, 20),
         Position = UDim2.new(0, 10, 0, 4),
         BackgroundColor3 = self.Theme.Tertiary,
         BackgroundTransparency = 0.3,
@@ -1027,7 +1027,7 @@ function Library:CreateSearchBox(section, config)
     
     search.ResultsContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(1, -20, 0, 0),
-        Position = UDim2.new(0, 10, 0, 35),
+        Position = UDim2.new(0, 10, 0, 28),
         BackgroundColor3 = self.Theme.Tertiary,
         BackgroundTransparency = 0.3,
         BorderSizePixel = 0,
@@ -1151,7 +1151,7 @@ function Library:CreateLabel(section, config)
     local label = {}
     
     label.Frame = CreateInstance("Frame", {
-        Size = UDim2.new(1, 0, 0, 25),
+        Size = UDim2.new(1, 0, 0, 20),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.7,
         BorderSizePixel = 0
