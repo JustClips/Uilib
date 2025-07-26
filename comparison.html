@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UI Library Size Comparison</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #64b5ff;
+            margin-bottom: 30px;
+        }
+        .comparison {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 40px 0;
+        }
+        .gui-mock {
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            position: relative;
+            box-shadow: 0 0 20px rgba(100, 181, 255, 0.3);
+        }
+        .gui-old {
+            width: 650px;
+            height: 450px;
+        }
+        .gui-new {
+            width: 380px;
+            height: 320px;
+        }
+        .title-bar {
+            background: #333;
+            height: 35px;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 14px;
+            color: #fff;
+        }
+        .content {
+            padding: 15px;
+            height: calc(100% - 65px);
+            overflow: hidden;
+        }
+        .component {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 3px 0;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .old .component {
+            height: 35px;
+        }
+        .new .component {
+            height: 28px;
+        }
+        .slider {
+            height: 55px !important;
+        }
+        .new .slider {
+            height: 45px !important;
+        }
+        .label {
+            height: 25px !important;
+        }
+        .new .label {
+            height: 20px !important;
+        }
+        .icon {
+            font-size: 16px;
+        }
+        .stats {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .reduction {
+            color: #4ade80;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .features {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .features h3 {
+            color: #64b5ff;
+            margin-bottom: 15px;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .feature-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #64b5ff;
+        }
+        .separator {
+            height: 1px !important;
+            background: #555;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 UI Library Size Comparison - Compact Edition</h1>
+        
+        <div class="comparison">
+            <div class="gui-section">
+                <h3 style="text-align: center; color: #ff6b6b; margin-bottom: 15px;">❌ Old Version</h3>
+                <div class="gui-mock gui-old old">
+                    <div class="title-bar">Eps1llon Hub - Old (650×450)</div>
+                    <div class="content">
+                        <div class="component"><span class="icon">🔘</span> Button Component</div>
+                        <div class="component"><span class="icon">🔄</span> Toggle Switch</div>
+                        <div class="component slider"><span class="icon">📊</span> Slider Control<br><small style="margin-top: 10px;">Value: 50</small></div>
+                        <div class="component"><span class="icon">📝</span> Text Input Field</div>
+                        <div class="component"><span class="icon">📋</span> Dropdown Menu</div>
+                        <div class="component"><span class="icon">🔍</span> Search Box</div>
+                        <div class="component label"><span class="icon">📄</span> Label Text</div>
+                        <div class="separator"></div>
+                        <div class="component"><span class="icon">🔧</span> Another Component</div>
+                        <div class="component"><span class="icon">⚙️</span> Settings Button</div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div>650 × 450 pixels</div>
+                    <div>292,500 total pixels</div>
+                </div>
+            </div>
+            
+            <div class="gui-section">
+                <h3 style="text-align: center; color: #4ade80; margin-bottom: 15px;">✅ New Version</h3>
+                <div class="gui-mock gui-new new">
+                    <div class="title-bar">Eps1llon Hub - Compact (380×320)</div>
+                    <div class="content">
+                        <div class="component"><span class="icon">🔘</span> Button Component</div>
+                        <div class="component"><span class="icon">🔄</span> Toggle Switch</div>
+                        <div class="component slider"><span class="icon">📊</span> Slider Control<br><small style="margin-top: 8px;">Value: 50</small></div>
+                        <div class="component"><span class="icon">📝</span> Text Input Field</div>
+                        <div class="component"><span class="icon">📋</span> Dropdown Menu</div>
+                        <div class="component"><span class="icon">🔍</span> Search Box</div>
+                        <div class="component label"><span class="icon">📄</span> Label Text</div>
+                        <div class="separator"></div>
+                        <div class="component"><span class="icon">🔧</span> Another Component</div>
+                        <div class="component"><span class="icon">⚙️</span> Settings Button</div>
+                        <div class="component"><span class="icon">🎨</span> More Components</div>
+                        <div class="component"><span class="icon">⭐</span> Fits Better!</div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div>380 × 320 pixels</div>
+                    <div>121,600 total pixels</div>
+                    <div class="reduction">42% Size Reduction!</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h3>🎉 Improvements & Features</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>📐 Size Reduction</strong><br>
+                    Main GUI: 650×450 → 380×320 pixels<br>
+                    Total reduction: 42% smaller interface
+                </div>
+                <div class="feature-item">
+                    <strong>🧩 Component Heights</strong><br>
+                    Buttons/Toggles/Inputs: 35px → 28px<br>
+                    Sliders: 55px → 45px<br>
+                    Labels: 25px → 20px
+                </div>
+                <div class="feature-item">
+                    <strong>✨ All 8 Components</strong><br>
+                    Buttons, Toggles, Sliders, Inputs,<br>
+                    Dropdowns, Search, Labels, Separators
+                </div>
+                <div class="feature-item">
+                    <strong>📚 Example Scripts</strong><br>
+                    comprehensive showcase (example.lua)<br>
+                    minimal demo (compact_demo.lua)
+                </div>
+                <div class="feature-item">
+                    <strong>🎨 4 Themes Available</strong><br>
+                    Dark, Light, Purple, Ocean<br>
+                    Dynamic theme switching support
+                </div>
+                <div class="feature-item">
+                    <strong>📖 Full Documentation</strong><br>
+                    Complete README with usage examples<br>
+                    API documentation for all components
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0; padding: 20px; background: rgba(100, 181, 255, 0.1); border-radius: 8px;">
+            <h3 style="color: #64b5ff; margin-bottom: 15px;">🚀 Ready to Use!</h3>
+            <p>The compact UI library maintains all functionality while using 42% less screen space.<br>
+            Perfect for mobile users and those who prefer minimal interfaces.</p>
+            <p><strong>All components are fully showcased with working examples!</strong></p>
+        </div>
+    </div>
+</body>
+</html>
