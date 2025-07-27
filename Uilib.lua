@@ -1804,6 +1804,41 @@ function Library:CreateInput(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         Font = self.Font,
+        PlaceholderText = config.PlaceholderText or "Enter text...",
+        PlaceholderColor3 = self.Theme.TextDark,
+        ClearTextOnFocus = false
+    }, input.Frame)
+    
+    input.TextBox:SetAttribute("OriginalBackgroundTransparency", 0.3)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 4)
+    }, input.TextBox)
+    
+    input.TextBox.FocusLost:Connect(function(enterPressed)
+        if config.Callback then
+            config.Callback(input.TextBox.Text, enterPressed)
+        end
+    end)
+    
+    input.Frame.MouseEnter:Connect(function()
+        Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/IBeam"
+    end)
+    
+    input.Frame.MouseLeave:Connect(function()
+        Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
+        Mouse.Icon = ""
+    end)
+    
+    return input
+end
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0,
+        Text = config.Default or "",
+        TextColor3 = self.Theme.Text,
+        TextSize = 14,
+        Font = self.Font,
         PlaceholderText = config.Placeholder or "Enter text...",
         PlaceholderColor3 = self.Theme.TextDark,
         ClearTextOnFocus = false
@@ -1909,14 +1944,15 @@ function Library:CreateDropdown(section, config)
     }, dropdown.Button)
     
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
-        Size = UDim2.new(0.65, -10, 0, 0),
-        Position = UDim2.new(0.35, 5, 0, 35),
+        Size = UDim2.new(1, -10, 0, 0),
+        Position = UDim2.new(0, 5, 1, 2),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
-        Visible = true
+        Visible = false,
+        ZIndex = 100
     }, dropdown.Frame)
     
     dropdown.OptionContainer:SetAttribute("OriginalBackgroundTransparency", 0.1)
@@ -1995,11 +2031,16 @@ function Library:CreateDropdown(section, config)
                 dropdown.Button.Text = option
                 dropdown.Open = false
                 
-                local optionCount = #dropdown.Options
-                local maxHeight = math.min(optionCount * 24 + 6, 120)
-                
+                -- Hide the dropdown with animation
+                Tween(dropdown.OptionContainer, {Size = UDim2.new(1, -10, 0, 0)}, 0.3, Enum.EasingStyle.Back)
                 Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
+                
+                -- Hide container after animation
+                spawn(function()
+                    wait(0.3)
+                    dropdown.OptionContainer.Visible = false
+                end)
                 
                 if config.Callback then
                     config.Callback(option)
@@ -2016,14 +2057,25 @@ function Library:CreateDropdown(section, config)
         if dropdown.Open then
             local optionCount = #dropdown.Options
             local maxHeight = math.min(optionCount * 24 + 6, 120)
-            local newSize = 35 + maxHeight + 5
             
-            dropdown.OptionContainer.Size = UDim2.new(0.65, -10, 0, maxHeight)
-            Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, newSize)}, 0.4, Enum.EasingStyle.Back)
+            -- Show and animate the options container
+            dropdown.OptionContainer.Visible = true
+            dropdown.OptionContainer.Size = UDim2.new(1, -10, 0, 0)
+            
+            Tween(dropdown.OptionContainer, {Size = UDim2.new(1, -10, 0, maxHeight)}, 0.4, Enum.EasingStyle.Back)
+            Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35 + maxHeight + 5)}, 0.4, Enum.EasingStyle.Back)
             Tween(dropdown.Arrow, {Rotation = 180}, 0.3, Enum.EasingStyle.Back)
         else
+            -- Hide with animation
+            Tween(dropdown.OptionContainer, {Size = UDim2.new(1, -10, 0, 0)}, 0.3, Enum.EasingStyle.Back)
             Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
             Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
+            
+            -- Hide container after animation completes
+            spawn(function()
+                wait(0.3)
+                dropdown.OptionContainer.Visible = false
+            end)
         end
     end)
     
@@ -2031,6 +2083,14 @@ function Library:CreateDropdown(section, config)
         Tween(dropdown.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
+    
+    dropdown.Frame.MouseLeave:Connect(function()
+        Tween(dropdown.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
+        Mouse.Icon = ""
+    end)
+    
+    return dropdown
+end
     
     dropdown.Frame.MouseLeave:Connect(function()
         Tween(dropdown.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
