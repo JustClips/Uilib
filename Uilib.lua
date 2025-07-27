@@ -326,7 +326,9 @@ function Library:Create(config)
         BackgroundColor3 = self.Theme.Background,
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
-        Visible = false
+        Visible = false,
+        Active = true,  -- Make it interactable
+        Selectable = true  -- Make it selectable
     }, self.ScreenGui)
     
     -- Add background image to minimized frame (same as main frame)
@@ -385,7 +387,9 @@ function Library:Create(config)
     self.MinimizedButton = CreateInstance("TextButton", {
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundTransparency = 1,
-        Text = ""
+        Text = "",
+        Active = true,
+        Selectable = true
     }, self.MinimizedFrame)
     
     self.MinimizedButton.MouseButton1Click:Connect(function()
@@ -779,25 +783,26 @@ function Library:CreateButton(section, config)
         Font = Enum.Font.Ubuntu
     }, button.Frame)
     
-    -- Click Indicator (RBX Asset Pointer)
-    button.ClickIndicator = CreateInstance("ImageLabel", {
+    -- Click Indicator (Using a simple arrow instead of RBX asset)
+    button.ClickIndicator = CreateInstance("TextLabel", {
         Size = UDim2.new(0, 18, 0, 18),
         Position = UDim2.new(1, -24, 0.5, -9),
         BackgroundTransparency = 1,
-        Image = "rbxassetid://86509207249522",
-        ImageColor3 = self.Theme.Accent,
-        ScaleType = Enum.ScaleType.Fit
+        Text = "➤",
+        TextColor3 = self.Theme.Accent,
+        TextSize = 14,
+        Font = Enum.Font.Ubuntu
     }, button.Frame)
     
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Tween(button.ClickIndicator, {ImageColor3 = self.Theme.Text}, 0.2)
+        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Text}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     button.Button.MouseLeave:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.5}, 0.2)
-        Tween(button.ClickIndicator, {ImageColor3 = self.Theme.Accent}, 0.2)
+        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Accent}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -806,10 +811,10 @@ function Library:CreateButton(section, config)
         local originalColor = button.Frame.BackgroundColor3
         Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
         -- Animate click indicator
-        Tween(button.ClickIndicator, {Size = UDim2.new(0, 22, 0, 22), Position = UDim2.new(1, -26, 0.5, -11)}, 0.1)
+        Tween(button.ClickIndicator, {Rotation = 90}, 0.1)
         wait(0.1)
         Tween(button.Frame, {BackgroundColor3 = originalColor}, 0.1)
-        Tween(button.ClickIndicator, {Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(1, -24, 0.5, -9)}, 0.1)
+        Tween(button.ClickIndicator, {Rotation = 0}, 0.1)
         
         if config.Callback then
             config.Callback()
@@ -987,8 +992,9 @@ function Library:CreateSlider(section, config)
         slider.Value = math.floor(slider.Min + (slider.Max - slider.Min) * percentage)
         slider.ValueLabel.Text = tostring(slider.Value)
         
-        Tween(slider.Fill, {Size = UDim2.new(percentage, 0, 1, 0)}, 0.05, Enum.EasingStyle.Linear)
-        Tween(slider.Knob, {Position = UDim2.new(percentage, -6, 0.5, -6)}, 0.05, Enum.EasingStyle.Linear)
+        -- Smooth tweening for slider components
+        Tween(slider.Fill, {Size = UDim2.new(percentage, 0, 1, 0)}, 0.1, Enum.EasingStyle.Quad)
+        Tween(slider.Knob, {Position = UDim2.new(percentage, -6, 0.5, -6)}, 0.1, Enum.EasingStyle.Quad)
         
         if config.Callback then
             config.Callback(slider.Value)
@@ -1014,9 +1020,18 @@ function Library:CreateSlider(section, config)
         end
     end)
     
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            UpdateSlider(input)
+    -- Use RunService for ultra-smooth dragging
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if dragging then
+            UpdateSlider()
+        end
+    end)
+    
+    -- Clean up connection when UI is destroyed
+    slider.Frame.AncestryChanged:Connect(function()
+        if not slider.Frame.Parent then
+            connection:Disconnect()
         end
     end)
     
@@ -1027,7 +1042,9 @@ function Library:CreateSlider(section, config)
     
     slider.Frame.MouseLeave:Connect(function()
         Tween(slider.Frame, {BackgroundTransparency = 0.5}, 0.2)
-        Mouse.Icon = ""
+        if not dragging then
+            Mouse.Icon = ""
+        end
     end)
     
     return slider
@@ -1397,7 +1414,7 @@ function Library:CreateSearchBox(section, config)
             end)
             
             resultButton.MouseButton1Click:Connect(function()
-                search.SearchBox.Text = item
+                             search.SearchBox.Text = item
                 search.ResultsContainer.Visible = false
                 Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 
