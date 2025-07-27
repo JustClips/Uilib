@@ -1422,8 +1422,8 @@ function Library:UpdateSectionHeaders()
             section.Header.TextXAlignment = headerAlignment
 
             -- Update header config
-           section.HeaderConfig.UnderlineEnabled = self.SectionHeaderConfig.UnderlineEnabled
-            if section.HeaderUnderline then
+          section.HeaderConfig.UnderlineEnabled = self.SectionHeaderConfig.UnderlineEnabled
+if section.HeaderUnderline then
                 section.HeaderUnderline.Visible = section.HeaderConfig.UnderlineEnabled and section.Header.Visible
                 section.HeaderUnderline.Size = UDim2.new(self.SectionHeaderConfig.UnderlineSize, 0, 0, self.SectionHeaderConfig.UnderlineThickness)
                 section.HeaderUnderline.Position = UDim2.new((1 - self.SectionHeaderConfig.UnderlineSize) / 2, 0, 0, 35)
