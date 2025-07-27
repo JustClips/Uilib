@@ -128,12 +128,13 @@ function Library:Create(config)
     config = config or {}
     local self = setmetatable({}, Library)
     
-    self.Theme = Themes[config.Theme or "Dark"]
+    self.Theme = Themes[config.Theme or "Ocean"]
     self.Sections = {}
     self.CurrentSection = nil
     self.Minimized = false
     self.MinSize = Vector2.new(500, 400)
     self.MaxSize = Vector2.new(800, 600)
+    self.OriginalSize = UDim2.new(0, 650, 0, 450) -- Store original size
     self.ActiveFunctions = {}
     
     -- Create ScreenGui
@@ -228,7 +229,7 @@ function Library:Create(config)
     
     self.CloseButton.MouseEnter:Connect(function()
         Tween(self.CloseButton, {TextColor3 = Color3.fromRGB(255, 100, 100)}, 0.2)
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     self.CloseButton.MouseLeave:Connect(function()
@@ -254,7 +255,7 @@ function Library:Create(config)
     
     self.MinimizeButton.MouseEnter:Connect(function()
         Tween(self.MinimizeButton, {TextColor3 = self.Theme.Accent}, 0.2)
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     self.MinimizeButton.MouseLeave:Connect(function()
@@ -379,7 +380,7 @@ function Library:CreateActiveFunctionsDisplay()
         BackgroundColor3 = self.Theme.Background,
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
-        Visible = true
+        Visible = false
     }, self.ScreenGui)
     
     CreateInstance("UICorner", {
@@ -466,6 +467,13 @@ function Library:UpdateActiveFunctions()
         if child:IsA("Frame") then
             child:Destroy()
         end
+    end
+    
+    -- Show/hide the active functions frame based on whether there are active functions
+    if #self.ActiveFunctions == 0 then
+        self.ActiveFunctionsFrame.Visible = false
+    else
+        self.ActiveFunctionsFrame.Visible = true
     end
     
     -- Add active functions
@@ -636,7 +644,7 @@ function Library:CreateSection(name)
             Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
             Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
         end
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     section.Button.MouseLeave:Connect(function()
@@ -659,13 +667,22 @@ end
 function Library:SelectSection(section)
     for _, s in pairs(self.Sections) do
         s.Content.Visible = false
-        s.Highlight.Visible = false
+        -- Smooth animation for highlight disappearing
+        if s.Highlight.Visible then
+            Tween(s.Highlight, {Size = UDim2.new(0, 0, 1, -10)}, 0.2)
+            wait(0.1)
+            s.Highlight.Visible = false
+            s.Highlight.Size = UDim2.new(0, 3, 1, -10) -- Reset size for next animation
+        end
         Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
         Tween(s.Button, {BackgroundTransparency = 0.3}, 0.2)
     end
     
     section.Content.Visible = true
     section.Highlight.Visible = true
+    -- Smooth animation for highlight appearing
+    section.Highlight.Size = UDim2.new(0, 0, 1, -10)
+    Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, 0.3)
     Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
     Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
     self.CurrentSection = section
@@ -673,6 +690,8 @@ end
 
 function Library:Minimize()
     self.Minimized = true
+    -- Store current size before minimizing
+    self.OriginalSize = self.MainFrame.Size
     Tween(self.MainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.3)
     Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, 50, 0, 20)}, 0.3)
     wait(0.3)
@@ -685,7 +704,8 @@ function Library:Restore()
     self.Minimized = false
     self.MinimizedFrame.Visible = false
     self.MainFrame.Visible = true
-    Tween(self.MainFrame, {Size = UDim2.new(0, 650, 0, 450), BackgroundTransparency = 0.05}, 0.3)
+    -- Restore to the original size, not a fixed size
+    Tween(self.MainFrame, {Size = self.OriginalSize, BackgroundTransparency = 0.05}, 0.3)
     Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
 end
 
@@ -717,7 +737,7 @@ function Library:CreateButton(section, config)
     
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     button.Button.MouseLeave:Connect(function()
@@ -726,9 +746,11 @@ function Library:CreateButton(section, config)
     end)
     
     button.Button.MouseButton1Click:Connect(function()
+        -- Create temporary visual feedback without changing the base color
+        local originalColor = button.Frame.BackgroundColor3
         Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
         wait(0.1)
-        Tween(button.Frame, {BackgroundColor3 = self.Theme.Secondary}, 0.1)
+        Tween(button.Frame, {BackgroundColor3 = originalColor}, 0.1)
         
         if config.Callback then
             config.Callback()
@@ -812,7 +834,7 @@ function Library:CreateToggle(section, config)
     
     toggle.Frame.MouseEnter:Connect(function()
         Tween(toggle.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     toggle.Frame.MouseLeave:Connect(function()
@@ -941,7 +963,7 @@ function Library:CreateSlider(section, config)
     
     slider.Frame.MouseEnter:Connect(function()
         Tween(slider.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     slider.Frame.MouseLeave:Connect(function()
@@ -1049,8 +1071,7 @@ function Library:CreateDropdown(section, config)
     dropdown.Button = CreateInstance("TextButton", {
         Size = UDim2.new(0.65, -10, 0, 27),
         Position = UDim2.new(0.35, 5, 0, 4),
-        BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = 1, -- Remove background behind button
         BorderSizePixel = 0,
         Text = dropdown.Selected,
         TextColor3 = self.Theme.Text,
@@ -1058,6 +1079,13 @@ function Library:CreateDropdown(section, config)
         Font = Enum.Font.Ubuntu,
         TextTruncate = Enum.TextTruncate.AtEnd
     }, dropdown.Frame)
+
+    -- Add a subtle border around the button area
+    CreateInstance("UIStroke", {
+        Color = self.Theme.Border,
+        Transparency = 0.6,
+        Thickness = 1
+    }, dropdown.Button)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 4)
@@ -1076,8 +1104,8 @@ function Library:CreateDropdown(section, config)
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(0.65, -10, 0, 0),
         Position = UDim2.new(0.35, 5, 0, 35),
-        BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundColor3 = self.Theme.Secondary, -- Proper background for content area
+        BackgroundTransparency = 0.1, -- More visible background
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
@@ -1085,7 +1113,14 @@ function Library:CreateDropdown(section, config)
     }, dropdown.Frame)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 4)
+        CornerRadius = UDim.new(0, 6) -- Increased corner radius
+    }, dropdown.OptionContainer)
+    
+    -- Add border around the dropdown content
+    CreateInstance("UIStroke", {
+        Color = self.Theme.Accent,
+        Transparency = 0.7,
+        Thickness = 1
     }, dropdown.OptionContainer)
     
     CreateInstance("UIListLayout", {
@@ -1110,8 +1145,7 @@ function Library:CreateDropdown(section, config)
         for _, option in pairs(dropdown.Options) do
             local optionButton = CreateInstance("TextButton", {
                 Size = UDim2.new(1, 0, 0, 22),
-                BackgroundColor3 = self.Theme.Secondary,
-                BackgroundTransparency = 0.5,
+                BackgroundTransparency = 1, -- Remove background behind option buttons
                 BorderSizePixel = 0,
                 Text = option,
                 TextColor3 = self.Theme.Text,
@@ -1123,13 +1157,28 @@ function Library:CreateDropdown(section, config)
                 CornerRadius = UDim.new(0, 3)
             }, optionButton)
             
+            -- Add highlight background that appears on hover
+            local highlightFrame = CreateInstance("Frame", {
+                Size = UDim2.new(1, 0, 1, 0),
+                Position = UDim2.new(0, 0, 0, 0),
+                BackgroundColor3 = self.Theme.Accent,
+                BackgroundTransparency = 1, -- Start invisible
+                BorderSizePixel = 0,
+                ZIndex = optionButton.ZIndex - 1
+            }, optionButton)
+            
+            CreateInstance("UICorner", {
+                CornerRadius = UDim.new(0, 3)
+            }, highlightFrame)
+            
             optionButton.MouseEnter:Connect(function()
-                Tween(optionButton, {BackgroundTransparency = 0.2}, 0.2)
-                Mouse.Icon = "rbxassetid://86509207249522"
+                -- Smooth highlight animation like sections
+                Tween(highlightFrame, {BackgroundTransparency = 0.8}, 0.2)
+                Mouse.Icon = "rbxasset://SystemCursors/Hand"
             end)
             
             optionButton.MouseLeave:Connect(function()
-                Tween(optionButton, {BackgroundTransparency = 0.5}, 0.2)
+                Tween(highlightFrame, {BackgroundTransparency = 1}, 0.2)
                 Mouse.Icon = ""
             end)
             
@@ -1172,7 +1221,7 @@ function Library:CreateDropdown(section, config)
     
     dropdown.Frame.MouseEnter:Connect(function()
         Tween(dropdown.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxassetid://86509207249522"
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     dropdown.Frame.MouseLeave:Connect(function()
@@ -1284,7 +1333,7 @@ function Library:CreateSearchBox(section, config)
             
             resultButton.MouseEnter:Connect(function()
                 Tween(resultButton, {BackgroundTransparency = 0.2}, 0.2)
-                Mouse.Icon = "rbxassetid://86509207249522"
+                Mouse.Icon = "rbxasset://SystemCursors/Hand"
             end)
             
             resultButton.MouseLeave:Connect(function()
@@ -1475,6 +1524,75 @@ function Library:Notify(config)
         wait(0.5)
         notification:Destroy()
     end)
+end
+
+function Library:CreateKeybind(section, config)
+    config = config or {}
+    local keybind = {}
+    keybind.Key = config.Default or Enum.KeyCode.F
+    keybind.Enabled = false
+    
+    keybind.Frame = CreateInstance("Frame", {
+        Size = UDim2.new(1, 0, 0, 35),
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = 0.5,
+        BorderSizePixel = 0
+    }, section.Content)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 6)
+    }, keybind.Frame)
+    
+    keybind.Label = CreateInstance("TextLabel", {
+        Size = UDim2.new(1, -80, 1, 0),
+        Position = UDim2.new(0, 10, 0, 0),
+        BackgroundTransparency = 1,
+        Text = config.Text or "Keybind",
+        TextColor3 = self.Theme.Text,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Font = Enum.Font.Ubuntu
+    }, keybind.Frame)
+    
+    keybind.KeyLabel = CreateInstance("TextLabel", {
+        Size = UDim2.new(0, 60, 1, 0),
+        Position = UDim2.new(1, -70, 0, 0),
+        BackgroundColor3 = self.Theme.Tertiary,
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0,
+        Text = keybind.Key.Name,
+        TextColor3 = self.Theme.Text,
+        TextSize = 12,
+        Font = Enum.Font.Ubuntu
+    }, keybind.Frame)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 4)
+    }, keybind.KeyLabel)
+    
+    -- Add to active functions when created
+    self:AddActiveFunction(config.Text or "Keybind")
+    
+    -- Handle key press
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == keybind.Key then
+            if config.Callback then
+                config.Callback()
+            end
+        end
+    end)
+    
+    keybind.Frame.MouseEnter:Connect(function()
+        Tween(keybind.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
+    end)
+    
+    keybind.Frame.MouseLeave:Connect(function()
+        Tween(keybind.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
+    end)
+    
+    return keybind
 end
 
 function Library:Destroy()
