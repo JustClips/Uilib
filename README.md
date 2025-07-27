@@ -1,97 +1,84 @@
-# Eps1llon Hub Premium UI Library
+# UILib - Modern UI Library for Roblox Executors
 
-A modern, feature-rich UI library for Roblox with smooth animations, customizable themes, and a sleek design inspired by popular UI frameworks.
+A sleek and customizable UI library designed for Roblox script executors, featuring a modern design with smooth animations and comprehensive UI elements.
 
-![Version](https://img.shields.io/badge/version-2.0-blue)
-![Roblox](https://img.shields.io/badge/platform-Roblox-red)
-![License](https://img.shields.io/badge/license-MIT-green)
+## Features
 
-## 🌟 Features
+- 🎨 Modern, clean interface with customizable themes
+- 🔄 Smooth animations and transitions
+- 📱 Draggable windows
+- 🎯 Multiple UI elements (buttons, toggles, sliders, dropdowns, etc.)
+- 💾 Settings persistence
+- 🎨 Color picker support
+- 📝 Text input fields
+- 🔔 Notification system
 
-- **Modern Design**: Clean, minimalist interface with smooth animations
-- **Fully Customizable**: Themes, fonts, colors, and more
-- **Rayfield-style BigDropdowns**: Collapsible sections with preview functionality
-- **Resizable & Draggable**: Windows can be resized and moved freely
-- **Active Functions Display**: Track enabled features in real-time
-- **Floating UI Settings**: Gear icon opens customizable settings panel
-- **Multiple Themes**: Dark, Light, Purple, and Ocean themes included
-- **Background Images**: Built-in scenic backgrounds
-- **Responsive Elements**: All UI elements respond to hover and click
-- **Section Headers**: Customizable headers with optional underlines
-- **Minimize to Icon**: Minimize UI to a small draggable widget
-
-## 📦 Installation
+## Installation
 
 ```lua
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Source.lua"))()
+local UILib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/UILib/main/Source.lua"))()
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ```lua
--- Create Window
-local Window = Library:Create({
-    Theme = "Ocean",           -- Dark, Light, Purple, Ocean
-    Background = "Blue Sky",   -- Blue Sky, Mountains, Blurred Stars
-    ToggleKey = Enum.KeyCode.RightShift,
-    Font = "Ubuntu"           -- See font list below
+local UILib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/UILib/main/Source.lua"))()
+
+local Window = UILib:CreateWindow({
+    Title = "My Script Hub",
+    SubTitle = "v1.0.0",
+    SaveFolder = "MyScriptConfig"
 })
 
--- Create Section
-local MainSection = Window:CreateSection("Main")
+local Tab = Window:CreateTab({
+    Name = "Main",
+    Icon = "rbxassetid://123456789"
+})
 
--- Add Elements
-Window:CreateButton(MainSection, {
-    Text = "Click Me",
+Tab:AddButton({
+    Title = "Click Me!",
+    Description = "This is a button",
     Callback = function()
         print("Button clicked!")
     end
 })
 ```
 
-## 📖 Documentation
+## API Documentation
 
-### Window Creation
+### Creating a Window
 
 ```lua
-local Window = Library:Create({
-    Theme = "Ocean",                    -- Theme name (string)
-    Background = "Blue Sky",            -- Background name (string)
-    ToggleKey = Enum.KeyCode.RightShift, -- Toggle UI visibility key
-    Font = "Ubuntu",                    -- Font name (string)
-    ButtonDarkness = 0.5,              -- Button transparency (0-1)
-    StrokeThickness = 1,               -- Border thickness (0-5)
-    SectionHeaderEnabled = true,        -- Show section headers
-    SectionHeaderWhite = false,        -- Make headers white
-    HideUISettings = false,            -- Hide UI settings button
-    SectionHeaderConfig = {
-        Size = 22,                     -- Header text size
-        Font = Enum.Font.GothamBold,   -- Header font
-        Color = nil,                   -- Custom header color (optional)
-        Position = "Center",           -- Left, Center, Right
-        UnderlineEnabled = true,       -- Show underline
-        UnderlineSize = 0.5,          -- Underline width (0-1)
-        UnderlineThickness = 2         -- Underline height
-    }
+local Window = UILib:CreateWindow({
+    Title = "Window Title",           -- Main title of the window
+    SubTitle = "v1.0.0",             -- Subtitle (optional)
+    SaveFolder = "ConfigFolder",      -- Folder name for saving settings
+    IntroEnabled = true,              -- Enable intro animation (default: true)
+    IntroText = "Welcome",            -- Intro text (optional)
+    IntroIcon = "rbxassetid://...",  -- Intro icon (optional)
+    Icon = "rbxassetid://...",        -- Window icon (optional)
+    DisableUIToggle = false,          -- Disable UI toggle (default: false)
+    Size = UDim2.new(0, 580, 0, 460), -- Window size (optional)
+    Position = UDim2.new(...),        -- Window position (optional)
 })
 ```
 
-### Creating Sections
+### Creating Tabs
 
 ```lua
--- Basic section
-local Section = Window:CreateSection("Section Name")
-
--- Section with custom header color
-local ColoredSection = Window:CreateSection("Colored Section", Color3.fromRGB(255, 100, 100))
+local Tab = Window:CreateTab({
+    Name = "Tab Name",
+    Icon = "rbxassetid://123456789" -- Optional icon
+})
 ```
 
 ### UI Elements
 
 #### Button
 ```lua
-Window:CreateButton(Section, {
-    Text = "Button Text",
+Tab:AddButton({
+    Title = "Button",
+    Description = "Button description",
     Callback = function()
         print("Clicked!")
     end
@@ -100,8 +87,9 @@ Window:CreateButton(Section, {
 
 #### Toggle
 ```lua
-Window:CreateToggle(Section, {
-    Text = "Toggle Name",
+Tab:AddToggle({
+    Title = "Toggle",
+    Description = "Toggle description",
     Default = false,
     Callback = function(value)
         print("Toggle:", value)
@@ -111,286 +99,149 @@ Window:CreateToggle(Section, {
 
 #### Slider
 ```lua
-Window:CreateSlider(Section, {
-    Text = "Slider Name",
+Tab:AddSlider({
+    Title = "Slider",
+    Description = "Adjust value",
     Min = 0,
     Max = 100,
     Default = 50,
+    Rounding = 1,
     Callback = function(value)
-        print("Value:", value)
-    end
-})
-```
-
-#### Input Box
-```lua
-Window:CreateInput(Section, {
-    Text = "Input Name",
-    Default = "Default Text",
-    Placeholder = "Enter text...",
-    Callback = function(text, enterPressed)
-        print("Input:", text)
+        print("Slider:", value)
     end
 })
 ```
 
 #### Dropdown
 ```lua
-Window:CreateDropdown(Section, {
-    Text = "Dropdown Name",
+Tab:AddDropdown({
+    Title = "Dropdown",
+    Description = "Select an option",
     Options = {"Option 1", "Option 2", "Option 3"},
-    Default = "Option 1",
-    Callback = function(selected)
-        print("Selected:", selected)
+    Default = 1,
+    Callback = function(value)
+        print("Selected:", value)
     end
 })
 ```
 
-#### BigDropdown (Rayfield-style)
+#### Color Picker
 ```lua
-Window:CreateBigDropdown(Section, {
-    Text = "Settings",
-    CreateElements = function(dropdown)
-        dropdown.AddToggle({
-            Text = "Enable Feature",
-            Default = true,
-            Callback = function(value)
-                print("Feature:", value)
-            end
-        })
-        
-        dropdown.AddSlider({
-            Text = "Power",
-            Min = 0,
-            Max = 100,
-            Default = 50,
-            Callback = function(value)
-                print("Power:", value)
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Reset",
-            Callback = function()
-                print("Reset!")
-            end
-        })
-        
-        dropdown.AddInput({
-            Text = "Name",
-            Default = "Player",
-            Callback = function(text)
-                print("Name:", text)
-            end
-        })
-        
-        dropdown.AddDropdown({
-            Text = "Mode",
-            Options = {"Easy", "Normal", "Hard"},
-            Default = "Normal",
-            Callback = function(mode)
-                print("Mode:", mode)
-            end
-        })
-        
-        dropdown.AddSeparator()
-        
-        dropdown.AddLabel({
-            Text = "Additional Options",
-            Color = Color3.fromRGB(255, 255, 0)
-        })
+Tab:AddColorPicker({
+    Title = "Color Picker",
+    Description = "Choose a color",
+    Default = Color3.new(1, 1, 1),
+    Callback = function(color)
+        print("Color:", color)
     end
 })
 ```
 
-#### Search Box
+#### Textbox
 ```lua
-Window:CreateSearchBox(Section, {
-    Placeholder = "Search players...",
-    Items = {"Player1", "Player2", "Player3"},
-    OnSelected = function(selected)
-        print("Selected:", selected)
-    end,
-    OnSearch = function(query, items)
-        -- Custom search logic (optional)
-        local filtered = {}
-        for _, item in pairs(items) do
-            if item:lower():find(query) then
-                table.insert(filtered, item)
-            end
-        end
-        return filtered
+Tab:AddTextbox({
+    Title = "Textbox",
+    Description = "Enter text",
+    Default = "Default text",
+    PlaceholderText = "Type here...",
+    Callback = function(text)
+        print("Text:", text)
     end
 })
 ```
 
-#### Keybind
+#### Bind
 ```lua
-Window:CreateKeybind(Section, {
-    Text = "Keybind Name",
+Tab:AddBind({
+    Title = "Keybind",
+    Description = "Set a keybind",
     Default = Enum.KeyCode.F,
+    Hold = false,
     Callback = function()
         print("Key pressed!")
+    end,
+    UpdateBind = function(key)
+        print("New bind:", key)
     end
 })
 ```
 
 #### Label
 ```lua
-Window:CreateLabel(Section, {
-    Text = "This is a label",
-    Color = Color3.fromRGB(255, 255, 0)  -- Optional
+Tab:AddLabel({
+    Title = "Label",
+    Content = "This is a label"
 })
 ```
 
-#### Separator
+#### Paragraph
 ```lua
-Window:CreateSeparator(Section)
+Tab:AddParagraph({
+    Title = "Paragraph Title",
+    Content = "This is a longer text that can span multiple lines."
+})
+```
+
+#### Section
+```lua
+local Section = Tab:AddSection({
+    Title = "Section Title"
+})
+
+-- Add elements to section
+Section:AddButton({...})
+Section:AddToggle({...})
+```
+
+### Updating Elements
+
+Most elements return an object that can be used to update their properties:
+
+```lua
+local Toggle = Tab:AddToggle({...})
+Toggle:UpdateToggle(true) -- Update toggle state
+
+local Slider = Tab:AddSlider({...})
+Slider:UpdateSlider(75) -- Update slider value
+
+local Dropdown = Tab:AddDropdown({...})
+Dropdown:UpdateDropdown("Option 2") -- Update selected option
 ```
 
 ### Notifications
 
 ```lua
-Window:Notify({
-    Title = "Success",
-    Text = "Operation completed successfully!",
-    Duration = 3  -- Seconds (optional, default: 3)
+UILib:Notify({
+    Title = "Notification",
+    Content = "This is a notification!",
+    Duration = 5
 })
 ```
 
-### Available Themes
-- `Dark` - Classic dark theme
-- `Light` - Clean light theme  
-- `Purple` - Purple accent theme
-- `Ocean` - Blue ocean theme (default)
+### Settings
 
-### Available Fonts
-- `Ubuntu` (default)
-- `Gotham`
-- `GothamBold`
-- `SourceSans`
-- `SourceSansBold`
-- `Code`
-- `Highway`
-- `SciFi`
-- `Arial`
-- `ArialBold`
+The library automatically saves and loads settings based on the `SaveFolder` parameter. Settings are stored in the executor's workspace folder.
 
-### Available Backgrounds
-- `Blue Sky` (default)
-- `Mountains`
-- `Blurred Stars`
+## Themes
 
-### Methods
+The UI uses a dark theme by default with customizable accent colors. The color scheme includes:
+- Background: Dark grays (#1C1C1C, #161616)
+- Accent: Blue (#3B82F6)
+- Text: White/Gray shades
+- Success: Green
+- Error: Red
 
-#### Change Theme
-```lua
-Window:SetTheme("Dark")
-```
+## Tips
 
-#### Change Background
-```lua
-Window:SetBackground("Mountains")
-```
+1. **Performance**: The library is optimized for performance with debounced callbacks and efficient rendering
+2. **Mobile Support**: While primarily designed for PC, basic mobile support is included
+3. **Customization**: Most visual properties can be customized through the element options
+4. **Auto-save**: Toggle states, slider values, and other settings are automatically saved
 
-#### Change Font
-```lua
-Window:SetFont("GothamBold")
-```
+## Credits
 
-#### Change Toggle Key
-```lua
-Window:SetToggleKey(Enum.KeyCode.LeftAlt)
-```
+Created by JustClips for the Roblox scripting community.
 
-#### Add UI Settings to Any Section
-```lua
-Window:AddUISettingsToSection(Section)
-```
+## License
 
-#### Destroy UI
-```lua
-Window:Destroy()
-```
-
-## 🎨 Customization
-
-### Button Darkness
-Controls the transparency of buttons (0 = transparent, 1 = opaque)
-```lua
-Window:SetButtonDarkness(0.7)
-```
-
-### Stroke Thickness
-Controls the border thickness of UI elements (0-5)
-```lua
-Window:SetStrokeThickness(2)
-```
-
-### Custom Section Headers
-You can customize section headers globally during window creation or individually per section:
-```lua
--- Global configuration
-local Window = Library:Create({
-    SectionHeaderConfig = {
-        Size = 24,
-        Font = Enum.Font.GothamBold,
-        Color = Color3.fromRGB(255, 100, 100),
-        Position = "Left",
-        UnderlineEnabled = true,
-        UnderlineSize = 0.8,
-        UnderlineThickness = 3
-    }
-})
-
--- Per-section color
-local Section = Window:CreateSection("Custom Section", Color3.fromRGB(100, 255, 100))
-```
-
-## 🔥 Advanced Features
-
-### Active Functions Display
-The library automatically tracks active toggles and keybinds in a floating panel that appears when features are enabled.
-
-### UI Settings Panel
-Click the gear icon in the title bar to open a floating settings panel where you can customize:
-- Button darkness
-- Stroke thickness
-- Font
-- Theme
-- Background
-- Section header settings
-
-### Minimize Functionality
-- Click the minimize button (-) to shrink the UI to a small draggable widget
-- Click the minimized widget to restore the UI
-- The UI remembers its size when restored
-
-### Dynamic BigDropdown Updates
-BigDropdowns show a preview of their first element's state:
-- Toggles show "Enabled/Disabled"
-- Sliders show their current value
-- Inputs show their text content
-- Dropdowns show the selected option
-
-## 📝 Example Script
-
-See `example.lua` for a complete implementation example.
-
-## 🤝 Contributing
-
-Feel free to submit issues and enhancement requests!
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 👤 Credits
-
-Created by Eps1llon
-- Inspired by popular UI libraries like Rayfield, Orion, and others
-- Built with performance and user experience in mind
-
----
-
-**Note**: This library is for educational purposes. Always respect game rules and terms of service when using UI libraries.
+This project is open source and available for anyone to use and modify.
