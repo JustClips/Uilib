@@ -1424,7 +1424,7 @@ function Library:Notify(config)
     
     local notification = CreateInstance("Frame", {
         Size = UDim2.new(0, 250, 0, 70),
-                Position = UDim2.new(1, 270, 1, -90),
+        Position = UDim2.new(1, 270, 1, -90),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0
