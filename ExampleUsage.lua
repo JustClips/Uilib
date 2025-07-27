@@ -1,673 +1,537 @@
+-- ╔═══════════════════════════════════════════════════════════════════════════════╗
+-- ║                     EPS1LLON HUB UI LIBRARY DOCUMENTATION                       ║
+-- ║                          Complete Usage Guide & Examples                        ║
+-- ║                              By: JustClips                                      ║
+-- ║                         Date: 2025-07-27 17:41:03 UTC                          ║
+-- ╚═══════════════════════════════════════════════════════════════════════════════╝
+
 --[[
-    Eps1llon Hub Premium UI Library - Full Example Usage
-    Author: JustClips
-    Date: 2025-01-27 15:31:04 UTC
-    Version: 2.0
-    
-    This example demonstrates every feature of the UI library
+    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+    █                                                                              █
+    █                           TABLE OF CONTENTS                                  █
+    █                                                                              █
+    █  1. GETTING STARTED                                                          █
+    █     - Loading the Library                                                    █
+    █     - Creating the UI                                                        █
+    █     - Configuration Options                                                  █
+    █                                                                              █
+    █  2. UI ELEMENTS                                                              █
+    █     - Button                                                                 █
+    █     - Toggle                                                                 █
+    █     - Slider                                                                 █
+    █     - Input Box                                                              █
+    █     - Dropdown                                                               █
+    █     - BigDropdown                                                            █
+    █     - SearchBox                                                              █
+    █     - Keybind                                                                █
+    █     - Label                                                                  █
+    █     - Separator                                                              █
+    █                                                                              █
+    █  3. CUSTOMIZATION                                                            █
+    █     - Themes                                                                 █
+    █     - Fonts                                                                  █
+    █     - Backgrounds                                                            █
+    █     - UI Settings                                                            █
+    █                                                                              █
+    █  4. ADVANCED FEATURES                                                        █
+    █     - Notifications                                                          █
+    █     - Active Functions Display                                               █
+    █     - Programmatic Control                                                   █
+    █     - Section Management                                                     █
+    █                                                                              █
+    █  5. COMPLETE EXAMPLES                                                        █
+    █                                                                              █
+    ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 ]]
 
--- Load the UI Library
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/eps1llon-hub/main/UILibrary.lua"))()
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- 1. GETTING STARTED
+-- ═══════════════════════════════════════════════════════════════════════════════════
 
--- Services
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
+-- Loading the Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Uilib.lua"))()
 
--- Variables
-local LocalPlayer = Players.LocalPlayer
-
--- ========================================
--- WINDOW CREATION WITH ALL OPTIONS
--- ========================================
-
-local Window = Library:Create({
-    -- Theme Options: "Dark", "Light", "Purple", "Ocean"
-    Theme = "Ocean",
+-- Creating the UI with all available options
+local UI = Library:Create({
+    -- THEMES (Choose one)
+    Theme = "Ocean",              -- Options: "Dark" | "Light" | "Purple" | "Ocean"
     
-    -- Toggle key to show/hide UI
-    ToggleKey = Enum.KeyCode.RightShift,
+    -- KEYBIND
+    ToggleKey = Enum.KeyCode.RightShift,  -- Key to show/hide UI
     
-    -- Button transparency (0 = fully transparent, 1 = fully opaque)
-    ButtonDarkness = 0.3,
+    -- BACKGROUNDS (Choose one)
+    Background = "Blue Sky",      -- Options: "Blue Sky" | "Mountains" | "Blurred Stars"
     
-    -- Border thickness (0-5)
-    StrokeThickness = 1.5,
+    -- FONTS (Choose one)
+    Font = "Ubuntu",              -- Options: "Ubuntu" | "Gotham" | "GothamBold" | "SourceSans" | 
+                                 -- "SourceSansBold" | "Code" | "Highway" | "SciFi" | "Arial" | "ArialBold"
     
-    -- Font Options: "Ubuntu", "Gotham", "GothamBold", "SourceSans", etc.
-    Font = "Ubuntu",
+    -- UI APPEARANCE
+    ButtonDarkness = 0.5,         -- 0 = fully transparent, 1 = fully opaque
+    StrokeThickness = 1,          -- Border thickness (0-5)
     
-    -- Background Options: "Blue Sky", "Mountains", "Blurred Stars"
-    Background = "Blue Sky",
+    -- SECTION HEADERS
+    SectionHeaderEnabled = true,   -- Show headers in content area
+    SectionHeaderWhite = false,    -- Make headers white instead of accent color
     
-    -- Section header settings
-    SectionHeaderEnabled = true,
-    SectionHeaderWhite = false,
-    DropdownSections = false,
+    -- UI SETTINGS SECTION
+    HideUISettings = false,        -- Hide the default UI Settings section
+    UISettingsAtBottom = true,     -- Keep UI Settings at bottom of sections
     
-    -- Advanced header configuration
+    -- ADVANCED SECTION HEADER CONFIG
     SectionHeaderConfig = {
-        Size = 24,
-        Font = Enum.Font.GothamBold,
-        Color = nil, -- nil uses theme color
-        Position = "Center", -- "Center", "Left", "Right"
-        UnderlineEnabled = true,
-        UnderlineSize = 0.6,
-        UnderlineThickness = 2
+        Size = 22,                        -- Font size
+        Font = Enum.Font.GothamBold,      -- Font style
+        Color = nil,                      -- Custom color (nil = theme accent)
+        Position = "Center",              -- "Center" | "Left" | "Right"
+        UnderlineEnabled = true,          -- Show underline
+        UnderlineSize = 0.5,              -- Width (0-1, fraction of header width)
+        UnderlineThickness = 2            -- Thickness in pixels
     }
 })
 
--- ========================================
--- CREATE SECTIONS
--- ========================================
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- 2. UI ELEMENTS - Complete Reference
+-- ═══════════════════════════════════════════════════════════════════════════════════
 
-local HomeSection = Window:CreateSection("Home")
-local PlayerSection = Window:CreateSection("Player")
-local CombatSection = Window:CreateSection("Combat")
-local VisualsSection = Window:CreateSection("Visuals")
-local TeleportSection = Window:CreateSection("Teleport")
-local MiscSection = Window:CreateSection("Misc")
-local ConfigSection = Window:CreateSection("Config")
+-- First, create sections to organize your UI
+local Section1 = UI:CreateSection("Main")
+local Section2 = UI:CreateSection("Features")
+local Section3 = UI:CreateSection("Settings")
 
--- ========================================
--- HOME SECTION
--- ========================================
-
--- Welcome Label
-Window:CreateLabel(HomeSection, {
-    Text = "Welcome to Eps1llon Hub Premium!",
-    Color = Color3.fromRGB(100, 200, 255)
-})
-
-Window:CreateSeparator(HomeSection)
-
--- Status Label
-local StatusLabel = Window:CreateLabel(HomeSection, {
-    Text = "Status: Connected",
-    Color = Color3.fromRGB(100, 255, 100)
-})
-
--- Info Button
-Window:CreateButton(HomeSection, {
-    Text = "Show Info",
-    Callback = function()
-        Window:Notify({
-            Title = "Information",
-            Text = "Eps1llon Hub v2.0 - Created by JustClips",
-            Duration = 4
-        })
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- BUTTON - Clickable button with hover effects
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Button = UI:CreateButton(Section1, {
+    Text = "Click Me!",                    -- Button text
+    Callback = function()                  -- Function to run when clicked
+        print("Button was clicked!")
+        -- Your code here
     end
 })
 
--- Discord Button
-Window:CreateButton(HomeSection, {
-    Text = "Copy Discord",
-    Callback = function()
-        setclipboard("discord.gg/eps1llon")
-        Window:Notify({
-            Title = "Discord",
-            Text = "Discord link copied to clipboard!",
-            Duration = 2
-        })
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- TOGGLE - On/Off switch with animation
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Toggle = UI:CreateToggle(Section1, {
+    Text = "Enable Feature",               -- Toggle label
+    Default = false,                       -- Starting state (true/false)
+    Callback = function(enabled)           -- Function called when toggled
+        print("Toggle is now:", enabled)
+        if enabled then
+            -- Code when enabled
+        else
+            -- Code when disabled
+        end
     end
 })
 
--- Big Dropdown Example - Quick Actions
-local QuickActions = Window:CreateBigDropdown(HomeSection, {
-    Text = "Quick Actions",
-    CreateElements = function(dropdown)
-        dropdown.AddLabel({
-            Text = "Common Actions",
-            Color = Color3.fromRGB(255, 200, 100)
-        })
-        
-        dropdown.AddButton({
-            Text = "Respawn",
-            Callback = function()
-                LocalPlayer.Character:BreakJoints()
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Reset Camera",
-            Callback = function()
-                workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-            end
-        })
-        
-        dropdown.AddSeparator()
+-- You can also set toggle state programmatically:
+-- Toggle.Set(true)  -- Enable
+-- Toggle.Set(false) -- Disable
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- SLIDER - Value slider with live updates
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Slider = UI:CreateSlider(Section1, {
+    Text = "Speed",                        -- Slider label
+    Min = 0,                               -- Minimum value
+    Max = 100,                             -- Maximum value
+    Default = 50,                          -- Starting value
+    Callback = function(value)             -- Called when value changes
+        print("Slider value:", value)
+        -- Your code here
+    end
+})
+
+-- Access current value: Slider.Value
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- INPUT BOX - Text input field
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Input = UI:CreateInput(Section1, {
+    Text = "Username",                     -- Label
+    Default = "Player",                    -- Default text
+    Placeholder = "Enter username...",     -- Placeholder when empty
+    Callback = function(text, enterPressed) -- Called when focus lost or enter pressed
+        print("Input text:", text)
+        print("Enter pressed:", enterPressed)
+        -- Your code here
+    end
+})
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- DROPDOWN - Selection menu
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Dropdown = UI:CreateDropdown(Section1, {
+    Text = "Select Option",                -- Label
+    Options = {"Option 1", "Option 2", "Option 3"}, -- Available options
+    Default = "Option 1",                  -- Default selection
+    Callback = function(selected)          -- Called when option selected
+        print("Selected:", selected)
+        -- Your code here
+    end
+})
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- BIGDROPDOWN - Expandable container for multiple elements
+-- ───────────────────────────────────────────────────────────────────────────────────
+local BigDropdown = UI:CreateBigDropdown(Section2, {
+    Text = "⚙️ Advanced Settings",         -- Dropdown title
+    CreateElements = function(dropdown)     -- Function to add elements
+        -- Add any UI element inside the dropdown
         
         dropdown.AddToggle({
-            Text = "Hide Username",
+            Text = "Sub Feature 1",
             Default = false,
             Callback = function(enabled)
-                LocalPlayer.Character.Humanoid.DisplayDistanceType = enabled and 
-                    Enum.HumanoidDisplayDistanceType.None or 
-                    Enum.HumanoidDisplayDistanceType.Viewer
+                print("Sub feature 1:", enabled)
             end
+        })
+        
+        dropdown.AddSlider({
+            Text = "Sub Slider",
+            Min = 0,
+            Max = 10,
+            Default = 5,
+            Callback = function(value)
+                print("Sub slider:", value)
+            end
+        })
+        
+        dropdown.AddButton({
+            Text = "Sub Button",
+            Callback = function()
+                print("Sub button clicked")
+            end
+        })
+        
+        dropdown.AddInput({
+            Text = "Sub Input",
+            Placeholder = "Type here...",
+            Callback = function(text)
+                print("Sub input:", text)
+            end
+        })
+        
+        dropdown.AddSeparator() -- Visual divider
+        
+        dropdown.AddLabel({
+            Text = "Information Label",
+            Color = UI.Theme.Accent  -- Optional custom color
         })
     end
 })
 
--- ========================================
--- PLAYER SECTION
--- ========================================
-
--- Walk Speed Slider
-local WalkSpeedSlider = Window:CreateSlider(PlayerSection, {
-    Text = "Walk Speed",
-    Min = 16,
-    Max = 500,
-    Default = 16,
-    Callback = function(value)
-        LocalPlayer.Character.Humanoid.WalkSpeed = value
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- SEARCHBOX - Dynamic search with filtering
+-- ───────────────────────────────────────────────────────────────────────────────────
+local SearchBox = UI:CreateSearchBox(Section2, {
+    Placeholder = "Search items...",       -- Search placeholder
+    Items = {"Apple", "Banana", "Orange", "Grape"}, -- Items to search
+    OnSelected = function(item)            -- Called when item selected
+        print("Selected item:", item)
+        -- Your code here
+    end,
+    OnSearch = function(searchText, items) -- Custom search logic (optional)
+        -- Return filtered items based on searchText
+        local results = {}
+        for _, item in pairs(items) do
+            if item:lower():find(searchText:lower()) then
+                table.insert(results, item)
+            end
+        end
+        return results
     end
 })
 
--- Jump Power Slider
-local JumpPowerSlider = Window:CreateSlider(PlayerSection, {
-    Text = "Jump Power",
-    Min = 50,
-    Max = 500,
-    Default = 50,
-    Callback = function(value)
-        LocalPlayer.Character.Humanoid.JumpPower = value
+-- Update search items dynamically:
+-- SearchBox.UpdateItems({"New", "Items", "Here"})
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- KEYBIND - Key binding functionality
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Keybind = UI:CreateKeybind(Section2, {
+    Text = "Hotkey",                       -- Label
+    Default = Enum.KeyCode.F,              -- Default key
+    Callback = function()                  -- Called when key pressed
+        print("Keybind pressed!")
+        -- Your code here
     end
 })
 
--- Gravity Slider
-local GravitySlider = Window:CreateSlider(PlayerSection, {
-    Text = "Gravity",
-    Min = 0,
-    Max = 196.2,
-    Default = 196.2,
-    Callback = function(value)
-        workspace.Gravity = value
-    end
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- LABEL - Text display
+-- ───────────────────────────────────────────────────────────────────────────────────
+local Label = UI:CreateLabel(Section2, {
+    Text = "Information Text",             -- Label text
+    Color = Color3.fromRGB(255, 255, 0)   -- Optional text color
 })
 
-Window:CreateSeparator(PlayerSection)
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- SEPARATOR - Visual divider line
+-- ───────────────────────────────────────────────────────────────────────────────────
+UI:CreateSeparator(Section2)  -- No configuration needed
 
--- God Mode Toggle
-local GodModeToggle = Window:CreateToggle(PlayerSection, {
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- 3. CUSTOMIZATION - Runtime Changes
+-- ═══════════════════════════════════════════════════════════════════════════════════
+
+-- Change theme at runtime
+UI:SetTheme("Purple")  -- "Dark" | "Light" | "Purple" | "Ocean"
+
+-- Change font at runtime
+UI:SetFont("GothamBold")  -- Any available font
+
+-- Change background at runtime
+UI:SetBackground("Mountains")  -- "Blue Sky" | "Mountains" | "Blurred Stars"
+
+-- Adjust UI appearance
+UI:SetButtonDarkness(0.7)   -- 0-1
+UI:SetStrokeThickness(2)    -- 0-5
+
+-- Change toggle key
+UI:SetToggleKey(Enum.KeyCode.Insert)
+
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- 4. ADVANCED FEATURES
+-- ═══════════════════════════════════════════════════════════════════════════════════
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- NOTIFICATIONS - Show temporary messages
+-- ───────────────────────────────────────────────────────────────────────────────────
+UI:Notify({
+    Title = "Success!",                    -- Notification title
+    Text = "Operation completed",          -- Notification text
+    Duration = 3                           -- Duration in seconds
+})
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- ACTIVE FUNCTIONS DISPLAY
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- The UI automatically shows active toggles and features in a floating window
+-- This happens automatically when toggles are enabled
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- CUSTOM UI SETTINGS PLACEMENT
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- If you hide default UI Settings, you can add them to any section:
+if UI.HideUISettings then
+    UI:AddUISettingsToSection(Section3)
+end
+
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- SECTION MANAGEMENT
+-- ───────────────────────────────────────────────────────────────────────────────────
+-- Sections are automatically managed, but you can control their order:
+local FirstSection = UI:CreateSection("First")   -- Will appear first
+local LastSection = UI:CreateSection("Last")     -- Will appear after First
+-- UI Settings will always be at bottom if UISettingsAtBottom = true
+
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- 5. COMPLETE WORKING EXAMPLE
+-- ═══════════════════════════════════════════════════════════════════════════════════
+
+-- Clean example showing all features
+local ExampleUI = Library:Create({
+    Theme = "Ocean",
+    ToggleKey = Enum.KeyCode.RightShift,
+    Background = "Blue Sky"
+})
+
+-- Create sections
+local MainSection = ExampleUI:CreateSection("Main")
+local PlayerSection = ExampleUI:CreateSection("Player")
+local VisualsSection = ExampleUI:CreateSection("Visuals")
+
+-- Main Features
+ExampleUI:CreateLabel(MainSection, {
+    Text = "Game Enhancements",
+    Color = ExampleUI.Theme.Accent
+})
+
+ExampleUI:CreateToggle(MainSection, {
     Text = "God Mode",
     Default = false,
     Callback = function(enabled)
         if enabled then
-            LocalPlayer.Character.Humanoid.MaxHealth = math.huge
-            LocalPlayer.Character.Humanoid.Health = math.huge
+            game.Players.LocalPlayer.Character.Humanoid.MaxHealth = math.huge
+            game.Players.LocalPlayer.Character.Humanoid.Health = math.huge
         else
-            LocalPlayer.Character.Humanoid.MaxHealth = 100
-            LocalPlayer.Character.Humanoid.Health = 100
+            game.Players.LocalPlayer.Character.Humanoid.MaxHealth = 100
         end
     end
 })
 
--- Infinite Jump Toggle
-local InfJumpConnection
-local InfJumpToggle = Window:CreateToggle(PlayerSection, {
-    Text = "Infinite Jump",
-    Default = false,
-    Callback = function(enabled)
-        if enabled then
-            InfJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
-                LocalPlayer.Character.Humanoid:ChangeState("Jumping")
-            end)
-        else
-            if InfJumpConnection then
-                InfJumpConnection:Disconnect()
-            end
-        end
-    end
-})
-
--- Noclip Toggle
-local NoclipToggle = Window:CreateToggle(PlayerSection, {
-    Text = "Noclip",
-    Default = false,
-    Callback = function(enabled)
-        -- Noclip implementation
-        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = not enabled
-            end
-        end
-    end
-})
-
--- ========================================
--- COMBAT SECTION
--- ========================================
-
--- Aimbot Keybind
-local AimbotKeybind = Window:CreateKeybind(CombatSection, {
-    Text = "Aimbot",
-    Default = Enum.KeyCode.E,
-    Callback = function()
-        Window:Notify({
-            Title = "Aimbot",
-            Text = "Aimbot activated!",
-            Duration = 1
-        })
-    end
-})
-
--- ESP Toggle
-local ESPToggle = Window:CreateToggle(CombatSection, {
-    Text = "Enable ESP",
-    Default = false,
-    Callback = function(enabled)
-        -- ESP implementation would go here
-        print("ESP:", enabled)
-    end
-})
-
--- FOV Circle Toggle
-local FOVToggle = Window:CreateToggle(CombatSection, {
-    Text = "Show FOV Circle",
-    Default = false,
-    Callback = function(enabled)
-        -- FOV circle implementation
-    end
-})
-
--- FOV Size Slider
-local FOVSlider = Window:CreateSlider(CombatSection, {
-    Text = "FOV Size",
-    Min = 10,
-    Max = 500,
-    Default = 90,
-    Callback = function(value)
-        -- Update FOV size
-    end
-})
-
-Window:CreateSeparator(CombatSection)
-
--- Target Priority Dropdown
-local TargetPriority = Window:CreateDropdown(CombatSection, {
-    Text = "Target Priority",
-    Options = {"Closest", "Lowest Health", "Highest Health", "Random"},
-    Default = "Closest",
-    Callback = function(selected)
-        print("Target Priority:", selected)
-    end
-})
-
--- Hit Part Dropdown
-local HitPart = Window:CreateDropdown(CombatSection, {
-    Text = "Hit Part",
-    Options = {"Head", "Torso", "Random"},
-    Default = "Head",
-    Callback = function(selected)
-        print("Hit Part:", selected)
-    end
-})
-
--- ========================================
--- VISUALS SECTION
--- ========================================
-
--- Environment Settings
-local EnvironmentSettings = Window:CreateBigDropdown(VisualsSection, {
-    Text = "Environment Settings",
+-- Player Controls
+local PlayerControls = ExampleUI:CreateBigDropdown(PlayerSection, {
+    Text = "🏃 Movement Settings",
     CreateElements = function(dropdown)
-        dropdown.AddLabel({
-            Text = "Lighting",
-            Color = Color3.fromRGB(255, 255, 100)
-        })
-        
         dropdown.AddSlider({
-            Text = "Time of Day",
-            Min = 0,
-            Max = 24,
-            Default = 14,
+            Text = "Walk Speed",
+            Min = 16,
+            Max = 200,
+            Default = 16,
             Callback = function(value)
-                game.Lighting.ClockTime = value
+                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
             end
         })
         
         dropdown.AddSlider({
-            Text = "Brightness",
-            Min = 0,
-            Max = 10,
-            Default = 1,
+            Text = "Jump Power",
+            Min = 50,
+            Max = 300,
+            Default = 50,
             Callback = function(value)
-                game.Lighting.Brightness = value
-            end
-        })
-        
-        dropdown.AddSeparator()
-        
-        dropdown.AddToggle({
-            Text = "Always Day",
-            Default = false,
-            Callback = function(enabled)
-                -- Always day implementation
+                game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
             end
         })
         
         dropdown.AddToggle({
-            Text = "No Fog",
+            Text = "Infinite Jump",
             Default = false,
             Callback = function(enabled)
-                if enabled then
-                    game.Lighting.FogEnd = 100000
-                else
-                    game.Lighting.FogEnd = 1000
-                end
+                -- Infinite jump implementation
+                local InfiniteJump = enabled
+                game:GetService("UserInputService").JumpRequest:Connect(function()
+                    if InfiniteJump then
+                        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+                    end
+                end)
+            end
+        })
+        
+        dropdown.AddButton({
+            Text = "Reset Character",
+            Callback = function()
+                game.Players.LocalPlayer.Character:BreakJoints()
             end
         })
     end
 })
 
--- Crosshair Settings
-Window:CreateToggle(VisualsSection, {
-    Text = "Custom Crosshair",
-    Default = false,
-    Callback = function(enabled)
-        -- Crosshair implementation
-    end
-})
-
-Window:CreateDropdown(VisualsSection, {
-    Text = "Crosshair Style",
-    Options = {"Cross", "Circle", "Dot", "Square"},
-    Default = "Cross",
-    Callback = function(selected)
-        -- Update crosshair style
-    end
-})
-
-Window:CreateSlider(VisualsSection, {
-    Text = "Crosshair Size",
-    Min = 1,
-    Max = 50,
-    Default = 10,
-    Callback = function(value)
-        -- Update crosshair size
-    end
-})
-
--- ========================================
--- TELEPORT SECTION
--- ========================================
-
--- Player Search Box
-local PlayerSearch = Window:CreateSearchBox(TeleportSection, {
-    Placeholder = "Search players...",
+-- Visual Settings
+ExampleUI:CreateSearchBox(VisualsSection, {
+    Placeholder = "Search players to highlight...",
     Items = {},
     OnSelected = function(playerName)
-        local targetPlayer = Players:FindFirstChild(playerName)
-        if targetPlayer and targetPlayer.Character then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = 
-                targetPlayer.Character.HumanoidRootPart.CFrame
-            
-            Window:Notify({
-                Title = "Teleport",
-                Text = "Teleported to " .. playerName,
-                Duration = 2
+        local player = game.Players:FindFirstChild(playerName)
+        if player and player.Character then
+            -- Highlight player logic
+            ExampleUI:Notify({
+                Title = "Player Selected",
+                Text = "Now tracking: " .. playerName,
+                Duration = 3
             })
         end
-    end,
-    OnSearch = function(searchText, items)
-        local filtered = {}
-        for _, player in pairs(Players:GetPlayers()) do
-            if player.Name:lower():find(searchText:lower()) then
-                table.insert(filtered, player.Name)
-            end
-        end
-        return filtered
     end
 })
 
 -- Update player list
-spawn(function()
-    while wait(1) do
-        local playerNames = {}
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                table.insert(playerNames, player.Name)
-            end
-        end
-        PlayerSearch.UpdateItems(playerNames)
+local function UpdatePlayerList()
+    local players = {}
+    for _, player in pairs(game.Players:GetPlayers()) do
+        table.insert(players, player.Name)
     end
-end)
+    -- Update search box items (assuming you stored the searchbox)
+end
 
--- Location Teleports
-Window:CreateLabel(TeleportSection, {
-    Text = "Quick Teleports",
-    Color = Color3.fromRGB(255, 200, 100)
-})
-
-Window:CreateButton(TeleportSection, {
-    Text = "Teleport to Spawn",
-    Callback = function()
-        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0)
-    end
-})
-
--- Custom Position Input
-local CustomTPInput = Window:CreateInput(TeleportSection, {
-    Text = "Custom Position",
-    Placeholder = "X, Y, Z",
-    Callback = function(text, enterPressed)
-        if enterPressed then
-            local coords = text:split(",")
-            if #coords == 3 then
-                local x = tonumber(coords[1])
-                local y = tonumber(coords[2])
-                local z = tonumber(coords[3])
-                
-                if x and y and z then
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(x, y, z)
-                    Window:Notify({
-                        Title = "Teleport",
-                        Text = "Teleported to custom position",
-                        Duration = 2
-                    })
-                end
-            end
-        end
-    end
-})
-
--- ========================================
--- MISC SECTION
--- ========================================
-
--- Anti-AFK Toggle
-local AntiAFKToggle = Window:CreateToggle(MiscSection, {
-    Text = "Anti-AFK",
-    Default = true,
-    Callback = function(enabled)
-        -- Anti-AFK implementation
-        local VirtualUser = game:GetService("VirtualUser")
-        game.Players.LocalPlayer.Idled:Connect(function()
-            if enabled then
-                VirtualUser:CaptureController()
-                VirtualUser:ClickButton2(Vector2.new())
-            end
-        end)
-    end
-})
-
--- Auto Rejoin Toggle
-local AutoRejoinToggle = Window:CreateToggle(MiscSection, {
-    Text = "Auto Rejoin on Kick",
-    Default = false,
-    Callback = function(enabled)
-        -- Auto rejoin implementation
-    end
-})
-
-Window:CreateSeparator(MiscSection)
-
--- Server Actions
-Window:CreateButton(MiscSection, {
-    Text = "Rejoin Server",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
-    end
-})
-
-Window:CreateButton(MiscSection, {
-    Text = "Server Hop",
-    Callback = function()
-        -- Server hop implementation
-        Window:Notify({
-            Title = "Server Hop",
-            Text = "Finding new server...",
-            Duration = 2
-        })
-    end
-})
-
--- Chat Spam
-local ChatSpamInput = Window:CreateInput(MiscSection, {
-    Text = "Chat Message",
-    Placeholder = "Message to spam...",
-    Callback = function(text, enterPressed)
-        if enterPressed and text ~= "" then
-            -- Chat spam implementation
-            print("Chat spam:", text)
-        end
-    end
-})
-
--- FPS Display Toggle
-local FPSToggle = Window:CreateToggle(MiscSection, {
-    Text = "Show FPS",
-    Default = false,
-    Callback = function(enabled)
-        -- FPS counter implementation
-    end
-})
-
--- ========================================
--- CONFIG SECTION
--- ========================================
-
-Window:CreateLabel(ConfigSection, {
-    Text = "Configuration",
-    Color = Color3.fromRGB(255, 200, 100)
-})
-
--- Config Name Input
-local ConfigNameInput = Window:CreateInput(ConfigSection, {
-    Text = "Config Name",
-    Placeholder = "Enter config name...",
-    Default = "config1"
-})
-
--- Save Config Button
-Window:CreateButton(ConfigSection, {
-    Text = "Save Config",
-    Callback = function()
-        Window:Notify({
-            Title = "Config",
-            Text = "Configuration saved!",
-            Duration = 2
-        })
-    end
-})
-
--- Load Config Button
-Window:CreateButton(ConfigSection, {
-    Text = "Load Config",
-    Callback = function()
-        Window:Notify({
-            Title = "Config",
-            Text = "Configuration loaded!",
-            Duration = 2
-        })
-    end
-})
-
-Window:CreateSeparator(ConfigSection)
-
--- Export/Import
-Window:CreateButton(ConfigSection, {
-    Text = "Export to Clipboard",
-    Callback = function()
-        -- Export config to clipboard
-        setclipboard("CONFIG_DATA_HERE")
-        Window:Notify({
-            Title = "Export",
-            Text = "Config exported to clipboard!",
-            Duration = 2
-        })
-    end
-})
-
-Window:CreateButton(ConfigSection, {
-    Text = "Import from Clipboard",
-    Callback = function()
-        -- Import config from clipboard
-        local clipboardData = getclipboard()
-        Window:Notify({
-            Title = "Import",
-            Text = "Config imported from clipboard!",
-            Duration = 2
-        })
-    end
-})
-
--- ========================================
--- RUNTIME CUSTOMIZATION EXAMPLES
--- ========================================
-
--- Example: Change theme after 5 seconds
-spawn(function()
-    wait(5)
-    Window:SetTheme("Purple")
-    Window:Notify({
-        Title = "Theme Changed",
-        Text = "Theme changed to Purple!",
-        Duration = 2
-    })
-end)
-
--- Example: Programmatic toggle control
-spawn(function()
-    wait(10)
-    GodModeToggle.Set(true)
-    Window:Notify({
-        Title = "God Mode",
-        Text = "God Mode enabled automatically!",
-        Duration = 2
-    })
-end)
-
--- ========================================
--- FINAL SETUP
--- ========================================
+game.Players.PlayerAdded:Connect(UpdatePlayerList)
+UpdatePlayerList()
 
 -- Show welcome notification
-Window:Notify({
-    Title = "Eps1llon Hub",
-    Text = "Successfully loaded! Press " .. Window.ToggleKey.Name .. " to toggle",
+ExampleUI:Notify({
+    Title = "Welcome!",
+    Text = "Press " .. ExampleUI.ToggleKey.Name .. " to toggle UI",
     Duration = 5
 })
 
--- Print instructions
-print("========================================")
-print("Eps1llon Hub Premium UI Library v2.0")
-print("Created by: JustClips")
-print("Toggle Key:", Window.ToggleKey.Name)
-print("========================================")
-print("Features:")
-print("- 4 Themes")
-print("- 3 Backgrounds")
-print("- Resizable Windows")
-print("- Active Functions Display")
-print("- Big Dropdowns")
-print("- And much more!")
-print("========================================")
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- ADDITIONAL TIPS & TRICKS
+-- ═══════════════════════════════════════════════════════════════════════════════════
 
--- Auto-save config on close (example)
-game:GetService("Players").LocalPlayer.OnTeleport:Connect(function()
-    -- Save configuration before teleporting
-    print("Saving configuration...")
+--[[
+    💡 TIPS:
+    
+    1. UI ORGANIZATION
+       - Use sections to group related features
+       - Use BigDropdowns to create collapsible feature groups
+       - Use separators and labels to visually organize elements
+    
+    2. PERFORMANCE
+       - The UI automatically handles cleanup when destroyed
+       - Animations are optimized for smooth performance
+       - Active functions display updates automatically
+    
+    3. USER EXPERIENCE
+       - All interactive elements show visual feedback
+       - Hover effects indicate clickable areas
+       - Smooth animations make the UI feel professional
+    
+    4. BEST PRACTICES
+       - Always provide clear labels for features
+       - Use appropriate input types (toggle for on/off, slider for ranges)
+       - Group related settings in BigDropdowns
+       - Show notifications for important actions
+    
+    5. KEYBOARD SHORTCUTS
+       - Default toggle: RightShift (customizable)
+       - UI is draggable by the title bar
+       - UI is resizable by dragging the bottom-right corner
+       - Minimize button creates a floating icon
+    
+    6. DESTROY UI
+       - When done, clean up with: UI:Destroy()
+]]
+
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- ERROR HANDLING EXAMPLE
+-- ═══════════════════════════════════════════════════════════════════════════════════
+
+-- Safe UI creation with error handling
+local success, UI = pcall(function()
+    return Library:Create({Theme = "Ocean"})
 end)
+
+if success then
+    print("UI created successfully!")
+else
+    warn("Failed to create UI:", UI)
+end
+
+-- ═══════════════════════════════════════════════════════════════════════════════════
+-- QUICK REFERENCE CARD
+-- ═══════════════════════════════════════════════════════════════════════════════════
+
+--[[
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                              QUICK REFERENCE                                    ║
+╠════════════════════════════════════════════════════════════════════════════════╣
+║ ELEMENT          │ RETURNS          │ KEY METHODS/PROPERTIES                   ║
+╠══════════════════╪══════════════════╪══════════════════════════════════════════╣
+║ CreateButton     │ button object    │ .Frame, .Button                          ║
+║ CreateToggle     │ toggle object    │ .Set(bool), .Enabled                     ║
+║ CreateSlider     │ slider object    │ .Value                                   ║
+║ CreateInput      │ input object     │ .TextBox                                 ║
+║ CreateDropdown   │ dropdown object  │ .Selected, .Options                      ║
+║ CreateBigDropdown│ bigdropdown obj  │ .AddToggle(), .AddSlider(), etc.         ║
+║ CreateSearchBox  │ searchbox object │ .UpdateItems(table)                      ║
+║ CreateKeybind    │ keybind object   │ .Key                                     ║
+║ CreateLabel      │ label object     │ .Label                                   ║
+║ CreateSeparator  │ separator object │ (none)                                   ║
+╠══════════════════╪══════════════════╪══════════════════════════════════════════╣
+║ LIBRARY METHODS  │                  │                                          ║
+╠══════════════════╪══════════════════╪══════════════════════════════════════════╣
+║ :Create()        │ UI object        │ Creates main UI                          ║
+║ :CreateSection() │ section object   │ Creates a new section                    ║
+║ :SetTheme()      │ void             │ Changes theme                            ║
+║ :SetFont()       │ void             │ Changes font                             ║
+║ :SetBackground() │ void             │ Changes background                       ║
+║ :Notify()        │ void             │ Shows notification                       ║
+║ :Destroy()       │ void             │Destroys UI                             ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+]]
+
+print("Eps1llon Hub UI Library loaded successfully!")
+print("Documentation by: JustClips")
+print("GitHub: https://github.com/JustClips/Uilib")
