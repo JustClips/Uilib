@@ -63,6 +63,20 @@ local Themes = {
     }
 }
 
+-- Available Fonts
+local Fonts = {
+    Ubuntu = Enum.Font.Ubuntu,
+    Gotham = Enum.Font.Gotham,
+    GothamBold = Enum.Font.GothamBold,
+    SourceSans = Enum.Font.SourceSans,
+    SourceSansBold = Enum.Font.SourceSansBold,
+    Code = Enum.Font.Code,
+    Highway = Enum.Font.Highway,
+    SciFi = Enum.Font.SciFi,
+    Arial = Enum.Font.Arial,
+    ArialBold = Enum.Font.ArialBold
+}
+
 -- Utility Functions
 local function CreateInstance(class, properties, parent)
     local instance = Instance.new(class)
@@ -144,6 +158,11 @@ function Library:Create(config)
     self.OriginalSize = UDim2.new(0, 650, 0, 450)
     self.ActiveFunctions = {}
     
+    -- Customization Options
+    self.ButtonDarkness = config.ButtonDarkness or 0.5  -- 0 = fully transparent, 1 = fully opaque
+    self.StrokeThickness = config.StrokeThickness or 1  -- Default stroke thickness
+    self.Font = Fonts[config.Font] or Fonts.Ubuntu      -- Default font
+    
     -- Create ScreenGui
     self.ScreenGui = CreateInstance("ScreenGui", {
         Name = "Eps1llonHub",
@@ -185,7 +204,7 @@ function Library:Create(config)
     }, self.MainFrame.BackgroundImage)
     
     -- Edge glow effect (made shorter)
-    local EdgeGlow = CreateInstance("ImageLabel", {
+    self.EdgeGlow = CreateInstance("ImageLabel", {
         Name = "EdgeGlow",
         Size = UDim2.new(1, 10, 1, 10),
         Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -199,7 +218,7 @@ function Library:Create(config)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 10)
-    }, EdgeGlow)
+    }, self.EdgeGlow)
     
     -- Title Bar
     self.TitleBar = CreateInstance("Frame", {
@@ -219,7 +238,7 @@ function Library:Create(config)
         TextColor3 = self.Theme.Text,
         TextSize = 18,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, self.TitleBar)
     
     -- Close Button (X) - Made bigger
@@ -231,7 +250,7 @@ function Library:Create(config)
         Text = "×",
         TextColor3 = self.Theme.Text,
         TextSize = 26,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, self.TitleBar)
     
     self.CloseButton.MouseEnter:Connect(function()
@@ -257,7 +276,7 @@ function Library:Create(config)
         Text = "—",
         TextColor3 = self.Theme.Text,
         TextSize = 16,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, self.TitleBar)
     
     self.MinimizeButton.MouseEnter:Connect(function()
@@ -389,7 +408,7 @@ function Library:Create(config)
         Text = "Eps1llon Hub",
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu,
+        Font = self.Font,
         ZIndex = 1000
     }, self.MinimizedFrame)
     
@@ -475,7 +494,7 @@ function Library:CreateActiveFunctionsDisplay()
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
         Transparency = 0.6,
-        Thickness = 1
+        Thickness = self.StrokeThickness
     }, self.ActiveFunctionsFrame)
     
     -- Header
@@ -486,7 +505,7 @@ function Library:CreateActiveFunctionsDisplay()
         Text = "Active Functions",
         TextColor3 = self.Theme.Accent,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu,
+        Font = self.Font,
         TextXAlignment = Enum.TextXAlignment.Center
     }, self.ActiveFunctionsFrame)
     
@@ -594,7 +613,7 @@ function Library:UpdateActiveFunctions()
             Text = func,
             TextColor3 = self.Theme.Text,
             TextSize = 11,
-            Font = Enum.Font.Ubuntu,
+            Font = self.Font,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextTruncate = Enum.TextTruncate.AtEnd
         }, funcFrame)
@@ -698,14 +717,14 @@ function Library:CreateSection(name)
         TextColor3 = self.Theme.TextDark,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, section.Button)
     
     -- Section Content
     section.Content = CreateInstance("ScrollingFrame", {
         Name = name .. "Content",
-        Size = UDim2.new(1, -20, 1, -10),
-        Position = UDim2.new(0, 10, 0, 5),
+        Size = UDim2.new(1, -20, 1, -50), -- Made room for header
+        Position = UDim2.new(0, 10, 0, 45), -- Moved down for header
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 3,
@@ -718,6 +737,34 @@ function Library:CreateSection(name)
         SortOrder = Enum.SortOrder.LayoutOrder,
         Padding = UDim.new(0, 8)
     }, section.Content)
+    
+    -- Section Header (New Feature)
+    section.Header = CreateInstance("TextLabel", {
+        Name = "SectionHeader",
+        Size = UDim2.new(1, -20, 0, 35),
+        Position = UDim2.new(0, 10, 0, 5),
+        BackgroundTransparency = 1,
+        Text = name,
+        TextColor3 = self.Theme.Accent,
+        TextSize = 22,
+        Font = Enum.Font.GothamBold,
+        TextXAlignment = Enum.TextXAlignment.Center,
+        Visible = false
+    }, self.ContentContainer)
+    
+    -- Header Underline
+    section.HeaderUnderline = CreateInstance("Frame", {
+        Size = UDim2.new(0.5, 0, 0, 2),
+        Position = UDim2.new(0.25, 0, 0, 35),
+        BackgroundColor3 = self.Theme.Accent,
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0,
+        Visible = false
+    }, section.Header)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 1)
+    }, section.HeaderUnderline)
     
     -- Section Selection
     section.Button.MouseButton1Click:Connect(function()
@@ -755,6 +802,12 @@ function Library:SelectSection(section)
     -- Hide all sections with synchronized fade out
     for _, s in pairs(self.Sections) do
         if s.Content.Visible and s ~= section then
+            -- Fade out header
+            if s.Header.Visible then
+                Tween(s.Header, {TextTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                Tween(s.HeaderUnderline, {BackgroundTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+            end
+            
             -- Fade out all content elements at the same time
             for _, child in pairs(s.Content:GetChildren()) do
                 if child:IsA("Frame") then
@@ -795,6 +848,8 @@ function Library:SelectSection(section)
                     wait(animationTime)
                     s.Highlight.Visible = false
                     s.Highlight.Size = UDim2.new(0, 3, 1, -10)
+                    s.Header.Visible = false
+                    s.HeaderUnderline.Visible = false
                 end)
             end
             
@@ -812,10 +867,20 @@ function Library:SelectSection(section)
     wait(animationTime)
     section.Content.Visible = true
     section.Highlight.Visible = true
+    section.Header.Visible = true
+    section.HeaderUnderline.Visible = true
+    
+    -- Reset header transparency
+    section.Header.TextTransparency = 0
+    section.HeaderUnderline.BackgroundTransparency = 0.3
     
     -- Animate highlight appearing
     section.Highlight.Size = UDim2.new(0, 0, 1, -10)
     Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, animationTime * 1.5)
+    
+    -- Animate header underline
+    section.HeaderUnderline.Size = UDim2.new(0, 0, 0, 2)
+    Tween(section.HeaderUnderline, {Size = UDim2.new(0.5, 0, 0, 2)}, animationTime * 2, Enum.EasingStyle.Back)
     
     -- Animate section button
     Tween(section.Label, {TextColor3 = self.Theme.Text}, animationTime)
@@ -830,7 +895,7 @@ function Library:SelectSection(section)
                 -- Restore transparency values for inner elements
                 for _, innerChild in pairs(child:GetDescendants()) do
                     if innerChild:IsA("Frame") or innerChild:IsA("TextBox") then
-                        local originalTransparency = innerChild:GetAttribute("OriginalBackgroundTransparency") or 0.5
+                        local originalTransparency = innerChild:GetAttribute("OriginalBackgroundTransparency") or self.ButtonDarkness
                         if innerChild.BackgroundTransparency ~= originalTransparency then
                             Tween(innerChild, {BackgroundTransparency = originalTransparency}, animationTime, Enum.EasingStyle.Quad)
                         end
@@ -847,7 +912,7 @@ function Library:SelectSection(section)
                 end
                 
                 -- Fade in main frame
-                local originalTransparency = child:GetAttribute("OriginalTransparency") or 0.5
+                local originalTransparency = child:GetAttribute("OriginalTransparency") or self.ButtonDarkness
                 Tween(child, {BackgroundTransparency = originalTransparency}, animationTime, Enum.EasingStyle.Quad)
             end)
         end
@@ -885,16 +950,25 @@ function Library:CreateButton(section, config)
     button.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0
     }, section.Content)
     
     -- Store original transparency
-    button.Frame:SetAttribute("OriginalTransparency", 0.5)
+    button.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, button.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, button.Frame)
+    end
     
     button.Button = CreateInstance("TextButton", {
         Size = UDim2.new(1, -30, 1, 0), -- Made room for click indicator
@@ -903,7 +977,7 @@ function Library:CreateButton(section, config)
         Text = config.Text or "Button",
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, button.Frame)
     
     -- Click Indicator (RBX Asset Pointer) - Always white
@@ -920,13 +994,13 @@ function Library:CreateButton(section, config)
     button.ClickIndicator:SetAttribute("OriginalImageTransparency", 0.3)
     
     button.Button.MouseEnter:Connect(function()
-        Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(button.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Tween(button.ClickIndicator, {ImageTransparency = 0}, 0.2) -- Make it more visible on hover
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     button.Button.MouseLeave:Connect(function()
-        Tween(button.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(button.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Tween(button.ClickIndicator, {ImageTransparency = 0.3}, 0.2) -- Slightly transparent when not hovered
         Mouse.Icon = ""
     end)
@@ -957,16 +1031,25 @@ function Library:CreateToggle(section, config)
     toggle.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0
     }, section.Content)
     
     -- Store original transparency
-    toggle.Frame:SetAttribute("OriginalTransparency", 0.5)
+    toggle.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, toggle.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, toggle.Frame)
+    end
     
     toggle.Label = CreateInstance("TextLabel", {
         Size = UDim2.new(1, -50, 1, 0),
@@ -976,7 +1059,7 @@ function Library:CreateToggle(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, toggle.Frame)
     
     -- Toggle background with smooth animation
@@ -1049,14 +1132,14 @@ function Library:CreateToggle(section, config)
     end)
     
     toggle.Frame.MouseEnter:Connect(function()
-        Tween(toggle.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(toggle.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         -- Scale up toggle slightly on hover
         Tween(toggle.Button, {Size = UDim2.new(0, 38, 0, 20), Position = UDim2.new(1, -47, 0.5, -10)}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     toggle.Frame.MouseLeave:Connect(function()
-        Tween(toggle.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(toggle.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         -- Scale back to normal
         Tween(toggle.Button, {Size = UDim2.new(0, 36, 0, 18), Position = UDim2.new(1, -46, 0.5, -9)}, 0.2)
         Mouse.Icon = ""
@@ -1077,16 +1160,25 @@ function Library:CreateSlider(section, config)
     slider.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 55),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0
     }, section.Content)
     
     -- Store original transparency
-    slider.Frame:SetAttribute("OriginalTransparency", 0.5)
+    slider.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, slider.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, slider.Frame)
+    end
     
     slider.Label = CreateInstance("TextLabel", {
         Size = UDim2.new(1, -70, 0, 20),
@@ -1096,7 +1188,7 @@ function Library:CreateSlider(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, slider.Frame)
     
     slider.ValueLabel = CreateInstance("TextLabel", {
@@ -1106,7 +1198,7 @@ function Library:CreateSlider(section, config)
         Text = tostring(slider.Value),
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, slider.Frame)
     
     slider.SliderFrame = CreateInstance("Frame", {
@@ -1201,12 +1293,12 @@ function Library:CreateSlider(section, config)
     end)
     
     slider.Frame.MouseEnter:Connect(function()
-        Tween(slider.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(slider.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     slider.Frame.MouseLeave:Connect(function()
-        Tween(slider.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(slider.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         if not dragging then
             Mouse.Icon = ""
         end
@@ -1222,16 +1314,25 @@ function Library:CreateInput(section, config)
     input.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0
     }, section.Content)
     
     -- Store original transparency
-    input.Frame:SetAttribute("OriginalTransparency", 0.5)
+    input.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, input.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, input.Frame)
+    end
     
     input.Label = CreateInstance("TextLabel", {
         Size = UDim2.new(0.35, -10, 1, 0),
@@ -1241,7 +1342,7 @@ function Library:CreateInput(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, input.Frame)
     
     input.TextBox = CreateInstance("TextBox", {
@@ -1253,7 +1354,7 @@ function Library:CreateInput(section, config)
         Text = config.Default or "",
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu,
+        Font = self.Font,
         PlaceholderText = config.Placeholder or "Enter text...",
         PlaceholderColor3 = self.Theme.TextDark,
         ClearTextOnFocus = false
@@ -1267,17 +1368,17 @@ function Library:CreateInput(section, config)
     
     input.TextBox.FocusLost:Connect(function(enterPressed)
         if config.Callback then
-            config.Callback(input.TextBox.Text, enterPressed)
+               config.Callback(input.TextBox.Text, enterPressed)
         end
     end)
     
     input.Frame.MouseEnter:Connect(function()
-        Tween(input.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/IBeam"
     end)
     
     input.Frame.MouseLeave:Connect(function()
-        Tween(input.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -1294,17 +1395,26 @@ function Library:CreateDropdown(section, config)
     dropdown.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         ClipsDescendants = true
     }, section.Content)
     
     -- Store original transparency
-    dropdown.Frame:SetAttribute("OriginalTransparency", 0.5)
+    dropdown.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, dropdown.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, dropdown.Frame)
+    end
     
     dropdown.Label = CreateInstance("TextLabel", {
         Size = UDim2.new(0.35, -10, 0, 35),
@@ -1314,7 +1424,7 @@ function Library:CreateDropdown(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, dropdown.Frame)
     
     dropdown.Button = CreateInstance("TextButton", {
@@ -1325,14 +1435,14 @@ function Library:CreateDropdown(section, config)
         Text = dropdown.Selected,
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu,
+        Font = self.Font,
         TextTruncate = Enum.TextTruncate.AtEnd
     }, dropdown.Frame)
     
     CreateInstance("UIStroke", {
         Color = self.Theme.Border,
         Transparency = 0.6,
-        Thickness = 1
+        Thickness = self.StrokeThickness
     }, dropdown.Button)
     
     CreateInstance("UICorner", {
@@ -1346,7 +1456,7 @@ function Library:CreateDropdown(section, config)
         Text = "▼",
         TextColor3 = self.Theme.Text,
         TextSize = 10,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, dropdown.Button)
     
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
@@ -1369,7 +1479,7 @@ function Library:CreateDropdown(section, config)
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
         Transparency = 0.7,
-        Thickness = 1
+        Thickness = self.StrokeThickness
     }, dropdown.OptionContainer)
     
     CreateInstance("UIListLayout", {
@@ -1378,7 +1488,8 @@ function Library:CreateDropdown(section, config)
     }, dropdown.OptionContainer)
     
     CreateInstance("UIPadding", {
-                PaddingBottom = UDim.new(0, 3),
+        PaddingTop = UDim.new(0, 3),
+        PaddingBottom = UDim.new(0, 3),
         PaddingLeft = UDim.new(0, 3),
         PaddingRight = UDim.new(0, 3)
     }, dropdown.OptionContainer)
@@ -1398,7 +1509,7 @@ function Library:CreateDropdown(section, config)
                 Text = option,
                 TextColor3 = self.Theme.Text,
                 TextSize = 13,
-                Font = Enum.Font.Ubuntu
+                Font = self.Font
             }, dropdown.OptionContainer)
             
             CreateInstance("UICorner", {
@@ -1468,12 +1579,12 @@ function Library:CreateDropdown(section, config)
     end)
     
     dropdown.Frame.MouseEnter:Connect(function()
-        Tween(dropdown.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(dropdown.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     dropdown.Frame.MouseLeave:Connect(function()
-        Tween(dropdown.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(dropdown.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -1485,21 +1596,32 @@ function Library:CreateSearchBox(section, config)
     local search = {}
     search.Items = config.Items or {}
     search.FilteredItems = {}
+    search.SelectedCallback = config.OnSelected
+    search.SearchCallback = config.OnSearch
     
     search.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         ClipsDescendants = true
     }, section.Content)
     
     -- Store original transparency
-    search.Frame:SetAttribute("OriginalTransparency", 0.5)
+    search.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, search.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, search.Frame)
+    end
     
     search.SearchBox = CreateInstance("TextBox", {
         Size = UDim2.new(1, -20, 0, 27),
@@ -1510,7 +1632,7 @@ function Library:CreateSearchBox(section, config)
         Text = "",
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu,
+        Font = self.Font,
         PlaceholderText = config.Placeholder or "Search...",
         PlaceholderColor3 = self.Theme.TextDark,
         ClearTextOnFocus = false
@@ -1560,6 +1682,14 @@ function Library:CreateSearchBox(section, config)
         PaddingRight = UDim.new(0, 3)
     }, search.ResultsContainer)
     
+    -- Method to update items dynamically
+    search.UpdateItems = function(newItems)
+        search.Items = newItems
+        if search.SearchBox.Text ~= "" then
+            search.SearchBox.Text = ""
+        end
+    end
+    
     local function UpdateResults()
         for _, child in pairs(search.ResultsContainer:GetChildren()) do
             if child:IsA("TextButton") then
@@ -1574,27 +1704,27 @@ function Library:CreateSearchBox(section, config)
             local resultButton = CreateInstance("TextButton", {
                 Size = UDim2.new(1, 0, 0, 22),
                 BackgroundColor3 = self.Theme.Secondary,
-                BackgroundTransparency = 0.5,
+                BackgroundTransparency = self.ButtonDarkness,
                 BorderSizePixel = 0,
                 Text = item,
                 TextColor3 = self.Theme.Text,
                 TextSize = 13,
-                Font = Enum.Font.Ubuntu
+                Font = self.Font
             }, search.ResultsContainer)
             
-            resultButton:SetAttribute("OriginalBackgroundTransparency", 0.5)
+            resultButton:SetAttribute("OriginalBackgroundTransparency", self.ButtonDarkness)
             
             CreateInstance("UICorner", {
                 CornerRadius = UDim.new(0, 3)
             }, resultButton)
             
             resultButton.MouseEnter:Connect(function()
-                Tween(resultButton, {BackgroundTransparency = 0.2}, 0.2)
+                Tween(resultButton, {BackgroundTransparency = self.ButtonDarkness - 0.3}, 0.2)
                 Mouse.Icon = "rbxasset://SystemCursors/Hand"
             end)
             
             resultButton.MouseLeave:Connect(function()
-                Tween(resultButton, {BackgroundTransparency = 0.5}, 0.2)
+                Tween(resultButton, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
                 Mouse.Icon = ""
             end)
             
@@ -1603,8 +1733,8 @@ function Library:CreateSearchBox(section, config)
                 search.ResultsContainer.Visible = false
                 Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 
-                if config.Callback then
-                    config.Callback(item)
+                if search.SelectedCallback then
+                    search.SelectedCallback(item)
                 end
             end)
         end
@@ -1630,9 +1760,15 @@ function Library:CreateSearchBox(section, config)
             search.ResultsContainer.Visible = false
             Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
         else
-            for _, item in pairs(search.Items) do
-                if item:lower():find(searchText) then
-                    table.insert(search.FilteredItems, item)
+            -- Call search callback if provided
+            if search.SearchCallback then
+                search.FilteredItems = search.SearchCallback(searchText, search.Items)
+            else
+                -- Default search behavior
+                for _, item in pairs(search.Items) do
+                    if tostring(item):lower():find(searchText) then
+                        table.insert(search.FilteredItems, item)
+                    end
                 end
             end
             UpdateResults()
@@ -1648,12 +1784,12 @@ function Library:CreateSearchBox(section, config)
     end)
     
     search.Frame.MouseEnter:Connect(function()
-        Tween(search.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(search.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/IBeam"
     end)
     
     search.Frame.MouseLeave:Connect(function()
-        Tween(search.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(search.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -1667,12 +1803,12 @@ function Library:CreateLabel(section, config)
     label.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 25),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.7,
+        BackgroundTransparency = self.ButtonDarkness + 0.2,
         BorderSizePixel = 0
     }, section.Content)
     
     -- Store original transparency
-    label.Frame:SetAttribute("OriginalTransparency", 0.7)
+    label.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness + 0.2)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
@@ -1686,7 +1822,7 @@ function Library:CreateLabel(section, config)
         TextColor3 = config.Color or self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, label.Frame)
     
     return label
@@ -1720,12 +1856,54 @@ function Library:SetTheme(themeName)
         for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
             if descendant.Name == "Highlight" then
                 descendant.BackgroundColor3 = self.Theme.SectionHighlight
+            elseif descendant.Name == "SectionHeader" then
+                descendant.TextColor3 = self.Theme.Accent
             elseif descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
                 if descendant.TextColor3 ~= self.Theme.TextDark then
                     descendant.TextColor3 = self.Theme.Text
                 end
             elseif descendant:IsA("ScrollingFrame") then
                 descendant.ScrollBarImageColor3 = self.Theme.Accent
+            elseif descendant:IsA("UIStroke") then
+                if descendant.Color == self.Theme.Border or descendant.Transparency > 0.5 then
+                    descendant.Color = self.Theme.Border
+                else
+                    descendant.Color = self.Theme.Accent
+                end
+            end
+        end
+    end
+end
+
+-- Methods to change customization settings
+function Library:SetButtonDarkness(darkness)
+    self.ButtonDarkness = math.clamp(darkness, 0, 1)
+    -- Update all existing buttons
+    for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
+        if descendant:IsA("Frame") and descendant:GetAttribute("OriginalTransparency") then
+            descendant.BackgroundTransparency = self.ButtonDarkness
+            descendant:SetAttribute("OriginalTransparency", self.ButtonDarkness)
+        end
+    end
+end
+
+function Library:SetStrokeThickness(thickness)
+    self.StrokeThickness = math.clamp(thickness, 0, 5)
+    -- Update all existing strokes
+    for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
+        if descendant:IsA("UIStroke") then
+            descendant.Thickness = self.StrokeThickness
+        end
+    end
+end
+
+function Library:SetFont(fontName)
+    if Fonts[fontName] then
+        self.Font = Fonts[fontName]
+        -- Update all text elements
+        for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                descendant.Font = self.Font
             end
         end
     end
@@ -1749,7 +1927,7 @@ function Library:Notify(config)
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
         Transparency = 0.5,
-        Thickness = 1
+        Thickness = self.StrokeThickness
     }, notification)
     
     CreateInstance("TextLabel", {
@@ -1760,7 +1938,7 @@ function Library:Notify(config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, notification)
     
     CreateInstance("TextLabel", {
@@ -1772,7 +1950,7 @@ function Library:Notify(config)
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextWrapped = true,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, notification)
     
     -- Animate in
@@ -1798,16 +1976,25 @@ function Library:CreateKeybind(section, config)
     keybind.Frame = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.5,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0
     }, section.Content)
     
     -- Store original transparency
-    keybind.Frame:SetAttribute("OriginalTransparency", 0.5)
+    keybind.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, keybind.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, keybind.Frame)
+    end
     
     keybind.Label = CreateInstance("TextLabel", {
         Size = UDim2.new(1, -80, 1, 0),
@@ -1817,7 +2004,7 @@ function Library:CreateKeybind(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, keybind.Frame)
     
     keybind.KeyLabel = CreateInstance("TextLabel", {
@@ -1829,7 +2016,7 @@ function Library:CreateKeybind(section, config)
         Text = keybind.Key.Name,
         TextColor3 = self.Theme.Text,
         TextSize = 12,
-        Font = Enum.Font.Ubuntu
+        Font = self.Font
     }, keybind.Frame)
     
     keybind.KeyLabel:SetAttribute("OriginalBackgroundTransparency", 0.3)
@@ -1851,12 +2038,12 @@ function Library:CreateKeybind(section, config)
     end)
     
     keybind.Frame.MouseEnter:Connect(function()
-        Tween(keybind.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(keybind.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     keybind.Frame.MouseLeave:Connect(function()
-        Tween(keybind.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(keybind.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
     
