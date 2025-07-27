@@ -318,26 +318,43 @@ function Library:Create(config)
         BorderSizePixel = 0
     }, self.MainFrame)
     
-    -- Minimized Frame (Floating Square)
+    -- Minimized Frame (Floating Square) with better background fitting
     self.MinimizedFrame = CreateInstance("Frame", {
         Name = "MinimizedFrame",
         Size = UDim2.new(0, 150, 0, 40),
         Position = UDim2.new(0, 20, 0, 20),
         BackgroundColor3 = self.Theme.Background,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = 0.1, -- More solid background for better visibility
         BorderSizePixel = 0,
         Visible = false
     }, self.ScreenGui)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 6)
+        CornerRadius = UDim.new(0, 8) -- Slightly more rounded for better aesthetics
     }, self.MinimizedFrame)
     
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
-        Transparency = 0.5,
-        Thickness = 1
+        Transparency = 0.3, -- More visible border
+        Thickness = 1.5 -- Slightly thicker border
     }, self.MinimizedFrame)
+    
+    -- Add subtle glow effect to minimized frame
+    local minimizedGlow = CreateInstance("ImageLabel", {
+        Name = "MinimizedGlow",
+        Size = UDim2.new(1, 6, 1, 6),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundTransparency = 1,
+        Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+        ImageColor3 = self.Theme.Accent,
+        ImageTransparency = 0.8,
+        ZIndex = -1
+    }, self.MinimizedFrame)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 10)
+    }, minimizedGlow)
     
     self.MinimizedTitle = CreateInstance("TextLabel", {
         Size = UDim2.new(1, 0, 1, 0),
@@ -356,6 +373,16 @@ function Library:Create(config)
     
     self.MinimizedButton.MouseButton1Click:Connect(function()
         self:Restore()
+    end)
+    
+    self.MinimizedButton.MouseEnter:Connect(function()
+        Tween(self.MinimizedFrame, {BackgroundTransparency = 0.05}, 0.2) -- Slight highlight on hover
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
+    end)
+    
+    self.MinimizedButton.MouseLeave:Connect(function()
+        Tween(self.MinimizedFrame, {BackgroundTransparency = 0.1}, 0.2)
+        Mouse.Icon = ""
     end)
     
     -- Create Active Functions Display
@@ -697,7 +724,7 @@ function Library:Minimize()
     wait(0.3)
     self.MainFrame.Visible = false
     self.MinimizedFrame.Visible = true
-    Tween(self.MinimizedFrame, {BackgroundTransparency = 0.3}, 0.2)
+    Tween(self.MinimizedFrame, {BackgroundTransparency = 0.1}, 0.2) -- Use the improved transparency
 end
 
 function Library:Restore()
