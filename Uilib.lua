@@ -24,9 +24,9 @@ local Themes = {
         Accent = Color3.fromRGB(100, 100, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(150, 150, 150),
-        Border = Color3.fromRGB(80, 80, 80), -- Made less visible
+        Border = Color3.fromRGB(80, 80, 80),
         SectionHighlight = Color3.fromRGB(100, 100, 255),
-        SectionBackground = Color3.fromRGB(25, 25, 25) -- New section background
+        SectionBackground = Color3.fromRGB(25, 25, 25)
     },
     Light = {
         Background = Color3.fromRGB(240, 240, 240),
@@ -35,9 +35,9 @@ local Themes = {
         Accent = Color3.fromRGB(50, 50, 200),
         Text = Color3.fromRGB(0, 0, 0),
         TextDark = Color3.fromRGB(100, 100, 100),
-        Border = Color3.fromRGB(180, 180, 180), -- Made less visible
+        Border = Color3.fromRGB(180, 180, 180),
         SectionHighlight = Color3.fromRGB(50, 50, 200),
-        SectionBackground = Color3.fromRGB(250, 250, 250) -- New section background
+        SectionBackground = Color3.fromRGB(250, 250, 250)
     },
     Purple = {
         Background = Color3.fromRGB(25, 20, 35),
@@ -46,9 +46,9 @@ local Themes = {
         Accent = Color3.fromRGB(150, 100, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(180, 180, 200),
-        Border = Color3.fromRGB(70, 60, 85), -- Made less visible
+        Border = Color3.fromRGB(70, 60, 85),
         SectionHighlight = Color3.fromRGB(150, 100, 255),
-        SectionBackground = Color3.fromRGB(30, 25, 40) -- New section background
+        SectionBackground = Color3.fromRGB(30, 25, 40)
     },
     Ocean = {
         Background = Color3.fromRGB(15, 25, 35),
@@ -57,9 +57,9 @@ local Themes = {
         Accent = Color3.fromRGB(100, 200, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(180, 200, 220),
-        Border = Color3.fromRGB(60, 80, 95), -- Made less visible
+        Border = Color3.fromRGB(60, 80, 95),
         SectionHighlight = Color3.fromRGB(100, 200, 255),
-        SectionBackground = Color3.fromRGB(20, 30, 40) -- New section background
+        SectionBackground = Color3.fromRGB(20, 30, 40)
     }
 }
 
@@ -118,7 +118,7 @@ local function AddDragging(frame, handle)
                     startPos.Y.Scale,
                     startPos.Y.Offset + delta.Y
                 )
-            }, 0.1, Enum.EasingStyle.Linear)
+            }, 0.05, Enum.EasingStyle.Linear)
         end
     end)
 end
@@ -128,13 +128,15 @@ function Library:Create(config)
     config = config or {}
     local self = setmetatable({}, Library)
     
-    self.Theme = Themes[config.Theme or "Dark"]
+    self.Theme = Themes[config.Theme or "Ocean"] -- Default theme changed to Ocean
     self.Sections = {}
     self.CurrentSection = nil
     self.Minimized = false
     self.MinSize = Vector2.new(500, 400)
     self.MaxSize = Vector2.new(800, 600)
     self.ActiveFunctions = {}
+    self.OriginalSize = UDim2.new(0, 650, 0, 450) -- Store original size
+    self.ShowActiveFunctions = false
     
     -- Create ScreenGui
     self.ScreenGui = CreateInstance("ScreenGui", {
@@ -146,7 +148,7 @@ function Library:Create(config)
     -- Main Frame with transparency effect
     self.MainFrame = CreateInstance("Frame", {
         Name = "MainFrame",
-        Size = UDim2.new(0, 650, 0, 450),
+        Size = self.OriginalSize,
         Position = UDim2.new(0.5, -325, 0.5, -225),
         BackgroundColor3 = self.Theme.Background,
         BackgroundTransparency = 0.05,
@@ -161,7 +163,7 @@ function Library:Create(config)
         Position = UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
         Image = "rbxassetid://98784591713474",
-        ImageTransparency = 0.8, -- Made visible but not too much
+        ImageTransparency = 0.8,
         ScaleType = Enum.ScaleType.Stretch,
         ZIndex = -2
     }, self.MainFrame)
@@ -176,10 +178,10 @@ function Library:Create(config)
         CornerRadius = UDim.new(0, 8)
     }, self.MainFrame.BackgroundImage)
     
-    -- Edge glow effect (made shorter)
+    -- Edge glow effect
     local EdgeGlow = CreateInstance("ImageLabel", {
         Name = "EdgeGlow",
-        Size = UDim2.new(1, 10, 1, 10), -- Reduced from 20 to 10
+        Size = UDim2.new(1, 10, 1, 10),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundTransparency = 1,
@@ -190,7 +192,7 @@ function Library:Create(config)
     }, self.MainFrame)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 10) -- Reduced from 12 to 10
+        CornerRadius = UDim.new(0, 10)
     }, EdgeGlow)
     
     -- Title Bar
@@ -214,15 +216,15 @@ function Library:Create(config)
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
-    -- Close Button (X) - Made bigger
+    -- Close Button (X)
     self.CloseButton = CreateInstance("TextButton", {
         Name = "CloseButton",
-        Size = UDim2.new(0, 25, 0, 25), -- Increased from 20x20 to 25x25
+        Size = UDim2.new(0, 25, 0, 25),
         Position = UDim2.new(1, -32, 0.5, -12.5),
         BackgroundTransparency = 1,
         Text = "×",
         TextColor3 = self.Theme.Text,
-        TextSize = 26, -- Increased from 22 to 26
+        TextSize = 26,
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
@@ -240,11 +242,11 @@ function Library:Create(config)
         self:Destroy()
     end)
     
-    -- Minimize Button (-) - Moved left and made shorter
+    -- Minimize Button (-)
     self.MinimizeButton = CreateInstance("TextButton", {
         Name = "MinimizeButton",
-        Size = UDim2.new(0, 20, 0, 18), -- Made shorter (height from 20 to 18)
-        Position = UDim2.new(1, -62, 0.5, -9), -- Moved left (from -55 to -62)
+        Size = UDim2.new(0, 20, 0, 18),
+        Position = UDim2.new(1, -62, 0.5, -9),
         BackgroundTransparency = 1,
         Text = "—",
         TextColor3 = self.Theme.Text,
@@ -266,29 +268,29 @@ function Library:Create(config)
         self:Minimize()
     end)
     
-    -- Top divider line (connects all the way)
+    -- Top divider line
     self.TopDivider = CreateInstance("Frame", {
         Name = "TopDivider",
-        Size = UDim2.new(1, 0, 0, 1), -- Full width instead of -30
-        Position = UDim2.new(0, 0, 0, 35), -- Start from 0 instead of 15
+        Size = UDim2.new(1, 0, 0, 1),
+        Position = UDim2.new(0, 0, 0, 35),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5, -- Made less visible (was 0.7)
+        BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, self.MainFrame)
     
-    -- Left Section Container WITHOUT background (transparent)
+    -- Left Section Container
     self.SectionContainer = CreateInstance("ScrollingFrame", {
         Name = "SectionContainer",
         Size = UDim2.new(0, 150, 1, -45),
         Position = UDim2.new(0, 10, 0, 40),
-        BackgroundTransparency = 1, -- Made completely transparent
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 0
     }, self.MainFrame)
     
     CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 8) -- Increased spacing between sections
+        Padding = UDim.new(0, 8)
     }, self.SectionContainer)
     
     CreateInstance("UIPadding", {
@@ -298,13 +300,13 @@ function Library:Create(config)
         PaddingRight = UDim.new(0, 5)
     }, self.SectionContainer)
     
-    -- Vertical divider line (connects all the way)
+    -- Vertical divider line
     self.VerticalDivider = CreateInstance("Frame", {
         Name = "VerticalDivider",
-        Size = UDim2.new(0, 1, 1, -35), -- Extended to connect from top to bottom
-        Position = UDim2.new(0, 170, 0, 35), -- Start from top line
+        Size = UDim2.new(0, 1, 1, -35),
+        Position = UDim2.new(0, 170, 0, 35),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5, -- Made less visible (was 0.7)
+        BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, self.MainFrame)
     
@@ -328,9 +330,25 @@ function Library:Create(config)
         Visible = false
     }, self.ScreenGui)
     
+    -- Add background image to minimized frame
+    CreateInstance("ImageLabel", {
+        Name = "MinimizedBackgroundImage",
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://98784591713474",
+        ImageTransparency = 0.8,
+        ScaleType = Enum.ScaleType.Stretch,
+        ZIndex = -1
+    }, self.MinimizedFrame)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, self.MinimizedFrame)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 6)
+    }, self.MinimizedFrame.MinimizedBackgroundImage)
     
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
@@ -357,12 +375,12 @@ function Library:Create(config)
         self:Restore()
     end)
     
-    -- Create Active Functions Display
+    -- Create Active Functions Display (hidden by default)
     self:CreateActiveFunctionsDisplay()
     
     -- Make frames draggable
     AddDragging(self.MainFrame, self.TitleBar)
-    AddDragging(self.MinimizedFrame)
+    AddDragging(self.MinimizedFrame) -- Make minimized frame draggable
     
     -- Add resizing
     self:AddResizing()
@@ -370,7 +388,7 @@ function Library:Create(config)
     return self
 end
 
--- New Active Functions Display
+-- Active Functions Display (hidden by default)
 function Library:CreateActiveFunctionsDisplay()
     self.ActiveFunctionsFrame = CreateInstance("Frame", {
         Name = "ActiveFunctionsFrame",
@@ -379,7 +397,7 @@ function Library:CreateActiveFunctionsDisplay()
         BackgroundColor3 = self.Theme.Background,
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
-        Visible = true
+        Visible = false -- Hidden by default
     }, self.ScreenGui)
     
     CreateInstance("UICorner", {
@@ -428,6 +446,17 @@ function Library:CreateActiveFunctionsDisplay()
         Padding = UDim.new(0, 3)
     }, self.ActiveFunctionsContent)
     
+    -- Make draggable
+    AddDragging(self.ActiveFunctionsFrame)
+    
+    -- Update content
+    self:UpdateActiveFunctions()
+end
+
+function Library:ShowActiveFunctions()
+    self.ShowActiveFunctions = true
+    self.ActiveFunctionsFrame.Visible = true
+    
     -- Floating animation
     local floatTween1 = TweenService:Create(
         self.ActiveFunctionsFrame,
@@ -435,12 +464,11 @@ function Library:CreateActiveFunctionsDisplay()
         {Position = UDim2.new(1, -220, 0, 30)}
     )
     floatTween1:Play()
-    
-    -- Make draggable
-    AddDragging(self.ActiveFunctionsFrame)
-    
-    -- Update content
-    self:UpdateActiveFunctions()
+end
+
+function Library:HideActiveFunctions()
+    self.ShowActiveFunctions = false
+    self.ActiveFunctionsFrame.Visible = false
 end
 
 function Library:AddActiveFunction(name)
@@ -556,8 +584,11 @@ function Library:AddResizing()
             local newWidth = math.clamp(startSize.X + delta.X, self.MinSize.X, self.MaxSize.X)
             local newHeight = math.clamp(startSize.Y + delta.Y, self.MinSize.Y, self.MaxSize.Y)
             
+            -- Update original size
+            self.OriginalSize = UDim2.new(0, newWidth, 0, newHeight)
+            
             Tween(self.MainFrame, {
-                Size = UDim2.new(0, newWidth, 0, newHeight)
+                Size = self.OriginalSize
             }, 0.1, Enum.EasingStyle.Linear)
         end
     end)
@@ -568,7 +599,7 @@ function Library:CreateSection(name)
     section.Name = name
     section.Elements = {}
     
-    -- Individual Section Button with its own background (separated from others)
+    -- Individual Section Button with its own background
     section.Button = CreateInstance("TextButton", {
         Name = name .. "Section",
         Size = UDim2.new(1, 0, 0, 35),
@@ -582,11 +613,12 @@ function Library:CreateSection(name)
         CornerRadius = UDim.new(0, 6)
     }, section.Button)
     
-    -- Section Highlight (left line)
+    -- Section Highlight (left line) with smooth animation
     section.Highlight = CreateInstance("Frame", {
         Name = "Highlight",
-        Size = UDim2.new(0, 3, 1, -10),
-        Position = UDim2.new(0, 0, 0, 5),
+        Size = UDim2.new(0, 3, 0, 0), -- Start with 0 height
+        Position = UDim2.new(0, 0, 0.5, 0), -- Start from center
+        AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = self.Theme.SectionHighlight,
         BorderSizePixel = 0,
         Visible = false
@@ -606,6 +638,17 @@ function Library:CreateSection(name)
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
         Font = Enum.Font.Ubuntu
+    }, section.Button)
+    
+    -- Cursor icon on the right side
+    section.CursorIcon = CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -18, 0.5, -6),
+        BackgroundTransparency = 1,
+        Text = "👆",
+        TextSize = 10,
+        TextTransparency = 0.7
     }, section.Button)
     
     -- Section Content
@@ -662,19 +705,33 @@ function Library:SelectSection(section)
         s.Highlight.Visible = false
         Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
         Tween(s.Button, {BackgroundTransparency = 0.3}, 0.2)
+        -- Animate highlight out
+        Tween(s.Highlight, {
+            Size = UDim2.new(0, 3, 0, 0),
+            Position = UDim2.new(0, 0, 0.5, 0)
+        }, 0.3, Enum.EasingStyle.Quint)
     end
     
     section.Content.Visible = true
     section.Highlight.Visible = true
     Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
     Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
+    
+    -- Animate highlight in smoothly
+    Tween(section.Highlight, {
+        Size = UDim2.new(0, 3, 1, -10),
+        Position = UDim2.new(0, 0, 0, 5)
+    }, 0.4, Enum.EasingStyle.Quint)
+    
     self.CurrentSection = section
 end
 
 function Library:Minimize()
     self.Minimized = true
     Tween(self.MainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.3)
-    Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, 50, 0, 20)}, 0.3)
+    if self.ShowActiveFunctions then
+        Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, 50, 0, 20)}, 0.3)
+    end
     wait(0.3)
     self.MainFrame.Visible = false
     self.MinimizedFrame.Visible = true
@@ -685,11 +742,14 @@ function Library:Restore()
     self.Minimized = false
     self.MinimizedFrame.Visible = false
     self.MainFrame.Visible = true
-    Tween(self.MainFrame, {Size = UDim2.new(0, 650, 0, 450), BackgroundTransparency = 0.05}, 0.3)
-    Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
+    -- Use stored original size instead of fixed size
+    Tween(self.MainFrame, {Size = self.OriginalSize, BackgroundTransparency = 0.05}, 0.3)
+    if self.ShowActiveFunctions then
+        Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
+    end
 end
 
--- Enhanced UI Elements with proper cursor
+-- Enhanced UI Elements
 function Library:CreateButton(section, config)
     config = config or {}
     local button = {}
@@ -706,13 +766,24 @@ function Library:CreateButton(section, config)
     }, button.Frame)
     
     button.Button = CreateInstance("TextButton", {
-        Size = UDim2.new(1, 0, 1, 0),
+        Size = UDim2.new(1, -25, 1, 0), -- Make room for cursor icon
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Text = config.Text or "Button",
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         Font = Enum.Font.Ubuntu
+    }, button.Frame)
+    
+    -- Cursor icon on the right side
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 15, 0, 15),
+        Position = UDim2.new(1, -20, 0.5, -7.5),
+        BackgroundTransparency = 1,
+        Text = "👆",
+        TextSize = 12,
+        TextTransparency = 0.7
     }, button.Frame)
     
     button.Button.MouseEnter:Connect(function()
@@ -726,10 +797,7 @@ function Library:CreateButton(section, config)
     end)
     
     button.Button.MouseButton1Click:Connect(function()
-        Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
-        wait(0.1)
-        Tween(button.Frame, {BackgroundColor3 = self.Theme.Secondary}, 0.1)
-        
+        -- No color change animation
         if config.Callback then
             config.Callback()
         end
@@ -755,7 +823,7 @@ function Library:CreateToggle(section, config)
     }, toggle.Frame)
     
     toggle.Label = CreateInstance("TextLabel", {
-        Size = UDim2.new(1, -50, 1, 0),
+        Size = UDim2.new(1, -70, 1, 0),
         Position = UDim2.new(0, 10, 0, 0),
         BackgroundTransparency = 1,
         Text = config.Text or "Toggle",
@@ -788,6 +856,17 @@ function Library:CreateToggle(section, config)
         CornerRadius = UDim.new(0.5, 0)
     }, toggle.Indicator)
     
+    -- Cursor icon on the right side
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -15, 0.5, -6),
+        BackgroundTransparency = 1,
+        Text = "👆",
+        TextSize = 10,
+        TextTransparency = 0.7
+    }, toggle.Frame)
+    
     local function SetToggle(value)
         toggle.Enabled = value
         
@@ -795,6 +874,9 @@ function Library:CreateToggle(section, config)
             Tween(toggle.Button, {BackgroundColor3 = self.Theme.Accent}, 0.2)
             Tween(toggle.Indicator, {Position = UDim2.new(1, -16, 0.5, -7)}, 0.2)
             self:AddActiveFunction(config.Text or "Toggle")
+            if not self.ShowActiveFunctions then
+                self:ShowActiveFunctions()
+            end
         else
             Tween(toggle.Button, {BackgroundColor3 = self.Theme.Tertiary}, 0.2)
             Tween(toggle.Indicator, {Position = UDim2.new(0, 2, 0.5, -7)}, 0.2)
@@ -865,7 +947,7 @@ function Library:CreateSlider(section, config)
     }, slider.Frame)
     
     slider.SliderFrame = CreateInstance("Frame", {
-        Size = UDim2.new(1, -20, 0, 4),
+        Size = UDim2.new(1, -35, 0, 4), -- Make room for cursor icon
         Position = UDim2.new(0, 10, 0, 33),
         BackgroundColor3 = self.Theme.Tertiary,
         BorderSizePixel = 0
@@ -896,6 +978,17 @@ function Library:CreateSlider(section, config)
         CornerRadius = UDim.new(0.5, 0)
     }, slider.Knob)
     
+    -- Cursor icon on the right side
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -15, 0, 33),
+        BackgroundTransparency = 1,
+        Text = "👆",
+        TextSize = 10,
+        TextTransparency = 0.7
+    }, slider.Frame)
+    
     local dragging = false
     
     local function UpdateSlider(input)
@@ -906,8 +999,9 @@ function Library:CreateSlider(section, config)
         slider.Value = math.floor(slider.Min + (slider.Max - slider.Min) * percentage)
         slider.ValueLabel.Text = tostring(slider.Value)
         
-        Tween(slider.Fill, {Size = UDim2.new(percentage, 0, 1, 0)}, 0.1)
-        Tween(slider.Knob, {Position = UDim2.new(percentage, -6, 0.5, -6)}, 0.1)
+        -- Smoother animation
+        Tween(slider.Fill, {Size = UDim2.new(percentage, 0, 1, 0)}, 0.05, Enum.EasingStyle.Linear)
+        Tween(slider.Knob, {Position = UDim2.new(percentage, -6, 0.5, -6)}, 0.05, Enum.EasingStyle.Linear)
         
         if config.Callback then
             config.Callback(slider.Value)
@@ -1047,7 +1141,7 @@ function Library:CreateDropdown(section, config)
     }, dropdown.Frame)
     
     dropdown.Button = CreateInstance("TextButton", {
-        Size = UDim2.new(0.65, -10, 0, 27),
+        Size = UDim2.new(0.65, -25, 0, 27), -- Make room for cursor icon
         Position = UDim2.new(0.35, 5, 0, 4),
         BackgroundColor3 = self.Theme.Tertiary,
         BackgroundTransparency = 0.3,
@@ -1073,31 +1167,38 @@ function Library:CreateDropdown(section, config)
         Font = Enum.Font.Ubuntu
     }, dropdown.Button)
     
+    -- Cursor icon on the right side
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -15, 0.5, -6),
+        BackgroundTransparency = 1,
+        Text = "👆",
+        TextSize = 10,
+        TextTransparency = 0.7
+    }, dropdown.Frame)
+    
+    -- Dropdown options container (no background container)
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(0.65, -10, 0, 0),
         Position = UDim2.new(0.35, 5, 0, 35),
-        BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = 1, -- Remove background
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
         Visible = true
     }, dropdown.Frame)
     
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 4)
-    }, dropdown.OptionContainer)
-    
     CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 2)
+        Padding = UDim.new(0, 3) -- Spacing between options
     }, dropdown.OptionContainer)
     
     CreateInstance("UIPadding", {
         PaddingTop = UDim.new(0, 3),
         PaddingBottom = UDim.new(0, 3),
-        PaddingLeft = UDim.new(0, 3),
-        PaddingRight = UDim.new(0, 3)
+        PaddingLeft = UDim.new(0, 0),
+        PaddingRight = UDim.new(0, 0)
     }, dropdown.OptionContainer)
     
     local function UpdateOptions()
@@ -1110,8 +1211,8 @@ function Library:CreateDropdown(section, config)
         for _, option in pairs(dropdown.Options) do
             local optionButton = CreateInstance("TextButton", {
                 Size = UDim2.new(1, 0, 0, 22),
-                BackgroundColor3 = self.Theme.Secondary,
-                BackgroundTransparency = 0.5,
+                BackgroundColor3 = self.Theme.SectionBackground, -- Individual background
+                BackgroundTransparency = 0.3,
                 BorderSizePixel = 0,
                 Text = option,
                 TextColor3 = self.Theme.Text,
@@ -1120,16 +1221,16 @@ function Library:CreateDropdown(section, config)
             }, dropdown.OptionContainer)
             
             CreateInstance("UICorner", {
-                CornerRadius = UDim.new(0, 3)
+                CornerRadius = UDim.new(0, 4)
             }, optionButton)
             
             optionButton.MouseEnter:Connect(function()
-                Tween(optionButton, {BackgroundTransparency = 0.2}, 0.2)
+                Tween(optionButton, {BackgroundTransparency = 0.1}, 0.2)
                 Mouse.Icon = "rbxassetid://86509207249522"
             end)
             
             optionButton.MouseLeave:Connect(function()
-                Tween(optionButton, {BackgroundTransparency = 0.5}, 0.2)
+                Tween(optionButton, {BackgroundTransparency = 0.3}, 0.2)
                 Mouse.Icon = ""
             end)
             
@@ -1139,7 +1240,7 @@ function Library:CreateDropdown(section, config)
                 dropdown.Open = false
                 
                 local optionCount = #dropdown.Options
-                local maxHeight = math.min(optionCount * 24 + 6, 120)
+                local maxHeight = math.min(optionCount * 25 + 9, 120) -- Account for spacing
                 
                 Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
                 Tween(dropdown.Arrow, {Rotation = 0}, 0.3)
@@ -1158,7 +1259,7 @@ function Library:CreateDropdown(section, config)
         
         if dropdown.Open then
             local optionCount = #dropdown.Options
-            local maxHeight = math.min(optionCount * 24 + 6, 120)
+            local maxHeight = math.min(optionCount * 25 + 9, 120) -- Account for spacing
             local newSize = 35 + maxHeight + 5
             
             dropdown.OptionContainer.Size = UDim2.new(0.65, -10, 0, maxHeight)
@@ -1229,31 +1330,27 @@ function Library:CreateSearchBox(section, config)
         TextSize = 12
     }, search.SearchBox)
     
+    -- Results container (no background container)
     search.ResultsContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(1, -20, 0, 0),
         Position = UDim2.new(0, 10, 0, 35),
-        BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = 1, -- Remove background
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
         Visible = false
     }, search.Frame)
     
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 4)
-    }, search.ResultsContainer)
-    
     CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 2)
+        Padding = UDim.new(0, 3) -- Spacing between results
     }, search.ResultsContainer)
     
     CreateInstance("UIPadding", {
         PaddingTop = UDim.new(0, 3),
         PaddingBottom = UDim.new(0, 3),
-        PaddingLeft = UDim.new(0, 3),
-        PaddingRight = UDim.new(0, 3)
+        PaddingLeft = UDim.new(0, 0),
+        PaddingRight = UDim.new(0, 0)
     }, search.ResultsContainer)
     
     local function UpdateResults()
@@ -1269,8 +1366,8 @@ function Library:CreateSearchBox(section, config)
             
             local resultButton = CreateInstance("TextButton", {
                 Size = UDim2.new(1, 0, 0, 22),
-                BackgroundColor3 = self.Theme.Secondary,
-                BackgroundTransparency = 0.5,
+                BackgroundColor3 = self.Theme.SectionBackground, -- Individual background
+                BackgroundTransparency = 0.3,
                 BorderSizePixel = 0,
                 Text = item,
                 TextColor3 = self.Theme.Text,
@@ -1279,16 +1376,16 @@ function Library:CreateSearchBox(section, config)
             }, search.ResultsContainer)
             
             CreateInstance("UICorner", {
-                CornerRadius = UDim.new(0, 3)
+                CornerRadius = UDim.new(0, 4)
             }, resultButton)
             
             resultButton.MouseEnter:Connect(function()
-                Tween(resultButton, {BackgroundTransparency = 0.2}, 0.2)
+                Tween(resultButton, {BackgroundTransparency = 0.1}, 0.2)
                 Mouse.Icon = "rbxassetid://86509207249522"
             end)
             
             resultButton.MouseLeave:Connect(function()
-                Tween(resultButton, {BackgroundTransparency = 0.5}, 0.2)
+                Tween(resultButton, {BackgroundTransparency = 0.3}, 0.2)
                 Mouse.Icon = ""
             end)
             
@@ -1304,7 +1401,7 @@ function Library:CreateSearchBox(section, config)
         end
         
         if resultCount > 0 then
-            local maxHeight = math.min(resultCount * 24 + 6, 120)
+            local maxHeight = math.min(resultCount * 25 + 9, 120) -- Account for spacing
             local newSize = 35 + maxHeight + 5
             
             search.ResultsContainer.Visible = true
@@ -1335,7 +1432,7 @@ function Library:CreateSearchBox(section, config)
     
     search.SearchBox.FocusLost:Connect(function()
         wait(0.1)
-        if search.SearchBox.Text == "" then
+                if search.SearchBox.Text == "" then
             search.ResultsContainer.Visible = false
             Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
         end
@@ -1387,7 +1484,7 @@ function Library:CreateSeparator(section)
     local separator = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 1),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5, -- Made less visible
+        BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, section.Content)
     
