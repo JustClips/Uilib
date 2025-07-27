@@ -1767,14 +1767,12 @@ function Library:CreateInput(section, config)
         BorderSizePixel = 0
     }, section.Content)
     
-    -- Store original transparency
     input.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, input.Frame)
     
-    -- Add stroke if thickness > 0
     if self.StrokeThickness > 0 then
         CreateInstance("UIStroke", {
             Color = self.Theme.Border,
@@ -2284,7 +2282,7 @@ function Library:CreateSearchBox(section, config)
         TextColor3 = self.Theme.Text,
         TextSize = 14,
         Font = self.Font,
-        PlaceholderText = config.Placeholder or "Search...",
+        PlaceholderText = config.PlaceholderText or "Search...",
         PlaceholderColor3 = self.Theme.TextDark,
         ClearTextOnFocus = false
     }, search.Frame)
