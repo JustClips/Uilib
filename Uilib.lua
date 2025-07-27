@@ -2570,9 +2570,8 @@ function Library:SetTheme(themeName)
             if descendant.Name == "Highlight" then
                 descendant.BackgroundColor3 = self.Theme.SectionHighlight
             elseif descendant.Name == "SectionHeader" then
-                if not self.SectionHeaderWhite then
-                    descendant.TextColor3 = self.Theme.Accent
-                end
+                -- Fix: Always respect SectionHeaderWhite setting, even during theme changes
+                descendant.TextColor3 = self.SectionHeaderConfig.Color or (self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent)
             elseif descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
                 if descendant.TextColor3 ~= self.Theme.TextDark then
                     descendant.TextColor3 = self.Theme.Text
