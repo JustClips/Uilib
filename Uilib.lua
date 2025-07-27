@@ -1264,6 +1264,9 @@ function Library:UpdateSectionHeaders()
             section.Header.TextSize = self.SectionHeaderConfig.Size
             section.Header.Font = self.SectionHeaderConfig.Font
             
+            -- Fix: Update header text color to respect SectionHeaderWhite setting
+            section.Header.TextColor3 = self.SectionHeaderConfig.Color or (self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent)
+            
             local headerAlignment = Enum.TextXAlignment.Center
             if self.SectionHeaderConfig.Position == "Left" then
                 headerAlignment = Enum.TextXAlignment.Left
@@ -1916,7 +1919,7 @@ function Library:CreateDropdown(section, config)
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
-        Visible = true
+        Visible = false  -- Fix: Start hidden to prevent empty container showing
     }, dropdown.Frame)
     
     dropdown.OptionContainer:SetAttribute("OriginalBackgroundTransparency", 0.1)
@@ -1995,9 +1998,7 @@ function Library:CreateDropdown(section, config)
                 dropdown.Button.Text = option
                 dropdown.Open = false
                 
-                local optionCount = #dropdown.Options
-                local maxHeight = math.min(optionCount * 24 + 6, 120)
-                
+                dropdown.OptionContainer.Visible = false  -- Fix: Hide container when option selected
                 Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
                 
@@ -2013,15 +2014,18 @@ function Library:CreateDropdown(section, config)
     dropdown.Button.MouseButton1Click:Connect(function()
         dropdown.Open = not dropdown.Open
         
-        if dropdown.Open then
+        if dropdown.Open and #dropdown.Options > 0 then  -- Fix: Only open if there are options
             local optionCount = #dropdown.Options
             local maxHeight = math.min(optionCount * 24 + 6, 120)
             local newSize = 35 + maxHeight + 5
             
+            dropdown.OptionContainer.Visible = true  -- Show container when opening
             dropdown.OptionContainer.Size = UDim2.new(0.65, -10, 0, maxHeight)
             Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, newSize)}, 0.4, Enum.EasingStyle.Back)
             Tween(dropdown.Arrow, {Rotation = 180}, 0.3, Enum.EasingStyle.Back)
         else
+            dropdown.Open = false  -- Close if no options or already closing
+            dropdown.OptionContainer.Visible = false  -- Hide container when closing
             Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
             Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
         end
