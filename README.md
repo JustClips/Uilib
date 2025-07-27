@@ -23,7 +23,7 @@ A modern, feature-rich UI library for Roblox with smooth animations, customizabl
 ## 📦 Installation
 
 ```lua
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/eps1llon-hub/main/library.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Source.lua"))()
 ```
 
 ## 🚀 Quick Start
