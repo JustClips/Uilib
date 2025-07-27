@@ -1,66 +1,337 @@
-# Eps1llon Hub Premium UI Library
+# 🎨 Eps1llon Hub Premium UI Library
 
-A modern, feature-rich UI library for Roblox with smooth animations, resizable interface, and multiple themes.
+A modern, feature-rich UI library for Roblox with smooth animations, customizable themes, and advanced functionality.
 
-## 🌟 Key Features
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Roblox](https://img.shields.io/badge/platform-Roblox-red)
 
-- **Multiple Themes**: Dark, Light, Purple, and Ocean themes
-- **Ultra-Smooth Animations**: Synchronized fade transitions and smooth toggle animations
-- **Resizable Window**: Drag from bottom-right corner to resize
-- **Smart Minimization**: Click to restore, drag to move the minimized window
-- **Active Functions Display**: Real-time display of active toggles/functions
-- **Advanced UI Elements**: Buttons, Toggles, Sliders, Dropdowns, Input fields, Search boxes, and more
-- **Custom Background**: Includes custom background image with proper transparency
+## 📋 Table of Contents
+- [Features](#-features)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [Configuration Options](#-configuration-options)
+- [UI Elements](#-ui-elements)
+- [Advanced Features](#-advanced-features)
+- [Themes](#-themes)
+- [Customization](#-customization)
+- [Full Example](#-full-example)
+- [Troubleshooting](#-troubleshooting)
 
-## 🛠️ Latest Updates (2025-07-27)
+## ✨ Features
 
-1. **Synchronized Section Animations**: All elements fade in/out at the same speed (0.15s)
-2. **Fixed Minimized Window**: Proper drag detection - only restores on quick clicks, not while dragging
-3. **Enhanced Toggle Animation**: Smooth color transitions with bounce effect and shadow
-4. **Improved Element Transparency**: Proper handling of all element transparencies during transitions
+- 🎨 **Multiple Themes** - Dark, Light, Purple, and Ocean themes
+- 🎯 **Dropdown Sections** - Collapsible sections for better organization
+- ⌨️ **Customizable Keybinds** - Set any key to toggle the UI
+- 📱 **Resizable Interface** - Drag corners to resize (500x400 to 800x600)
+- 🔍 **Advanced Search** - Functional search with custom callbacks
+- 💫 **Smooth Animations** - All elements have polished transitions
+- 🎪 **Active Functions Display** - Real-time view of active features
+- 🔧 **Highly Customizable** - Adjust darkness, stroke thickness, fonts, and more
 
 ## 📥 Installation
 
 ```lua
-local Library = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
+local Library = loadstring(game:HttpGet("YOUR_RAW_GITHUB_URL_HERE"))()
 ```
 
-## 📚 Complete Usage Example
+## 🚀 Quick Start
 
 ```lua
 -- Load the library
-local Library = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
+local Library = loadstring(game:HttpGet("YOUR_URL"))()
 
--- Create main window with Ocean theme
+-- Create window with default settings
 local Window = Library:Create({
-    Theme = "Ocean" -- Options: "Dark", "Light", "Purple", "Ocean"
+    Theme = "Ocean"
+})
+
+-- Create a section
+local MainSection = Window:CreateSection("Main")
+
+-- Add a button
+Window:CreateButton(MainSection, {
+    Text = "Click Me!",
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+```
+
+## ⚙️ Configuration Options
+
+When creating a window, you can customize various options:
+
+```lua
+local Window = Library:Create({
+    Theme = "Ocean",                    -- "Dark", "Light", "Purple", "Ocean"
+    ToggleKey = Enum.KeyCode.RightShift, -- Key to toggle UI visibility
+    ButtonDarkness = 0.5,               -- 0 = transparent, 1 = opaque
+    StrokeThickness = 1,                -- Border thickness (0-5)
+    Font = "Ubuntu",                    -- Font name (see Fonts section)
+    SectionHeaderEnabled = true,        -- Show section headers in content area
+    SectionHeaderWhite = false,         -- Make headers white instead of colored
+    DropdownSections = false            -- Enable collapsible sections
+})
+```
+
+## 🧩 UI Elements
+
+### Button
+```lua
+Window:CreateButton(section, {
+    Text = "Button Name",
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+```
+
+### Toggle
+```lua
+local toggle = Window:CreateToggle(section, {
+    Text = "Toggle Name",
+    Default = false,
+    Callback = function(value)
+        print("Toggle is now:", value)
+    end
+})
+
+-- Set toggle programmatically
+toggle.Set(true)
+```
+
+### Slider
+```lua
+local slider = Window:CreateSlider(section, {
+    Text = "Slider Name",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Callback = function(value)
+        print("Slider value:", value)
+    end
+})
+```
+
+### Input Box
+```lua
+Window:CreateInput(section, {
+    Text = "Input Name",
+    Placeholder = "Type here...",
+    Default = "Default text",
+    Callback = function(text, enterPressed)
+        if enterPressed then
+            print("User entered:", text)
+        end
+    end
+})
+```
+
+### Dropdown
+```lua
+Window:CreateDropdown(section, {
+    Text = "Select Option",
+    Options = {"Option 1", "Option 2", "Option 3"},
+    Default = "Option 1",
+    Callback = function(selected)
+        print("Selected:", selected)
+    end
+})
+```
+
+### Search Box
+```lua
+local searchBox = Window:CreateSearchBox(section, {
+    Placeholder = "Search items...",
+    Items = {"Apple", "Banana", "Cherry", "Date"},
+    OnSelected = function(item)
+        print("Selected:", item)
+    end,
+    OnSearch = function(searchText, items)
+        -- Custom search logic (optional)
+        local filtered = {}
+        for _, item in pairs(items) do
+            if item:lower():find(searchText:lower()) then
+                table.insert(filtered, item)
+            end
+        end
+        return filtered
+    end
+})
+
+-- Update search items dynamically
+searchBox.UpdateItems({"New", "Items", "Here"})
+```
+
+### Keybind
+```lua
+Window:CreateKeybind(section, {
+    Text = "Keybind Name",
+    Default = Enum.KeyCode.F,
+    Callback = function()
+        print("Keybind pressed!")
+    end
+})
+```
+
+### Label
+```lua
+Window:CreateLabel(section, {
+    Text = "This is a label",
+    Color = Color3.fromRGB(255, 255, 0) -- Optional color
+})
+```
+
+### Separator
+```lua
+Window:CreateSeparator(section)
+```
+
+## 🎯 Advanced Features
+
+### Dropdown Sections
+Enable collapsible sections that start closed and expand when clicked:
+
+```lua
+local Window = Library:Create({
+    DropdownSections = true
+})
+
+-- Sections will now have a dropdown arrow and collapse/expand functionality
+```
+
+### Custom Section Headers
+Display section names prominently at the top of content area:
+
+```lua
+local Window = Library:Create({
+    SectionHeaderEnabled = true,
+    SectionHeaderWhite = true  -- Makes headers white instead of accent color
+})
+```
+
+### Notifications
+```lua
+Window:Notify({
+    Title = "Success!",
+    Text = "Operation completed successfully",
+    Duration = 3  -- seconds
+})
+```
+
+### Runtime Customization
+```lua
+-- Change theme
+Window:SetTheme("Purple")
+
+-- Adjust button darkness
+Window:SetButtonDarkness(0.3)  -- More transparent
+
+-- Change stroke thickness
+Window:SetStrokeThickness(2)
+
+-- Change font
+Window:SetFont("Gotham")
+
+-- Change toggle key
+Window:SetToggleKey(Enum.KeyCode.Tab)
+```
+
+## 🎨 Themes
+
+Available themes:
+- **Dark** - Classic dark theme with blue accents
+- **Light** - Clean light theme for daytime use  
+- **Purple** - Elegant purple theme
+- **Ocean** - Cool ocean blue theme (default)
+
+## 🛠️ Customization
+
+### Available Fonts
+- Ubuntu (default)
+- Gotham
+- GothamBold
+- SourceSans
+- SourceSansBold
+- Code
+- Highway
+- SciFi
+- Arial
+- ArialBold
+
+### Button Darkness
+Adjust the opacity of all UI elements:
+```lua
+Window:SetButtonDarkness(0.2)  -- Very transparent
+Window:SetButtonDarkness(0.8)  -- Nearly opaque
+```
+
+### Stroke Thickness
+Control border thickness:
+```lua
+Window:SetStrokeThickness(0)  -- No borders
+Window:SetStrokeThickness(3)  -- Thick borders
+```
+
+## 📖 Full Example
+
+```lua
+-- Eps1llon Hub Example Script
+-- Created by: JustClips
+-- Date: 2025-07-27
+
+-- Load the library
+local Library = loadstring(game:HttpGet("YOUR_URL"))()
+
+-- Create window with custom configuration
+local Window = Library:Create({
+    Theme = "Ocean",
+    ToggleKey = Enum.KeyCode.RightShift,
+    ButtonDarkness = 0.5,
+    StrokeThickness = 1,
+    Font = "Ubuntu",
+    SectionHeaderEnabled = true,
+    SectionHeaderWhite = false,
+    DropdownSections = false  -- Set to true for collapsible sections
 })
 
 -- Create sections
 local MainSection = Window:CreateSection("Main")
-local CombatSection = Window:CreateSection("Combat")
+local PlayerSection = Window:CreateSection("Player")
 local VisualsSection = Window:CreateSection("Visuals")
+local MiscSection = Window:CreateSection("Misc")
 local SettingsSection = Window:CreateSection("Settings")
 
--- Main Section Elements
+-- Main Section
+Window:CreateLabel(MainSection, {
+    Text = "Main Features",
+    Color = Color3.fromRGB(100, 200, 255)
+})
+
 Window:CreateButton(MainSection, {
-    Text = "Execute Script",
+    Text = "Execute Main Script",
     Callback = function()
-        print("Script executed!")
         Window:Notify({
-            Title = "Success",
-            Text = "Script has been executed successfully!",
-            Duration = 3
+            Title = "Executed!",
+            Text = "Main script has been executed",
+            Duration = 2
         })
     end
 })
 
-local autoFarmToggle = Window:CreateToggle(MainSection, {
+local autoFarm = Window:CreateToggle(MainSection, {
     Text = "Auto Farm",
     Default = false,
     Callback = function(value)
-        print("Auto Farm:", value)
-        -- Your auto farm code here
+        getgenv().AutoFarm = value
+        if value then
+            -- Start auto farm
+            print("Auto farm enabled")
+        else
+            -- Stop auto farm
+            print("Auto farm disabled")
+        end
     end
 })
 
@@ -70,48 +341,54 @@ Window:CreateSlider(MainSection, {
     Max = 10,
     Default = 5,
     Callback = function(value)
-        print("Farm Speed:", value)
-        -- Adjust farm speed
+        getgenv().FarmSpeed = value
     end
 })
 
--- Combat Section Elements
-Window:CreateToggle(CombatSection, {
-    Text = "Kill Aura",
+Window:CreateSeparator(MainSection)
+
+-- Player Section
+local speedSlider = Window:CreateSlider(PlayerSection, {
+    Text = "Walk Speed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Callback = function(value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+    end
+})
+
+local jumpSlider = Window:CreateSlider(PlayerSection, {
+    Text = "Jump Power",
+    Min = 50,
+    Max = 300,
+    Default = 50,
+    Callback = function(value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+    end
+})
+
+Window:CreateToggle(PlayerSection, {
+    Text = "Infinite Jump",
     Default = false,
     Callback = function(value)
-        print("Kill Aura:", value)
-        -- Your kill aura code
+        getgenv().InfiniteJump = value
     end
 })
 
-Window:CreateSlider(CombatSection, {
-    Text = "Aura Range",
-    Min = 5,
-    Max = 50,
-    Default = 15,
-    Callback = function(value)
-        print("Aura Range:", value)
-        -- Adjust aura range
+Window:CreateButton(PlayerSection, {
+    Text = "Reset Character",
+    Callback = function()
+        game.Players.LocalPlayer.Character:BreakJoints()
     end
 })
 
-Window:CreateDropdown(CombatSection, {
-    Text = "Target Priority",
-    Options = {"Closest", "Lowest Health", "Highest Health", "Random"},
-    Default = "Closest",
-    Callback = function(selected)
-        print("Target Priority:", selected)
-    end
-})
-
--- Visuals Section Elements
+-- Visuals Section
 Window:CreateToggle(VisualsSection, {
-    Text = "ESP",
+    Text = "ESP Enabled",
     Default = false,
     Callback = function(value)
-        print("ESP:", value)
-        -- Your ESP code
+        -- ESP code here
     end
 })
 
@@ -124,220 +401,166 @@ Window:CreateDropdown(VisualsSection, {
     end
 })
 
-Window:CreateLabel(VisualsSection, {
-    Text = "Visual Settings",
-    Color = Color3.fromRGB(255, 255, 0)
+Window:CreateToggle(VisualsSection, {
+    Text = "Tracers",
+    Default = false,
+    Callback = function(value)
+        -- Tracer code here
+    end
 })
 
 Window:CreateSeparator(VisualsSection)
 
--- Settings Section Elements
-Window:CreateInput(SettingsSection, {
-    Text = "Config Name",
-    Placeholder = "Enter config name...",
-    Default = "MyConfig",
+Window:CreateLabel(VisualsSection, {
+    Text = "Visual Settings"
+})
+
+Window:CreateSlider(VisualsSection, {
+    Text = "Field of View",
+    Min = 70,
+    Max = 120,
+    Default = 70,
+    Callback = function(value)
+        workspace.CurrentCamera.FieldOfView = value
+    end
+})
+
+-- Misc Section
+Window:CreateInput(MiscSection, {
+    Text = "Custom Command",
+    Placeholder = "Enter command...",
     Callback = function(text, enterPressed)
         if enterPressed then
-            print("Config saved as:", text)
+            -- Execute custom command
+            print("Command:", text)
         end
     end
 })
 
-Window:CreateSearchBox(SettingsSection, {
+local playerSearch = Window:CreateSearchBox(MiscSection, {
     Placeholder = "Search players...",
-    Items = {"Player1", "Player2", "Player3", "Player4"},
-    Callback = function(selected)
-        print("Selected player:", selected)
+    Items = {},  -- Will be updated
+    OnSelected = function(playerName)
+        print("Selected player:", playerName)
     end
 })
 
-Window:CreateKeybind(SettingsSection, {
-    Text = "Toggle UI",
-    Default = Enum.KeyCode.RightShift,
-    Callback = function()
-        Window:Minimize()
-    end
-})
-
-Window:CreateButton(SettingsSection, {
-    Text = "Change Theme",
-    Callback = function()
-        local themes = {"Dark", "Light", "Purple", "Ocean"}
-        local currentTheme = 1
-        for i, theme in pairs(themes) do
-            if Window.Theme == Themes[theme] then
-                currentTheme = i
-                break
-            end
+-- Update player list
+spawn(function()
+    while true do
+        local players = {}
+        for _, player in pairs(game.Players:GetPlayers()) do
+            table.insert(players, player.Name)
         end
-        local nextTheme = themes[currentTheme % #themes + 1]
-        Window:SetTheme(nextTheme)
-        
+        playerSearch.UpdateItems(players)
+        wait(5)
+    end
+end)
+
+Window:CreateKeybind(MiscSection, {
+    Text = "Panic Key",
+    Default = Enum.KeyCode.P,
+    Callback = function()
+        -- Disable all features
+        autoFarm.Set(false)
         Window:Notify({
-            Title = "Theme Changed",
-            Text = "Changed to " .. nextTheme .. " theme",
+            Title = "Panic!",
+            Text = "All features disabled",
             Duration = 2
         })
     end
 })
 
--- Example of programmatic control
-wait(2)
-autoFarmToggle.Set(true) -- Enable auto farm after 2 seconds
-
--- Show welcome notification
-Window:Notify({
-    Title = "Welcome!",
-    Text = "Eps1llon Hub loaded successfully",
-    Duration = 5
+-- Settings Section
+Window:CreateLabel(SettingsSection, {
+    Text = "UI Settings"
 })
-```
 
-## 🎨 Available Themes
-
-1. **Dark** - Classic dark theme with blue accents
-2. **Light** - Clean light theme for daytime use
-3. **Purple** - Elegant purple theme
-4. **Ocean** - Cool ocean blue theme (default)
-
-## 📋 API Reference
-
-### Window Creation
-```lua
-local Window = Library:Create({
-    Theme = "Ocean" -- Optional, defaults to "Ocean"
+Window:CreateDropdown(SettingsSection, {
+    Text = "Theme",
+    Options = {"Dark", "Light", "Purple", "Ocean"},
+    Default = "Ocean",
+    Callback = function(selected)
+        Window:SetTheme(selected)
+    end
 })
-```
 
-### Sections
-```lua
-local section = Window:CreateSection("Section Name")
-```
-
-### UI Elements
-
-**Button**
-```lua
-Window:CreateButton(section, {
-    Text = "Button Text",
-    Callback = function() end
-})
-```
-
-**Toggle** (with smooth animations)
-```lua
-local toggle = Window:CreateToggle(section, {
-    Text = "Toggle Text",
-    Default = false,
-    Callback = function(value) end
-})
-toggle.Set(true) -- Set programmatically
-```
-
-**Slider** (ultra-smooth)
-```lua
-Window:CreateSlider(section, {
-    Text = "Slider Text",
+Window:CreateSlider(SettingsSection, {
+    Text = "Button Transparency",
     Min = 0,
     Max = 100,
     Default = 50,
-    Callback = function(value) end
+    Callback = function(value)
+        Window:SetButtonDarkness(value / 100)
+    end
 })
-```
 
-**Input**
-```lua
-Window:CreateInput(section, {
-    Text = "Label",
-    Placeholder = "Enter text...",
-    Default = "",
-    Callback = function(text, enterPressed) end
+Window:CreateSlider(SettingsSection, {
+    Text = "Border Thickness",
+    Min = 0,
+    Max = 5,
+    Default = 1,
+    Callback = function(value)
+        Window:SetStrokeThickness(value)
+    end
 })
-```
 
-**Dropdown**
-```lua
-Window:CreateDropdown(section, {
-    Text = "Dropdown Label",
-    Options = {"Option 1", "Option 2"},
-    Default = "Option 1",
-    Callback = function(selected) end
+Window:CreateDropdown(SettingsSection, {
+    Text = "Font",
+    Options = {"Ubuntu", "Gotham", "GothamBold", "SourceSans", "Code", "Arial"},
+    Default = "Ubuntu",
+    Callback = function(selected)
+        Window:SetFont(selected)
+    end
 })
-```
 
-**Search Box**
-```lua
-Window:CreateSearchBox(section, {
-    Placeholder = "Search...",
-    Items = {"Item 1", "Item 2", "Item 3"},
-    Callback = function(selected) end
+Window:CreateSeparator(SettingsSection)
+
+Window:CreateButton(SettingsSection, {
+    Text = "Destroy UI",
+    Callback = function()
+        Window:Destroy()
+    end
 })
-```
 
-**Keybind**
-```lua
-Window:CreateKeybind(section, {
-    Text = "Keybind Label",
-    Default = Enum.KeyCode.F,
-    Callback = function() end
-})
-```
-
-**Label**
-```lua
-Window:CreateLabel(section, {
-    Text = "Label Text",
-    Color = Color3.fromRGB(255, 255, 255)
-})
-```
-
-**Separator**
-```lua
-Window:CreateSeparator(section)
-```
-
-### Other Functions
-
-**Notification**
-```lua
+-- Show welcome notification
 Window:Notify({
-    Title = "Title",
-    Text = "Message",
-    Duration = 3 -- seconds
+    Title = "Welcome " .. game.Players.LocalPlayer.Name .. "!",
+    Text = "Eps1llon Hub loaded successfully",
+    Duration = 5
+})
+
+-- Keybind hint
+Window:Notify({
+    Title = "Tip",
+    Text = "Press Right Shift to toggle UI",
+    Duration = 3
 })
 ```
 
-**Theme Change**
-```lua
-Window:SetTheme("Dark") -- "Dark", "Light", "Purple", "Ocean"
-```
+## 🔧 Troubleshooting
 
-**Window Control**
-```lua
-Window:Minimize() -- Minimize to floating icon
-Window:Restore() -- Restore from minimized state
-Window:Destroy() -- Destroy the UI
-```
+### UI won't toggle with keybind
+- Make sure you're not in chat or another text input
+- Try changing the toggle key: `Window:SetToggleKey(Enum.KeyCode.Tab)`
 
-## 💡 Tips & Tricks
+### Sections not showing
+- If using dropdown sections, click on the section name to expand
+- Check that you've created elements in the section
 
-1. **Minimized Window**: Click quickly to restore, drag to move around
-2. **Smooth Animations**: All section transitions are synchronized at 0.15s
-3. **Toggle Effects**: Toggles have bounce animation and shadow effects
-4. **Active Functions**: Toggle and keybind states appear in the floating panel
-5. **Resizing**: Drag from bottom-right corner to resize (500x400 to 800x600)
+### Search not working
+- Ensure you've provided items to search through
+- Check your custom search callback returns a table
 
-## 🐛 Known Issues & Fixes
-
-- ✅ Fixed: Minimized window dragging vs clicking detection
-- ✅ Fixed: Synchronized fade animations for all elements
-- ✅ Fixed: Toggle animations with smooth transitions
-- ✅ Fixed: Proper transparency handling during section switches
+### UI looks wrong
+- Try a different theme
+- Adjust button darkness and stroke thickness
+- Some games may interfere with UI rendering
 
 ## 📄 License
 
-This UI library is created by the Eps1llon Hub Team. Feel free to use and modify for your projects.
+This UI library is free to use and modify. Created by the Eps1llon Hub Team.
 
 ---
 
-Made with ❤️ by Eps1llon Hub Team | Last Updated: 2025-07-27
+**Last Updated:** 2025-07-27 | **Version:** 2.0.0 | **Author:** JustClips
