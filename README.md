@@ -1,364 +1,73 @@
-# 🎨 Eps1llon Hub Premium UI Library
+-- Load the UI Library
+local Library = loadstring(game:HttpGet("YOUR_UI_LIBRARY_URL_HERE"))()
 
-A modern, feature-rich UI library for Roblox with smooth animations, customizable themes, and advanced functionality.
-
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Roblox](https://img.shields.io/badge/platform-Roblox-red)
-
-## 📋 Table of Contents
-- [Features](#-features)
-- [Installation](#-installation)
-- [Quick Start](#-quick-start)
-- [Configuration Options](#-configuration-options)
-- [UI Elements](#-ui-elements)
-- [Advanced Features](#-advanced-features)
-- [Themes](#-themes)
-- [Customization](#-customization)
-- [Full Example](#-full-example)
-- [Troubleshooting](#-troubleshooting)
-
-## ✨ Features
-
-- 🎨 **Multiple Themes** - Dark, Light, Purple, and Ocean themes
-- 🎯 **Dropdown Sections** - Collapsible sections for better organization
-- ⌨️ **Customizable Keybinds** - Set any key to toggle the UI
-- 📱 **Resizable Interface** - Drag corners to resize (500x400 to 800x600)
-- 🔍 **Advanced Search** - Functional search with custom callbacks
-- 💫 **Smooth Animations** - All elements have polished transitions
-- 🎪 **Active Functions Display** - Real-time view of active features
-- 🔧 **Highly Customizable** - Adjust darkness, stroke thickness, fonts, and more
-
-## 📥 Installation
-
-```lua
-local Library = loadstring(game:HttpGet("YOUR_RAW_GITHUB_URL_HERE"))()
-```
-
-## 🚀 Quick Start
-
-```lua
--- Load the library
-local Library = loadstring(game:HttpGet("YOUR_URL"))()
-
--- Create window with default settings
+-- Create the main UI window with custom configuration
 local Window = Library:Create({
-    Theme = "Ocean"
-})
-
--- Create a section
-local MainSection = Window:CreateSection("Main")
-
--- Add a button
-Window:CreateButton(MainSection, {
-    Text = "Click Me!",
-    Callback = function()
-        print("Button clicked!")
-    end
-})
-```
-
-## ⚙️ Configuration Options
-
-When creating a window, you can customize various options:
-
-```lua
-local Window = Library:Create({
-    Theme = "Ocean",                    -- "Dark", "Light", "Purple", "Ocean"
-    ToggleKey = Enum.KeyCode.RightShift, -- Key to toggle UI visibility
-    ButtonDarkness = 0.5,               -- 0 = transparent, 1 = opaque
-    StrokeThickness = 1,                -- Border thickness (0-5)
-    Font = "Ubuntu",                    -- Font name (see Fonts section)
-    SectionHeaderEnabled = true,        -- Show section headers in content area
-    SectionHeaderWhite = false,         -- Make headers white instead of colored
-    DropdownSections = false            -- Enable collapsible sections
-})
-```
-
-## 🧩 UI Elements
-
-### Button
-```lua
-Window:CreateButton(section, {
-    Text = "Button Name",
-    Callback = function()
-        print("Button clicked!")
-    end
-})
-```
-
-### Toggle
-```lua
-local toggle = Window:CreateToggle(section, {
-    Text = "Toggle Name",
-    Default = false,
-    Callback = function(value)
-        print("Toggle is now:", value)
-    end
-})
-
--- Set toggle programmatically
-toggle.Set(true)
-```
-
-### Slider
-```lua
-local slider = Window:CreateSlider(section, {
-    Text = "Slider Name",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Callback = function(value)
-        print("Slider value:", value)
-    end
-})
-```
-
-### Input Box
-```lua
-Window:CreateInput(section, {
-    Text = "Input Name",
-    Placeholder = "Type here...",
-    Default = "Default text",
-    Callback = function(text, enterPressed)
-        if enterPressed then
-            print("User entered:", text)
-        end
-    end
-})
-```
-
-### Dropdown
-```lua
-Window:CreateDropdown(section, {
-    Text = "Select Option",
-    Options = {"Option 1", "Option 2", "Option 3"},
-    Default = "Option 1",
-    Callback = function(selected)
-        print("Selected:", selected)
-    end
-})
-```
-
-### Search Box
-```lua
-local searchBox = Window:CreateSearchBox(section, {
-    Placeholder = "Search items...",
-    Items = {"Apple", "Banana", "Cherry", "Date"},
-    OnSelected = function(item)
-        print("Selected:", item)
-    end,
-    OnSearch = function(searchText, items)
-        -- Custom search logic (optional)
-        local filtered = {}
-        for _, item in pairs(items) do
-            if item:lower():find(searchText:lower()) then
-                table.insert(filtered, item)
-            end
-        end
-        return filtered
-    end
-})
-
--- Update search items dynamically
-searchBox.UpdateItems({"New", "Items", "Here"})
-```
-
-### Keybind
-```lua
-Window:CreateKeybind(section, {
-    Text = "Keybind Name",
-    Default = Enum.KeyCode.F,
-    Callback = function()
-        print("Keybind pressed!")
-    end
-})
-```
-
-### Label
-```lua
-Window:CreateLabel(section, {
-    Text = "This is a label",
-    Color = Color3.fromRGB(255, 255, 0) -- Optional color
-})
-```
-
-### Separator
-```lua
-Window:CreateSeparator(section)
-```
-
-## 🎯 Advanced Features
-
-### Dropdown Sections
-Enable collapsible sections that start closed and expand when clicked:
-
-```lua
-local Window = Library:Create({
-    DropdownSections = true
-})
-
--- Sections will now have a dropdown arrow and collapse/expand functionality
-```
-
-### Custom Section Headers
-Display section names prominently at the top of content area:
-
-```lua
-local Window = Library:Create({
-    SectionHeaderEnabled = true,
-    SectionHeaderWhite = true  -- Makes headers white instead of accent color
-})
-```
-
-### Notifications
-```lua
-Window:Notify({
-    Title = "Success!",
-    Text = "Operation completed successfully",
-    Duration = 3  -- seconds
-})
-```
-
-### Runtime Customization
-```lua
--- Change theme
-Window:SetTheme("Purple")
-
--- Adjust button darkness
-Window:SetButtonDarkness(0.3)  -- More transparent
-
--- Change stroke thickness
-Window:SetStrokeThickness(2)
-
--- Change font
-Window:SetFont("Gotham")
-
--- Change toggle key
-Window:SetToggleKey(Enum.KeyCode.Tab)
-```
-
-## 🎨 Themes
-
-Available themes:
-- **Dark** - Classic dark theme with blue accents
-- **Light** - Clean light theme for daytime use  
-- **Purple** - Elegant purple theme
-- **Ocean** - Cool ocean blue theme (default)
-
-## 🛠️ Customization
-
-### Available Fonts
-- Ubuntu (default)
-- Gotham
-- GothamBold
-- SourceSans
-- SourceSansBold
-- Code
-- Highway
-- SciFi
-- Arial
-- ArialBold
-
-### Button Darkness
-Adjust the opacity of all UI elements:
-```lua
-Window:SetButtonDarkness(0.2)  -- Very transparent
-Window:SetButtonDarkness(0.8)  -- Nearly opaque
-```
-
-### Stroke Thickness
-Control border thickness:
-```lua
-Window:SetStrokeThickness(0)  -- No borders
-Window:SetStrokeThickness(3)  -- Thick borders
-```
-
-## 📖 Full Example
-
-```lua
--- Eps1llon Hub Example Script
--- Created by: JustClips
--- Date: 2025-07-27
-
--- Load the library
-local Library = loadstring(game:HttpGet("YOUR_URL"))()
-
--- Create window with custom configuration
-local Window = Library:Create({
-    Theme = "Ocean",
-    ToggleKey = Enum.KeyCode.RightShift,
-    ButtonDarkness = 0.5,
-    StrokeThickness = 1,
-    Font = "Ubuntu",
-    SectionHeaderEnabled = true,
-    SectionHeaderWhite = false,
-    DropdownSections = false  -- Set to true for collapsible sections
+    Theme = "Ocean",                    -- Available: Dark, Light, Purple, Ocean
+    ToggleKey = Enum.KeyCode.RightShift, -- Key to show/hide UI
+    ButtonDarkness = 0.3,               -- 0 = transparent, 1 = opaque
+    StrokeThickness = 1.5,              -- Border thickness
+    Font = "Ubuntu",                    -- Default font
+    Background = "Blue Sky",            -- Default background
+    SectionHeaderEnabled = true,        -- Show section headers
+    SectionHeaderWhite = false,         -- Use theme color for headers
+    DropdownSections = false,           -- Normal sections (not dropdown)
+    SectionHeaderConfig = {
+        Size = 24,
+        Font = Enum.Font.GothamBold,
+        Color = nil,                    -- nil = use theme color
+        Position = "Center",            -- Center, Left, Right
+        UnderlineEnabled = true,
+        UnderlineSize = 0.6,           -- 60% of header width
+        UnderlineThickness = 2
+    }
 })
 
 -- Create sections
 local MainSection = Window:CreateSection("Main")
-local PlayerSection = Window:CreateSection("Player")
+local CombatSection = Window:CreateSection("Combat")
 local VisualsSection = Window:CreateSection("Visuals")
 local MiscSection = Window:CreateSection("Misc")
 local SettingsSection = Window:CreateSection("Settings")
 
--- Main Section
+-- Main Section Elements
 Window:CreateLabel(MainSection, {
-    Text = "Main Features",
+    Text = "Welcome to Eps1llon Hub!",
     Color = Color3.fromRGB(100, 200, 255)
-})
-
-Window:CreateButton(MainSection, {
-    Text = "Execute Main Script",
-    Callback = function()
-        Window:Notify({
-            Title = "Executed!",
-            Text = "Main script has been executed",
-            Duration = 2
-        })
-    end
-})
-
-local autoFarm = Window:CreateToggle(MainSection, {
-    Text = "Auto Farm",
-    Default = false,
-    Callback = function(value)
-        getgenv().AutoFarm = value
-        if value then
-            -- Start auto farm
-            print("Auto farm enabled")
-        else
-            -- Stop auto farm
-            print("Auto farm disabled")
-        end
-    end
-})
-
-Window:CreateSlider(MainSection, {
-    Text = "Farm Speed",
-    Min = 1,
-    Max = 10,
-    Default = 5,
-    Callback = function(value)
-        getgenv().FarmSpeed = value
-    end
 })
 
 Window:CreateSeparator(MainSection)
 
--- Player Section
-local speedSlider = Window:CreateSlider(PlayerSection, {
-    Text = "Walk Speed",
-    Min = 16,
-    Max = 200,
-    Default = 16,
-    Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+-- Button Example
+local SpeedButton = Window:CreateButton(MainSection, {
+    Text = "Speed Boost",
+    Callback = function()
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+        Window:Notify({
+            Title = "Speed Boost",
+            Text = "Your speed has been increased!",
+            Duration = 3
+        })
     end
 })
 
-local jumpSlider = Window:CreateSlider(PlayerSection, {
+-- Toggle Example
+local GodModeToggle = Window:CreateToggle(MainSection, {
+    Text = "God Mode",
+    Default = false,
+    Callback = function(enabled)
+        if enabled then
+            -- Enable god mode logic
+            print("God Mode Enabled")
+        else
+            -- Disable god mode logic
+            print("God Mode Disabled")
+        end
+    end
+})
+
+-- Slider Example
+local JumpPowerSlider = Window:CreateSlider(MainSection, {
     Text = "Jump Power",
     Min = 50,
     Max = 300,
@@ -368,199 +77,338 @@ local jumpSlider = Window:CreateSlider(PlayerSection, {
     end
 })
 
-Window:CreateToggle(PlayerSection, {
-    Text = "Infinite Jump",
-    Default = false,
-    Callback = function(value)
-        getgenv().InfiniteJump = value
-    end
-})
-
-Window:CreateButton(PlayerSection, {
-    Text = "Reset Character",
-    Callback = function()
-        game.Players.LocalPlayer.Character:BreakJoints()
-    end
-})
-
--- Visuals Section
-Window:CreateToggle(VisualsSection, {
-    Text = "ESP Enabled",
-    Default = false,
-    Callback = function(value)
-        -- ESP code here
-    end
-})
-
-Window:CreateDropdown(VisualsSection, {
-    Text = "ESP Type",
-    Options = {"Box", "Name", "Health", "Distance", "All"},
-    Default = "Box",
-    Callback = function(selected)
-        print("ESP Type:", selected)
-    end
-})
-
-Window:CreateToggle(VisualsSection, {
-    Text = "Tracers",
-    Default = false,
-    Callback = function(value)
-        -- Tracer code here
-    end
-})
-
-Window:CreateSeparator(VisualsSection)
-
-Window:CreateLabel(VisualsSection, {
-    Text = "Visual Settings"
-})
-
-Window:CreateSlider(VisualsSection, {
-    Text = "Field of View",
-    Min = 70,
-    Max = 120,
-    Default = 70,
-    Callback = function(value)
-        workspace.CurrentCamera.FieldOfView = value
-    end
-})
-
--- Misc Section
-Window:CreateInput(MiscSection, {
-    Text = "Custom Command",
-    Placeholder = "Enter command...",
+-- Input Box Example
+local TeleportInput = Window:CreateInput(MainSection, {
+    Text = "Player Name",
+    Placeholder = "Enter player name...",
     Callback = function(text, enterPressed)
         if enterPressed then
-            -- Execute custom command
-            print("Command:", text)
+            -- Teleport to player logic
+            print("Teleporting to:", text)
         end
     end
 })
 
-local playerSearch = Window:CreateSearchBox(MiscSection, {
-    Placeholder = "Search players...",
-    Items = {},  -- Will be updated
-    OnSelected = function(playerName)
-        print("Selected player:", playerName)
+-- Dropdown Example
+local WeaponDropdown = Window:CreateDropdown(MainSection, {
+    Text = "Select Weapon",
+    Options = {"Sword", "Gun", "Bow", "Staff", "Dagger"},
+    Default = "Sword",
+    Callback = function(selected)
+        print("Selected weapon:", selected)
     end
 })
 
--- Update player list
+-- Big Dropdown Example (New Feature)
+local AdvancedSettings = Window:CreateBigDropdown(MainSection, {
+    Text = "Advanced Options",
+    CreateElements = function(dropdown)
+        dropdown.AddLabel({Text = "Movement Settings", Color = Color3.fromRGB(255, 200, 100)})
+        
+        dropdown.AddToggle({
+            Text = "Auto Sprint",
+            Default = false,
+            Callback = function(v) print("Auto Sprint:", v) end
+        })
+        
+        dropdown.AddSlider({
+            Text = "Sprint Speed",
+            Min = 16,
+            Max = 100,
+            Default = 30,
+            Callback = function(v) print("Sprint Speed:", v) end
+        })
+        
+        dropdown.AddSeparator()
+        
+        dropdown.AddLabel({Text = "Jump Settings"})
+        
+        dropdown.AddToggle({
+            Text = "Infinite Jump",
+            Callback = function(v) print("Infinite Jump:", v) end
+        })
+        
+        dropdown.AddInput({
+            Text = "Jump Height",
+            Placeholder = "50-500",
+            Callback = function(text) print("Jump Height:", text) end
+        })
+        
+        dropdown.AddButton({
+            Text = "Reset to Defaults",
+            Callback = function()
+                print("Settings reset!")
+            end
+        })
+    end
+})
+
+-- Combat Section Elements
+Window:CreateKeybind(CombatSection, {
+    Text = "Aimbot",
+    Default = Enum.KeyCode.E,
+    Callback = function()
+        print("Aimbot activated!")
+    end
+})
+
+local ESPToggle = Window:CreateToggle(CombatSection, {
+    Text = "Enable ESP",
+    Default = false,
+    Callback = function(enabled)
+        -- ESP logic here
+        print("ESP:", enabled)
+    end
+})
+
+local FOVSlider = Window:CreateSlider(CombatSection, {
+    Text = "Aimbot FOV",
+    Min = 10,
+    Max = 360,
+    Default = 90,
+    Callback = function(value)
+        print("FOV set to:", value)
+    end
+})
+
+-- Search Box Example
+local PlayerSearch = Window:CreateSearchBox(CombatSection, {
+    Placeholder = "Search players...",
+    Items = {}, -- Will be populated dynamically
+    OnSelected = function(player)
+        print("Selected player:", player)
+    end,
+    OnSearch = function(searchText, items)
+        -- Custom search logic
+        local filtered = {}
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Name:lower():find(searchText) then
+                table.insert(filtered, player.Name)
+            end
+        end
+        return filtered
+    end
+})
+
+-- Update search items dynamically
 spawn(function()
-    while true do
+    while wait(1) do
         local players = {}
         for _, player in pairs(game.Players:GetPlayers()) do
             table.insert(players, player.Name)
         end
-        playerSearch.UpdateItems(players)
-        wait(5)
+        PlayerSearch.UpdateItems(players)
     end
 end)
 
-Window:CreateKeybind(MiscSection, {
-    Text = "Panic Key",
-    Default = Enum.KeyCode.P,
+-- Visuals Section
+local ColorPicker = Window:CreateButton(VisualsSection, {
+    Text = "UI Color (Coming Soon)",
     Callback = function()
-        -- Disable all features
-        autoFarm.Set(false)
         Window:Notify({
-            Title = "Panic!",
-            Text = "All features disabled",
+            Title = "Coming Soon",
+            Text = "Color picker will be added in next update!",
             Duration = 2
         })
     end
 })
 
--- Settings Section
+local CrosshairToggle = Window:CreateToggle(VisualsSection, {
+    Text = "Custom Crosshair",
+    Default = false,
+    Callback = function(enabled)
+        -- Crosshair logic
+    end
+})
+
+local CrosshairSize = Window:CreateSlider(VisualsSection, {
+    Text = "Crosshair Size",
+    Min = 1,
+    Max = 50,
+    Default = 10,
+    Callback = function(value)
+        -- Update crosshair size
+    end
+})
+
+-- Big Dropdown for Visual Settings
+local VisualPresets = Window:CreateBigDropdown(VisualsSection, {
+    Text = "Visual Presets",
+    CreateElements = function(dropdown)
+        dropdown.AddLabel({Text = "Quick Presets"})
+        
+        dropdown.AddButton({
+            Text = "Competitive",
+            Callback = function()
+                -- Apply competitive visual settings
+                print("Applied Competitive preset")
+            end
+        })
+        
+        dropdown.AddButton({
+            Text = "Cinematic",
+            Callback = function()
+                -- Apply cinematic visual settings
+                print("Applied Cinematic preset")
+            end
+        })
+        
+        dropdown.AddSeparator()
+        
+        dropdown.AddToggle({
+            Text = "Motion Blur",
+            Callback = function(v) print("Motion Blur:", v) end
+        })
+        
+        dropdown.AddToggle({
+            Text = "Bloom Effects",
+            Callback = function(v) print("Bloom:", v) end
+        })
+        
+        dropdown.AddSlider({
+            Text = "Render Distance",
+            Min = 100,
+            Max = 1000,
+            Default = 500,
+            Callback = function(v) print("Render Distance:", v) end
+        })
+    end
+})
+
+-- Misc Section
+Window:CreateButton(MiscSection, {
+    Text = "Server Hop",
+    Callback = function()
+        -- Server hop logic
+        print("Hopping servers...")
+    end
+})
+
+Window:CreateButton(MiscSection, {
+    Text = "Rejoin Server",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+    end
+})
+
+Window:CreateToggle(MiscSection, {
+    Text = "Anti-AFK",
+    Default = true,
+    Callback = function(enabled)
+        -- Anti-AFK logic
+        print("Anti-AFK:", enabled)
+    end
+})
+
+Window:CreateInput(MiscSection, {
+    Text = "Chat Spam",
+    Placeholder = "Message to spam...",
+    Callback = function(text, enterPressed)
+        if enterPressed and text ~= "" then
+            -- Chat spam logic
+            print("Spamming:", text)
+        end
+    end
+})
+
+-- Settings Section (Additional to built-in UI Settings)
 Window:CreateLabel(SettingsSection, {
-    Text = "UI Settings"
-})
-
-Window:CreateDropdown(SettingsSection, {
-    Text = "Theme",
-    Options = {"Dark", "Light", "Purple", "Ocean"},
-    Default = "Ocean",
-    Callback = function(selected)
-        Window:SetTheme(selected)
-    end
-})
-
-Window:CreateSlider(SettingsSection, {
-    Text = "Button Transparency",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Callback = function(value)
-        Window:SetButtonDarkness(value / 100)
-    end
-})
-
-Window:CreateSlider(SettingsSection, {
-    Text = "Border Thickness",
-    Min = 0,
-    Max = 5,
-    Default = 1,
-    Callback = function(value)
-        Window:SetStrokeThickness(value)
-    end
-})
-
-Window:CreateDropdown(SettingsSection, {
-    Text = "Font",
-    Options = {"Ubuntu", "Gotham", "GothamBold", "SourceSans", "Code", "Arial"},
-    Default = "Ubuntu",
-    Callback = function(selected)
-        Window:SetFont(selected)
-    end
+    Text = "Game Settings",
+    Color = Color3.fromRGB(255, 255, 100)
 })
 
 Window:CreateSeparator(SettingsSection)
 
-Window:CreateButton(SettingsSection, {
-    Text = "Destroy UI",
-    Callback = function()
-        Window:Destroy()
+local FPSCapDropdown = Window:CreateDropdown(SettingsSection, {
+    Text = "FPS Cap",
+    Options = {"30", "60", "120", "144", "240", "Unlimited"},
+    Default = "60",
+    Callback = function(selected)
+        if selected == "Unlimited" then
+            setfpscap(999)
+        else
+            setfpscap(tonumber(selected))
+        end
     end
 })
 
--- Show welcome notification
+Window:CreateToggle(SettingsSection, {
+    Text = "Show FPS",
+    Default = false,
+    Callback = function(enabled)
+        -- FPS counter logic
+        print("Show FPS:", enabled)
+    end
+})
+
+Window:CreateButton(SettingsSection, {
+    Text = "Export Settings",
+    Callback = function()
+        -- Export settings to clipboard
+        Window:Notify({
+            Title = "Settings",
+            Text = "Settings copied to clipboard!",
+            Duration = 2
+        })
+    end
+})
+
+Window:CreateButton(SettingsSection, {
+    Text = "Load Config",
+    Callback = function()
+        -- Load config logic
+        print("Loading config...")
+    end
+})
+
+-- Example of programmatically changing settings
+wait(2)
+
+-- Change theme
+Window:SetTheme("Purple")
+
+-- Change font
+Window:SetFont("GothamBold")
+
+-- Change button darkness
+Window:SetButtonDarkness(0.5)
+
+-- Change stroke thickness
+Window:SetStrokeThickness(2)
+
+-- Change background
+Window:SetBackground("Mountains")
+
+-- Update section headers
+Window.SectionHeaderConfig.Size = 26
+Window.SectionHeaderConfig.Position = "Left"
+Window:UpdateSectionHeaders()
+
+-- Send notification
 Window:Notify({
-    Title = "Welcome " .. game.Players.LocalPlayer.Name .. "!",
-    Text = "Eps1llon Hub loaded successfully",
+    Title = "UI Loaded",
+    Text = "All features have been loaded successfully!",
     Duration = 5
 })
 
--- Keybind hint
-Window:Notify({
-    Title = "Tip",
-    Text = "Press Right Shift to toggle UI",
-    Duration = 3
+-- Example of using toggle methods
+wait(3)
+GodModeToggle.Set(true) -- Enable god mode programmatically
+
+-- Example of dropdown sections (uncomment to test)
+--[[
+local Window2 = Library:Create({
+    Theme = "Dark",
+    DropdownSections = true, -- This makes sections collapsible
 })
-```
 
-## 🔧 Troubleshooting
+local Section1 = Window2:CreateSection("Dropdown Section 1")
+Window2:CreateButton(Section1, {Text = "Button 1"})
+Window2:CreateToggle(Section1, {Text = "Toggle 1"})
 
-### UI won't toggle with keybind
-- Make sure you're not in chat or another text input
-- Try changing the toggle key: `Window:SetToggleKey(Enum.KeyCode.Tab)`
+local Section2 = Window2:CreateSection("Dropdown Section 2")
+Window2:CreateSlider(Section2, {Text = "Slider 1"})
+--]]
 
-### Sections not showing
-- If using dropdown sections, click on the section name to expand
-- Check that you've created elements in the section
-
-### Search not working
-- Ensure you've provided items to search through
-- Check your custom search callback returns a table
-
-### UI looks wrong
-- Try a different theme
-- Adjust button darkness and stroke thickness
-- Some games may interfere with UI rendering
-
-## 📄 License
-
-This UI library is free to use and modify. Created by the Eps1llon Hub Team.
-
----
-
-**Last Updated:** 2025-07-27 | **Version:** 2.0.0 | **Author:** JustClips
+print("UI Library loaded successfully!")
+print("Press", Window.ToggleKey.Name, "to toggle UI visibility")
