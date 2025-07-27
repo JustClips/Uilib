@@ -1,414 +1,341 @@
-# Eps1llon Hub UI library
+# Eps1llon Hub Premium UI Library
 
+A modern, feature-rich UI library for Roblox with smooth animations, resizable interface, and multiple themes.
 
+## 🌟 Features
 
-## ✨ Features
-
-- **Modern Design**: Clean, professional interface with smooth animations
 - **Multiple Themes**: Dark, Light, Purple, and Ocean themes
-- **Resizable Interface**: Drag corners to resize the main window
-- **Draggable Windows**: Move windows by dragging the title bar
-- **Active Functions Display**: Floating sidebar showing currently active toggles/keybinds
-- **Click Indicators**: Visual indicators on clickable buttons (RBX asset pointer icon)
-- **Minimizable**: Minimize to a compact floating window
-- **Notification System**: Built-in notifications with auto-dismiss
-- **Comprehensive Elements**: Buttons, toggles, sliders, inputs, dropdowns, search boxes, and more
+- **Smooth Animations**: All UI elements have smooth fade-in/out transitions
+- **Resizable Window**: Drag from bottom-right corner to resize
+- **Minimizable**: Minimize to a small floating window that's fully draggable
+- **Active Functions Display**: Shows currently active toggles/functions in a floating panel
+- **Section Animations**: Smooth transitions when switching between sections
+- **Multiple UI Elements**: Buttons, Toggles, Sliders, Dropdowns, Input fields, Search boxes, and more
+- **Custom Background**: Includes custom background image with proper transparency
 
-## 🚀 Installation
+## 🛠️ Fixed Issues
 
-1. Copy the library code to a ModuleScript
-2. Place the ModuleScript in ReplicatedStorage or ServerStorage
-3. Require the module in your script
+1. **Button Click Indicator**: Uses RBX asset ID 86509207249522 with always-white color
+2. **Minimized Window**: Fully draggable with proper ZIndex to prevent blocking
+3. **Smooth Slider**: Ultra-smooth dragging using RunService.Heartbeat
+4. **Section Transitions**: Smooth fade animations when switching sections
+
+## 📥 Installation
 
 ```lua
-local Library = require(game.ReplicatedStorage.Eps1llonHubLibrary)
+local Library = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
 ```
 
-## 📖 Basic Usage
-
-### Creating a Main Window
+## 📚 Usage Example
 
 ```lua
 -- Load the library
-local Library = require(game.ReplicatedStorage.Eps1llonHubLibrary)
+local Library = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
 
--- Create the main window with configuration
+-- Create main window with Ocean theme
 local Window = Library:Create({
-    Theme = "Ocean" -- Available: "Dark", "Light", "Purple", "Ocean"
-})
-```
-
-### Creating Sections
-
-Sections are categories that organize your UI elements:
-
-```lua
--- Create sections for organizing elements
-local MainSection = Window:CreateSection("Main")
-local SettingsSection = Window:CreateSection("Settings")
-local UtilsSection = Window:CreateSection("Utils")
-```
-
-## 🎮 UI Elements
-
-### Buttons
-
-Clickable buttons with visual feedback and click indicators (RBX asset pointer icon):
-
-```lua
-MainSection:CreateButton({
-    Text = "Click Me!",
-    Callback = function()
-        print("Button was clicked!")
-        Window:Notify({
-            Title = "Success",
-            Text = "Button activated!",
-            Duration = 2
-        })
-    end
-})
-```
-
-### Toggles
-
-On/off switches that maintain state:
-
-```lua
-local espEnabled = false
-
-SettingsSection:CreateToggle({
-    Text = "ESP",
-    Default = false,
-    Callback = function(value)
-        espEnabled = value
-        print("ESP is now:", value and "enabled" or "disabled")
-    end
-})
-```
-
-### Sliders
-
-Numeric value selectors with visual feedback:
-
-```lua
-local walkSpeed = 16
-
-MainSection:CreateSlider({
-    Text = "Walk Speed",
-    Min = 0,
-    Max = 100,
-    Default = 16,
-    Callback = function(value)
-        walkSpeed = value
-        -- Apply walk speed to character
-        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-        end
-    end
-})
-```
-
-### Input Boxes
-
-Text input fields for user data:
-
-```lua
-UtilsSection:CreateInput({
-    Text = "Player Name",
-    Placeholder = "Enter username...",
-    Default = "",
-    Callback = function(text, enterPressed)
-        if enterPressed then
-            print("Searching for player:", text)
-            -- Add your player search logic here
-        end
-    end
-})
-```
-
-### Dropdowns
-
-Selection menus with multiple options:
-
-```lua
-local selectedWeapon = "None"
-
-MainSection:CreateDropdown({
-    Text = "Weapon",
-    Options = {"None", "Sword", "Bow", "Staff", "Dagger"},
-    Default = "None",
-    Callback = function(option)
-        selectedWeapon = option
-        print("Selected weapon:", option)
-        -- Add weapon switching logic here
-    end
-})
-```
-
-### Search Boxes
-
-Interactive search with live filtering:
-
-```lua
-local playerNames = {"Player1", "Player2", "Player3", "TestUser", "GameMaster"}
-
-UtilsSection:CreateSearchBox({
-    Placeholder = "Search players...",
-    Items = playerNames,
-    Callback = function(selectedPlayer)
-        print("Selected player:", selectedPlayer)
-        -- Add player selection logic here
-    end
-})
-```
-
-### Labels
-
-Display-only text elements:
-
-```lua
-SettingsSection:CreateLabel({
-    Text = "Version: 1.0.0",
-    Color = Color3.fromRGB(100, 200, 255) -- Optional custom color
-})
-```
-
-### Separators
-
-Visual dividers between elements:
-
-```lua
-SettingsSection:CreateSeparator()
-```
-
-### Keybinds
-
-Key-activated functions:
-
-```lua
-MainSection:CreateKeybind({
-    Text = "Toggle GUI",
-    Default = Enum.KeyCode.F,
-    Callback = function()
-        -- Toggle GUI visibility
-        Window.MainFrame.Visible = not Window.MainFrame.Visible
-    end
-})
-```
-
-## 🎨 Theme System
-
-Change themes dynamically:
-
-```lua
--- Available themes: "Dark", "Light", "Purple", "Ocean"
-Window:SetTheme("Purple")
-```
-
-### Theme Colors
-
-Each theme includes:
-- **Background**: Main window background
-- **Secondary**: Element backgrounds
-- **Tertiary**: Input field backgrounds
-- **Accent**: Highlight and active colors
-- **Text**: Primary text color
-- **TextDark**: Secondary text color
-- **Border**: Border and divider colors
-
-## 📢 Notifications
-
-Display temporary messages to users:
-
-```lua
-Window:Notify({
-    Title = "Information",
-    Text = "This is a notification message!",
-    Duration = 3 -- seconds (optional, default is 3)
-})
-```
-
-## 🎯 Advanced Features
-
-### Enhanced Animations
-- **Smooth Dropdowns**: Dropdowns open and close with Back easing style for natural motion
-- **Responsive Sliders**: Ultra-smooth dragging with minimal lag (0.05s response time)
-- **Bouncy Search Boxes**: Search results appear and disappear with satisfying animations
-
-### Active Functions Display
-
-The library automatically tracks active toggles and keybinds in a floating sidebar. This shows users what features are currently enabled.
-
-### Window Controls
-
-- **Minimize**: Click the "—" button to minimize to a draggable floating icon with the same background
-- **Close**: Click the "×" button to destroy the GUI
-- **Resize**: Drag the bottom-right corner to resize the window
-- **Move**: Drag the title bar to move the window or drag the minimized window directly
-
-### Programmatic Control
-
-```lua
--- Minimize the window
-Window:Minimize()
-
--- Restore from minimized state
-Window:Restore()
-
--- Destroy the GUI completely
-Window:Destroy()
-
--- Add/remove active functions manually
-Window:AddActiveFunction("Custom Feature")
-Window:RemoveActiveFunction("Custom Feature")
-```
-
-## 📝 Complete Example
-
-Here's a full example script showing all features:
-
-```lua
--- Load the library
-local Library = require(game.ReplicatedStorage.Eps1llonHubLibrary)
-
--- Create main window
-local Window = Library:Create({
-    Theme = "Ocean"
+    Theme = "Ocean" -- Options: "Dark", "Light", "Purple", "Ocean"
 })
 
 -- Create sections
 local MainSection = Window:CreateSection("Main")
 local CombatSection = Window:CreateSection("Combat")
+local VisualsSection = Window:CreateSection("Visuals")
 local SettingsSection = Window:CreateSection("Settings")
 
--- Main section elements
-MainSection:CreateButton({
-    Text = "Teleport to Spawn",
+-- Main Section Elements
+Window:CreateButton(MainSection, {
+    Text = "Execute Script",
     Callback = function()
-        local player = game.Players.LocalPlayer
-        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            player.Character.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0)
-            Window:Notify({
-                Title = "Teleported",
-                Text = "Moved to spawn location!"
-            })
-        end
+        print("Script executed!")
+        Window:Notify({
+            Title = "Success",
+            Text = "Script has been executed successfully!",
+            Duration = 3
+        })
     end
 })
 
-MainSection:CreateSlider({
-    Text = "Walk Speed",
-    Min = 0,
-    Max = 100,
-    Default = 16,
-    Callback = function(value)
-        local player = game.Players.LocalPlayer
-        if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = value
-        end
-    end
-})
-
-MainSection:CreateToggle({
-    Text = "Infinite Jump",
+local autoFarmToggle = Window:CreateToggle(MainSection, {
+    Text = "Auto Farm",
     Default = false,
-    Callback = function(enabled)
-        -- Add infinite jump logic here
-        print("Infinite Jump:", enabled)
+    Callback = function(value)
+        print("Auto Farm:", value)
+        -- Your auto farm code here
     end
 })
 
--- Combat section
-CombatSection:CreateDropdown({
-    Text = "Target Player",
-    Options = {"None", "Player1", "Player2", "Player3"},
-    Default = "None",
-    Callback = function(target)
-        print("Target set to:", target)
+Window:CreateSlider(MainSection, {
+    Text = "Farm Speed",
+    Min = 1,
+    Max = 10,
+    Default = 5,
+    Callback = function(value)
+        print("Farm Speed:", value)
+        -- Adjust farm speed
     end
 })
 
-CombatSection:CreateKeybind({
-    Text = "Auto Attack",
-    Default = Enum.KeyCode.X,
+-- Combat Section Elements
+Window:CreateToggle(CombatSection, {
+    Text = "Kill Aura",
+    Default = false,
+    Callback = function(value)
+        print("Kill Aura:", value)
+        -- Your kill aura code
+    end
+})
+
+Window:CreateSlider(CombatSection, {
+    Text = "Aura Range",
+    Min = 5,
+    Max = 50,
+    Default = 15,
+    Callback = function(value)
+        print("Aura Range:", value)
+        -- Adjust aura range
+    end
+})
+
+Window:CreateDropdown(CombatSection, {
+    Text = "Target Priority",
+    Options = {"Closest", "Lowest Health", "Highest Health", "Random"},
+    Default = "Closest",
+    Callback = function(selected)
+        print("Target Priority:", selected)
+    end
+})
+
+-- Visuals Section Elements
+Window:CreateToggle(VisualsSection, {
+    Text = "ESP",
+    Default = false,
+    Callback = function(value)
+        print("ESP:", value)
+        -- Your ESP code
+    end
+})
+
+Window:CreateDropdown(VisualsSection, {
+    Text = "ESP Type",
+    Options = {"Box", "Name", "Health", "Distance", "All"},
+    Default = "Box",
+    Callback = function(selected)
+        print("ESP Type:", selected)
+    end
+})
+
+Window:CreateLabel(VisualsSection, {
+    Text = "Visual Settings",
+    Color = Color3.fromRGB(255, 255, 0)
+})
+
+Window:CreateSeparator(VisualsSection)
+
+-- Settings Section Elements
+Window:CreateInput(SettingsSection, {
+    Text = "Config Name",
+    Placeholder = "Enter config name...",
+    Default = "MyConfig",
+    Callback = function(text, enterPressed)
+        if enterPressed then
+            print("Config saved as:", text)
+        end
+    end
+})
+
+Window:CreateSearchBox(SettingsSection, {
+    Placeholder = "Search players...",
+    Items = game.Players:GetPlayers():GetChildren(),
+    Callback = function(selected)
+        print("Selected player:", selected)
+    end
+})
+
+Window:CreateKeybind(SettingsSection, {
+    Text = "Toggle UI",
+    Default = Enum.KeyCode.RightShift,
     Callback = function()
-        print("Auto attack activated!")
+        Window:Minimize()
     end
 })
 
--- Settings section
-SettingsSection:CreateLabel({
-    Text = "GUI Settings",
-    Color = Color3.fromRGB(100, 200, 255)
-})
-
-SettingsSection:CreateSeparator()
-
-SettingsSection:CreateDropdown({
-    Text = "Theme",
-    Options = {"Dark", "Light", "Purple", "Ocean"},
-    Default = "Ocean",
-    Callback = function(theme)
-        Window:SetTheme(theme)
+Window:CreateButton(SettingsSection, {
+    Text = "Change Theme",
+    Callback = function()
+        local themes = {"Dark", "Light", "Purple", "Ocean"}
+        local currentTheme = 1
+        for i, theme in pairs(themes) do
+            if Window.Theme == Themes[theme] then
+                currentTheme = i
+                break
+            end
+        end
+        local nextTheme = themes[currentTheme % #themes + 1]
+        Window:SetTheme(nextTheme)
+        
         Window:Notify({
             Title = "Theme Changed",
-            Text = "Switched to " .. theme .. " theme!"
+            Text = "Changed to " .. nextTheme .. " theme",
+            Duration = 2
         })
     end
 })
 
-SettingsSection:CreateInput({
-    Text = "Custom Title",
-    Placeholder = "Enter new title...",
-    Callback = function(text, enterPressed)
-        if enterPressed and text ~= "" then
-            Window.Title.Text = text
-        end
-    end
-})
+-- Example of programmatic control
+wait(2)
+autoFarmToggle.Set(true) -- Enable auto farm after 2 seconds
 
--- Search box example
-local searchItems = {"Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig"}
-SettingsSection:CreateSearchBox({
-    Placeholder = "Search fruits...",
-    Items = searchItems,
-    Callback = function(fruit)
-        Window:Notify({
-            Title = "Selected",
-            Text = "You chose: " .. fruit
-        })
-    end
+-- Show welcome notification
+Window:Notify({
+    Title = "Welcome!",
+    Text = "Eps1llon Hub loaded successfully",
+    Duration = 5
 })
-
-print("Eps1llon Hub loaded successfully!")
 ```
 
-## 🔧 Customization Tips
+## 🎨 Available Themes
 
-1. **Organize Logically**: Group related functions into sections
-2. **Use Descriptive Names**: Make button and toggle names clear
-3. **Provide Feedback**: Use notifications to confirm actions
-4. **Set Reasonable Defaults**: Choose sensible default values for sliders and toggles
-5. **Handle Errors**: Add error checking in your callbacks
+1. **Dark** - Classic dark theme with blue accents
+2. **Light** - Clean light theme for daytime use
+3. **Purple** - Elegant purple theme
+4. **Ocean** - Cool ocean blue theme (default)
+
+## 📋 API Reference
+
+### Window Creation
+```lua
+local Window = Library:Create({
+    Theme = "Ocean" -- Optional, defaults to "Ocean"
+})
+```
+
+### Sections
+```lua
+local section = Window:CreateSection("Section Name")
+```
+
+### UI Elements
+
+**Button**
+```lua
+Window:CreateButton(section, {
+    Text = "Button Text",
+    Callback = function() end
+})
+```
+
+**Toggle**
+```lua
+local toggle = Window:CreateToggle(section, {
+    Text = "Toggle Text",
+    Default = false,
+    Callback = function(value) end
+})
+toggle.Set(true) -- Set programmatically
+```
+
+**Slider**
+```lua
+Window:CreateSlider(section, {
+    Text = "Slider Text",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Callback = function(value) end
+})
+```
+
+**Input**
+```lua
+Window:CreateInput(section, {
+    Text = "Label",
+    Placeholder = "Enter text...",
+    Default = "",
+    Callback = function(text, enterPressed) end
+})
+```
+
+**Dropdown**
+```lua
+Window:CreateDropdown(section, {
+    Text = "Dropdown Label",
+    Options = {"Option 1", "Option 2"},
+    Default = "Option 1",
+    Callback = function(selected) end
+})
+```
+
+**Search Box**
+```lua
+Window:CreateSearchBox(section, {
+    Placeholder = "Search...",
+    Items = {"Item 1", "Item 2", "Item 3"},
+    Callback = function(selected) end
+})
+```
+
+**Keybind**
+```lua
+Window:CreateKeybind(section, {
+    Text = "Keybind Label",
+    Default = Enum.KeyCode.F,
+    Callback = function() end
+})
+```
+
+**Label**
+```lua
+Window:CreateLabel(section, {
+    Text = "Label Text",
+    Color = Color3.fromRGB(255, 255, 255)
+})
+```
+
+**Separator**
+```lua
+Window:CreateSeparator(section)
+```
+
+### Other Functions
+
+**Notification**
+```lua
+Window:Notify({
+    Title = "Title",
+    Text = "Message",
+    Duration = 3 -- seconds
+})
+```
+
+**Theme Change**
+```lua
+Window:SetTheme("Dark") -- "Dark", "Light", "Purple", "Ocean"
+```
+
+**Window Control**
+```lua
+Window:Minimize() -- Minimize to floating icon
+Window:Restore() -- Restore from minimized state
+Window:Destroy() -- Destroy the UI
+```
+
+## 💡 Tips
+
+1. The UI is fully resizable - drag from the bottom-right corner
+2. Click the minimize button or the minimized window to toggle states
+3. Active functions (toggles, keybinds) appear in a floating side panel
+4. All elements have smooth hover effects and animations
+5. The UI saves its size when minimized and restores to the same size
 
 ## 🐛 Troubleshooting
 
-**GUI not appearing?**
-- Check that the library is properly required
-- Ensure you're calling `Library:Create()`
-
-**Elements not working?**
-- Verify callback functions are properly defined
-- Check for syntax errors in your callbacks
-
-**Performance issues?**
-- Avoid complex operations in slider callbacks
-- Use debouncing for frequently-called functions
-
-## 📄 License
-
-This library is free to use and modify for your Roblox projects.
+If you encounter any issues:
+1. Make sure you're using the latest version
+2. Check that you're in a game that allows loadstring
+3. Verify that the CoreGui is accessible
+4. Ensure all theme names are spelled correctly
 
 ---
 
-**Created by Eps1llon Hub Development Team**
+Made with ❤️ by Eps1llon Hub Team
