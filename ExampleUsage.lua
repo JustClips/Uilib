@@ -1,407 +1,307 @@
--- Eps1llon Hub UI Library - Complete Usage Example
--- This script demonstrates all features of the library
+-- UILib Example Usage
+-- This script demonstrates all features of the UILib library
 
 -- Load the library
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/eps1llon-hub/main/library.lua"))()
+local UILib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/UILib/main/Source.lua"))()
 
--- Create the main window with custom configuration
-local Window = Library:Create({
-    Theme = "Ocean",                      -- Available: Dark, Light, Purple, Ocean
-    Background = "Blue Sky",              -- Available: Blue Sky, Mountains, Blurred Stars
-    ToggleKey = Enum.KeyCode.RightShift,  -- Key to toggle UI visibility
-    Font = "Ubuntu",                      -- Default font
-    ButtonDarkness = 0.5,                 -- Button transparency (0-1)
-    StrokeThickness = 1,                  -- Border thickness (0-5)
-    SectionHeaderEnabled = true,          -- Show section headers
-    SectionHeaderWhite = false,           -- Make headers white instead of accent color
-    HideUISettings = false,               -- Show UI settings button
-    SectionHeaderConfig = {
-        Size = 22,                        -- Header text size
-        Font = Enum.Font.GothamBold,      -- Header font
-        Color = nil,                      -- Custom color (nil = use theme accent)
-        Position = "Center",              -- Left, Center, or Right
-        UnderlineEnabled = true,          -- Show underline
-        UnderlineSize = 0.5,              -- Underline width (0-1)
-        UnderlineThickness = 2            -- Underline height in pixels
-    }
+-- Create main window
+local Window = UILib:CreateWindow({
+    Title = "UILib Example Hub",
+    SubTitle = "v1.0.0 - Full Demo",
+    SaveFolder = "UILibExample", -- Settings will be saved here
+    IntroEnabled = true,
+    IntroText = "UILib Example",
+    IntroIcon = "rbxassetid://7733964370",
+    Icon = "rbxassetid://7733964370",
+    DisableUIToggle = false
 })
 
--- Create sections
-local MainSection = Window:CreateSection("Main Features")
-local PlayerSection = Window:CreateSection("Player", Color3.fromRGB(255, 100, 100)) -- Custom header color
-local VisualsSection = Window:CreateSection("Visuals", Color3.fromRGB(100, 255, 100))
-local SettingsSection = Window:CreateSection("Settings")
-local ExamplesSection = Window:CreateSection("Examples")
+-- ========================================
+-- Tab 1: Basic Elements
+-- ========================================
+local BasicTab = Window:CreateTab({
+    Name = "Basic Elements",
+    Icon = "rbxassetid://7733960981"
+})
 
--- Main Features Section
-Window:CreateButton(MainSection, {
-    Text = "Execute Script",
+-- Button Example
+BasicTab:AddButton({
+    Title = "Print Message",
+    Description = "Click to print a message to console",
     Callback = function()
-        Window:Notify({
-            Title = "Success",
-            Text = "Script executed successfully!",
+        print("Hello from UILib!")
+        UILib:Notify({
+            Title = "Button Clicked",
+            Content = "Check your console for the message!",
             Duration = 3
         })
     end
 })
 
-Window:CreateToggle(MainSection, {
-    Text = "Auto Farm",
+-- Toggle Example
+local GodmodeToggle = BasicTab:AddToggle({
+    Title = "Godmode",
+    Description = "Enable godmode (example)",
     Default = false,
     Callback = function(value)
-        print("Auto Farm:", value)
         if value then
-            Window:Notify({
-                Title = "Auto Farm",
-                Text = "Auto Farm enabled!",
-                Duration = 2
-            })
+            print("Godmode enabled!")
+            -- Your godmode code here
+        else
+            print("Godmode disabled!")
+            -- Disable godmode code here
         end
     end
 })
 
-Window:CreateSlider(MainSection, {
-    Text = "Walk Speed",
+-- Slider Example
+local WalkspeedSlider = BasicTab:AddSlider({
+    Title = "Walkspeed",
+    Description = "Adjust your walkspeed",
     Min = 16,
     Max = 200,
     Default = 16,
+    Rounding = 0,
     Callback = function(value)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
     end
 })
 
-Window:CreateKeybind(MainSection, {
-    Text = "Toggle Fly",
+-- Dropdown Example
+local TeamDropdown = BasicTab:AddDropdown({
+    Title = "Select Team",
+    Description = "Choose a team to join",
+    Options = {"Red Team", "Blue Team", "Green Team", "Yellow Team"},
+    Default = 1,
+    Callback = function(selected)
+        print("Selected team:", selected)
+        UILib:Notify({
+            Title = "Team Selected",
+            Content = "You selected: " .. selected,
+            Duration = 2
+        })
+    end
+})
+
+-- ========================================
+-- Tab 2: Advanced Elements
+-- ========================================
+local AdvancedTab = Window:CreateTab({
+    Name = "Advanced",
+    Icon = "rbxassetid://7733956134"
+})
+
+-- Color Picker Example
+local ColorPicker = AdvancedTab:AddColorPicker({
+    Title = "UI Color",
+    Description = "Change UI accent color",
+    Default = Color3.fromRGB(59, 130, 246),
+    Callback = function(color)
+        print("Color changed to:", color)
+        -- You could update UI elements with this color
+    end
+})
+
+-- Textbox Example
+local UsernameBox = AdvancedTab:AddTextbox({
+    Title = "Target Player",
+    Description = "Enter a player's username",
+    Default = "",
+    PlaceholderText = "Enter username...",
+    Callback = function(text)
+        print("Target player set to:", text)
+        -- Your targeting code here
+    end
+})
+
+-- Keybind Example
+local FlyBind = AdvancedTab:AddBind({
+    Title = "Fly Keybind",
+    Description = "Press this key to toggle fly",
     Default = Enum.KeyCode.F,
+    Hold = false,
     Callback = function()
         print("Fly key pressed!")
+        -- Your fly toggle code here
+    end,
+    UpdateBind = function(key)
+        print("Fly keybind changed to:", tostring(key))
     end
 })
 
--- Player Section with BigDropdown
-Window:CreateBigDropdown(PlayerSection, {
-    Text = "Character Settings",
-    CreateElements = function(dropdown)
-        dropdown.AddToggle({
-            Text = "God Mode",
-            Default = false,
-            Callback = function(value)
-                print("God Mode:", value)
-            end
-        })
-        
-        dropdown.AddToggle({
-            Text = "Infinite Jump",
-            Default = false,
-            Callback = function(value)
-                print("Infinite Jump:", value)
-            end
-        })
-        
-        dropdown.AddSlider({
-            Text = "Jump Power",
-            Min = 50,
-            Max = 300,
-            Default = 50,
-            Callback = function(value)
-                game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
-            end
-        })
-        
-        dropdown.AddSlider({
-            Text = "Gravity",
-            Min = 0,
-            Max = 196.2,
-            Default = 196.2,
-            Callback = function(value)
-                workspace.Gravity = value
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Reset Character",
-            Callback = function()
-                game.Players.LocalPlayer.Character:BreakJoints()
-            end
-        })
-    end
+-- Section Example
+local CombatSection = AdvancedTab:AddSection({
+    Title = "Combat Settings"
 })
 
-Window:CreateBigDropdown(PlayerSection, {
-    Text = "Teleportation",
-    CreateElements = function(dropdown)
-        dropdown.AddInput({
-            Text = "Player Name",
-            Placeholder = "Enter player name...",
-            Callback = function(text)
-                print("Target player:", text)
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Teleport to Player",
-            Callback = function()
-                print("Teleporting...")
-            end
-        })
-        
-        dropdown.AddSeparator()
-        
-        dropdown.AddLabel({
-            Text = "Quick Teleports",
-            Color = Color3.fromRGB(255, 255, 0)
-        })
-        
-        dropdown.AddButton({
-            Text = "Spawn",
-            Callback = function()
-                -- Teleport to spawn logic
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Previous Position",
-            Callback = function()
-                -- Teleport to previous position
-            end
-        })
-    end
-})
-
--- Visuals Section
-Window:CreateToggle(VisualsSection, {
-    Text = "ESP Enabled",
+CombatSection:AddToggle({
+    Title = "Aimbot",
+    Description = "Enable aimbot",
     Default = false,
     Callback = function(value)
-        print("ESP:", value)
+        print("Aimbot:", value and "Enabled" or "Disabled")
     end
 })
 
-Window:CreateDropdown(VisualsSection, {
-    Text = "ESP Type",
-    Options = {"Box", "Name", "Health", "Distance", "All"},
-    Default = "Box",
-    Callback = function(selected)
-        print("ESP Type:", selected)
-    end
-})
-
-Window:CreateSlider(VisualsSection, {
-    Text = "ESP Distance",
-    Min = 100,
-    Max = 10000,
-    Default = 1000,
+CombatSection:AddSlider({
+    Title = "FOV Size",
+    Description = "Aimbot field of view",
+    Min = 10,
+    Max = 500,
+    Default = 100,
+    Rounding = 0,
     Callback = function(value)
-        print("ESP Distance:", value)
+        print("FOV Size:", value)
     end
 })
 
-Window:CreateSeparator(VisualsSection)
-
-Window:CreateLabel(VisualsSection, {
-    Text = "Chams Settings",
-    Color = Color3.fromRGB(255, 200, 0)
+-- ========================================
+-- Tab 3: Information
+-- ========================================
+local InfoTab = Window:CreateTab({
+    Name = "Information",
+    Icon = "rbxassetid://7733964719"
 })
 
-Window:CreateToggle(VisualsSection, {
-    Text = "Chams Enabled",
+-- Label Example
+InfoTab:AddLabel({
+    Title = "Script Info",
+    Content = "UILib Example v1.0.0"
+})
+
+-- Paragraph Example
+InfoTab:AddParagraph({
+    Title = "About This Script",
+    Content = "This is a demonstration of all UILib features. Each element showcases different functionality that you can use in your own scripts. Feel free to modify and experiment!"
+})
+
+InfoTab:AddParagraph({
+    Title = "Features",
+    Content = "• Modern UI Design\n• Smooth Animations\n• Auto-Save Settings\n• Customizable Elements\n• Easy to Use API"
+})
+
+-- Add some spacing
+InfoTab:AddLabel({
+    Title = "",
+    Content = ""
+})
+
+-- Credits section
+local CreditsSection = InfoTab:AddSection({
+    Title = "Credits"
+})
+
+CreditsSection:AddParagraph({
+    Title = "Developer",
+    Content = "UILib created by JustClips"
+})
+
+CreditsSection:AddButton({
+    Title = "GitHub Repository",
+    Description = "Open the GitHub page",
+    Callback = function()
+        setclipboard("https://github.com/JustClips/UILib")
+        UILib:Notify({
+            Title = "Copied!",
+            Content = "GitHub link copied to clipboard",
+            Duration = 2
+        })
+    end
+})
+
+-- ========================================
+-- Tab 4: Settings & Examples
+-- ========================================
+local SettingsTab = Window:CreateTab({
+    Name = "Settings",
+    Icon = "rbxassetid://7733956134"
+})
+
+-- UI Settings Section
+local UISection = SettingsTab:AddSection({
+    Title = "UI Settings"
+})
+
+UISection:AddButton({
+    Title = "Destroy UI",
+    Description = "Remove the UI completely",
+    Callback = function()
+        Window:Destroy()
+    end
+})
+
+UISection:AddToggle({
+    Title = "Rainbow UI",
+    Description = "Enable rainbow effect (example)",
     Default = false,
     Callback = function(value)
-        print("Chams:", value)
-    end
-})
-
--- Settings Section
-Window:CreateInput(SettingsSection, {
-    Text = "Config Name",
-    Default = "default",
-    Placeholder = "Enter config name...",
-    Callback = function(text, enterPressed)
-        if enterPressed then
-            print("Saving config:", text)
+        if value then
+            print("Rainbow mode enabled!")
+            -- Add rainbow effect code here
+        else
+            print("Rainbow mode disabled!")
         end
     end
 })
 
-Window:CreateButton(SettingsSection, {
-    Text = "Save Config",
+-- Notification Examples Section
+local NotifSection = SettingsTab:AddSection({
+    Title = "Notification Examples"
+})
+
+NotifSection:AddButton({
+    Title = "Success Notification",
+    Description = "Show a success message",
     Callback = function()
-        Window:Notify({
-            Title = "Config",
-            Text = "Configuration saved!",
-            Duration = 2
+        UILib:Notify({
+            Title = "Success!",
+            Content = "Operation completed successfully!",
+            Duration = 3
         })
     end
 })
 
-Window:CreateButton(SettingsSection, {
-    Text = "Load Config",
+NotifSection:AddButton({
+    Title = "Error Notification",
+    Description = "Show an error message",
     Callback = function()
-        Window:Notify({
-            Title = "Config",
-            Text = "Configuration loaded!",
-            Duration = 2
+        UILib:Notify({
+            Title = "Error!",
+            Content = "Something went wrong!",
+            Duration = 3
         })
     end
 })
 
-Window:CreateSeparator(SettingsSection)
-
--- Search Box Example
-local players = {}
-for _, player in pairs(game.Players:GetPlayers()) do
-    table.insert(players, player.Name)
-end
-
-Window:CreateSearchBox(SettingsSection, {
-    Placeholder = "Search players...",
-    Items = players,
-    OnSelected = function(selected)
-        print("Selected player:", selected)
-        Window:Notify({
-            Title = "Player Selected",
-            Text = "You selected: " .. selected,
-            Duration = 2
-        })
-    end
-})
-
--- Examples Section
-Window:CreateLabel(ExamplesSection, {
-    Text = "UI Customization Examples",
-    Color = Color3.fromRGB(100, 200, 255)
-})
-
--- Theme Changer
-Window:CreateDropdown(ExamplesSection, {
-    Text = "Change Theme",
-    Options = {"Dark", "Light", "Purple", "Ocean"},
-    Default = "Ocean",
-    Callback = function(theme)
-        Window:SetTheme(theme)
-        Window:Notify({
-            Title = "Theme Changed",
-            Text = "Theme set to: " .. theme,
-            Duration = 2
-        })
-    end
-})
-
--- Background Changer
-Window:CreateDropdown(ExamplesSection, {
-    Text = "Change Background",
-    Options = {"Blue Sky", "Mountains", "Blurred Stars"},
-    Default = "Blue Sky",
-    Callback = function(bg)
-        Window:SetBackground(bg)
-    end
-})
-
--- Font Changer
-Window:CreateDropdown(ExamplesSection, {
-    Text = "Change Font",
-    Options = {"Ubuntu", "Gotham", "GothamBold", "SourceSans", "Code", "SciFi"},
-    Default = "Ubuntu",
-    Callback = function(font)
-        Window:SetFont(font)
-    end
-})
-
-Window:CreateSeparator(ExamplesSection)
-
--- Dynamic Examples
-Window:CreateButton(ExamplesSection, {
-    Text = "Show Multiple Notifications",
+NotifSection:AddButton({
+    Title = "Long Notification",
+    Description = "Show a longer notification",
     Callback = function()
-        for i = 1, 3 do
-            task.wait(0.5)
-            Window:Notify({
-                Title = "Notification " .. i,
-                Text = "This is notification number " .. i,
-                Duration = 2
-            })
-        end
-    end
-})
-
--- BigDropdown with mixed elements
-Window:CreateBigDropdown(ExamplesSection, {
-    Text = "Advanced Example",
-    CreateElements = function(dropdown)
-        dropdown.AddLabel({
-            Text = "Mixed Elements Example",
-            Color = Color3.fromRGB(255, 100, 255)
-        })
-        
-        dropdown.AddToggle({
-            Text = "Enable All",
-            Default = false,
-            Callback = function(value)
-                print("Enable All:", value)
-            end
-        })
-        
-        dropdown.AddSlider({
-            Text = "Quality",
-            Min = 1,
-            Max = 10,
-            Default = 5,
-            Callback = function(value)
-                print("Quality:", value)
-            end
-        })
-        
-        dropdown.AddDropdown({
-            Text = "Mode",
-            Options = {"Performance", "Balanced", "Quality"},
-            Default = "Balanced",
-            Callback = function(mode)
-                print("Mode:", mode)
-            end
-        })
-        
-        dropdown.AddSeparator()
-        
-        dropdown.AddInput({
-            Text = "Custom Value",
-            Default = "100",
-            Placeholder = "Enter value...",
-            Callback = function(text)
-                print("Custom Value:", text)
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Apply Settings",
-            Callback = function()
-                Window:Notify({
-                    Title = "Settings",
-                    Text = "All settings applied!",
-                    Duration = 2
-                })
-            end
+        UILib:Notify({
+            Title = "Information",
+            Content = "This is a longer notification that demonstrates how the notification system handles longer text content.",
+            Duration = 5
         })
     end
 })
 
--- Add UI Settings to the bottom of Examples section
-Window:AddUISettingsToSection(ExamplesSection)
+-- ========================================
+-- Dynamic Updates Example
+-- ========================================
 
--- Initial notification
-Window:Notify({
+-- Example of updating elements after creation
+task.wait(2)
+GodmodeToggle:UpdateToggle(true) -- Enable godmode toggle after 2 seconds
+
+-- Example of updating dropdown options
+task.wait(5)
+TeamDropdown:UpdateDropdown("Blue Team") -- Change selected team after 5 seconds
+
+-- Show welcome notification
+UILib:Notify({
     Title = "Welcome!",
-    Text = "Eps1llon Hub loaded successfully!",
+    Content = "UILib loaded successfully. Explore all the features!",
     Duration = 5
 })
 
--- Tips
-print([[
-=== Eps1llon Hub Tips ===
-- Press RightShift to toggle UI visibility
-- Click the gear icon for UI settings
-- Drag windows by the title bar
-- Resize by dragging the bottom-right corner
-- Click minimize (-) to shrink to icon
-- All your active features appear in the floating panel
-========================
-]])
+print("UILib Example loaded! Press RightShift to toggle UI visibility.")
