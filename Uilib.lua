@@ -318,7 +318,7 @@ function Library:Create(config)
         BorderSizePixel = 0
     }, self.MainFrame)
     
-    -- Minimized Frame (Floating Square) with better background fitting
+    -- Minimized Frame (Floating Square) - FIXED with proper ZIndex
     self.MinimizedFrame = CreateInstance("Frame", {
         Name = "MinimizedFrame",
         Size = UDim2.new(0, 150, 0, 40),
@@ -327,8 +327,9 @@ function Library:Create(config)
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
         Visible = false,
-        Active = true,  -- Make it interactable
-        Selectable = true  -- Make it selectable
+        ZIndex = 999,  -- High ZIndex to ensure it's on top
+        Active = true,
+        Selectable = true
     }, self.ScreenGui)
     
     -- Add background image to minimized frame (same as main frame)
@@ -340,7 +341,7 @@ function Library:Create(config)
         Image = "rbxassetid://98784591713474",
         ImageTransparency = 0.8,
         ScaleType = Enum.ScaleType.Stretch,
-        ZIndex = -2
+        ZIndex = 998
     }, self.MinimizedFrame)
     
     CreateInstance("UICorner", {
@@ -368,7 +369,7 @@ function Library:Create(config)
         Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
         ImageColor3 = self.Theme.Accent,
         ImageTransparency = 0.8,
-        ZIndex = -1
+        ZIndex = 997
     }, self.MinimizedFrame)
     
     CreateInstance("UICorner", {
@@ -381,27 +382,26 @@ function Library:Create(config)
         Text = "Eps1llon Hub",
         TextColor3 = self.Theme.Text,
         TextSize = 14,
-        Font = Enum.Font.Ubuntu
+        Font = Enum.Font.Ubuntu,
+        ZIndex = 1000
     }, self.MinimizedFrame)
     
-    self.MinimizedButton = CreateInstance("TextButton", {
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1,
-        Text = "",
-        Active = true,
-        Selectable = true
-    }, self.MinimizedFrame)
+    -- Make minimized frame draggable
+    AddDragging(self.MinimizedFrame)
     
-    self.MinimizedButton.MouseButton1Click:Connect(function()
-        self:Restore()
+    -- Click to restore
+    self.MinimizedFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            self:Restore()
+        end
     end)
     
-    self.MinimizedButton.MouseEnter:Connect(function()
+    self.MinimizedFrame.MouseEnter:Connect(function()
         Tween(self.MinimizedFrame, {BackgroundTransparency = 0.05}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
-    self.MinimizedButton.MouseLeave:Connect(function()
+    self.MinimizedFrame.MouseLeave:Connect(function()
         Tween(self.MinimizedFrame, {BackgroundTransparency = 0.1}, 0.2)
         Mouse.Icon = ""
     end)
@@ -409,9 +409,8 @@ function Library:Create(config)
     -- Create Active Functions Display
     self:CreateActiveFunctionsDisplay()
     
-    -- Make frames draggable
+    -- Make main frame draggable
     AddDragging(self.MainFrame, self.TitleBar)
-    AddDragging(self.MinimizedFrame)
     
     -- Add resizing
     self:AddResizing()
@@ -713,26 +712,62 @@ function Library:CreateSection(name)
 end
 
 function Library:SelectSection(section)
+    -- Hide all sections with fade out animation
     for _, s in pairs(self.Sections) do
-        s.Content.Visible = false
-        -- Smooth animation for highlight disappearing
-        if s.Highlight.Visible then
-            Tween(s.Highlight, {Size = UDim2.new(0, 0, 1, -10)}, 0.2)
-            wait(0.1)
-            s.Highlight.Visible = false
-            s.Highlight.Size = UDim2.new(0, 3, 1, -10) -- Reset size for next animation
+        if s.Content.Visible and s ~= section then
+            -- Fade out content
+            for _, child in pairs(s.Content:GetChildren()) do
+                if child:IsA("Frame") then
+                    spawn(function()
+                        Tween(child, {BackgroundTransparency = 1}, 0.2, Enum.EasingStyle.Quad)
+                    end)
+                end
+            end
+            
+            -- Hide highlight with animation
+            if s.Highlight.Visible then
+                Tween(s.Highlight, {Size = UDim2.new(0, 0, 1, -10)}, 0.2)
+                spawn(function()
+                    wait(0.2)
+                    s.Highlight.Visible = false
+                    s.Highlight.Size = UDim2.new(0, 3, 1, -10)
+                end)
+            end
+            
+            Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
+            Tween(s.Button, {BackgroundTransparency = 0.3}, 0.2)
+            
+            spawn(function()
+                wait(0.2)
+                s.Content.Visible = false
+            end)
         end
-        Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
-        Tween(s.Button, {BackgroundTransparency = 0.3}, 0.2)
     end
     
+    -- Show selected section with fade in animation
+    wait(0.2)
     section.Content.Visible = true
     section.Highlight.Visible = true
-    -- Smooth animation for highlight appearing
+    
+    -- Animate highlight appearing
     section.Highlight.Size = UDim2.new(0, 0, 1, -10)
     Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, 0.3)
+    
+    -- Animate section button
     Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
     Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
+    
+    -- Fade in content elements
+    for _, child in pairs(section.Content:GetChildren()) do
+        if child:IsA("Frame") then
+            child.BackgroundTransparency = 1
+            spawn(function()
+                wait(0.1)
+                Tween(child, {BackgroundTransparency = child:GetAttribute("OriginalTransparency") or 0.5}, 0.3, Enum.EasingStyle.Quad)
+            end)
+        end
+    end
+    
     self.CurrentSection = section
 end
 
@@ -769,6 +804,9 @@ function Library:CreateButton(section, config)
         BorderSizePixel = 0
     }, section.Content)
     
+    -- Store original transparency
+    button.Frame:SetAttribute("OriginalTransparency", 0.5)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, button.Frame)
@@ -783,26 +821,25 @@ function Library:CreateButton(section, config)
         Font = Enum.Font.Ubuntu
     }, button.Frame)
     
-    -- Click Indicator (Using a simple arrow instead of RBX asset)
-    button.ClickIndicator = CreateInstance("TextLabel", {
+    -- Click Indicator (RBX Asset Pointer) - Always white
+    button.ClickIndicator = CreateInstance("ImageLabel", {
         Size = UDim2.new(0, 18, 0, 18),
         Position = UDim2.new(1, -24, 0.5, -9),
         BackgroundTransparency = 1,
-        Text = "➤",
-        TextColor3 = self.Theme.Accent,
-        TextSize = 14,
-        Font = Enum.Font.Ubuntu
+        Image = "rbxassetid://86509207249522",
+        ImageColor3 = Color3.fromRGB(255, 255, 255), -- Always white
+        ScaleType = Enum.ScaleType.Fit
     }, button.Frame)
     
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Text}, 0.2)
+        Tween(button.ClickIndicator, {ImageTransparency = 0}, 0.2) -- Make it more visible on hover
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     button.Button.MouseLeave:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.5}, 0.2)
-        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Accent}, 0.2)
+        Tween(button.ClickIndicator, {ImageTransparency = 0.3}, 0.2) -- Slightly transparent when not hovered
         Mouse.Icon = ""
     end)
     
@@ -811,10 +848,10 @@ function Library:CreateButton(section, config)
         local originalColor = button.Frame.BackgroundColor3
         Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
         -- Animate click indicator
-        Tween(button.ClickIndicator, {Rotation = 90}, 0.1)
+        Tween(button.ClickIndicator, {Size = UDim2.new(0, 22, 0, 22), Position = UDim2.new(1, -26, 0.5, -11)}, 0.1)
         wait(0.1)
         Tween(button.Frame, {BackgroundColor3 = originalColor}, 0.1)
-        Tween(button.ClickIndicator, {Rotation = 0}, 0.1)
+        Tween(button.ClickIndicator, {Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(1, -24, 0.5, -9)}, 0.1)
         
         if config.Callback then
             config.Callback()
@@ -835,6 +872,9 @@ function Library:CreateToggle(section, config)
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, section.Content)
+    
+    -- Store original transparency
+    toggle.Frame:SetAttribute("OriginalTransparency", 0.5)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
@@ -924,6 +964,9 @@ function Library:CreateSlider(section, config)
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, section.Content)
+    
+    -- Store original transparency
+    slider.Frame:SetAttribute("OriginalTransparency", 0.5)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
@@ -1061,6 +1104,9 @@ function Library:CreateInput(section, config)
         BorderSizePixel = 0
     }, section.Content)
     
+    -- Store original transparency
+    input.Frame:SetAttribute("OriginalTransparency", 0.5)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, input.Frame)
@@ -1128,6 +1174,9 @@ function Library:CreateDropdown(section, config)
         BorderSizePixel = 0,
         ClipsDescendants = true
     }, section.Content)
+    
+    -- Store original transparency
+    dropdown.Frame:SetAttribute("OriginalTransparency", 0.5)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
@@ -1318,6 +1367,9 @@ function Library:CreateSearchBox(section, config)
         ClipsDescendants = true
     }, section.Content)
     
+    -- Store original transparency
+    search.Frame:SetAttribute("OriginalTransparency", 0.5)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, search.Frame)
@@ -1361,7 +1413,7 @@ function Library:CreateSearchBox(section, config)
         Visible = false
     }, search.Frame)
     
-    CreateInstance("UICorner", {
+        CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 4)
     }, search.ResultsContainer)
     
@@ -1414,7 +1466,7 @@ function Library:CreateSearchBox(section, config)
             end)
             
             resultButton.MouseButton1Click:Connect(function()
-                             search.SearchBox.Text = item
+                search.SearchBox.Text = item
                 search.ResultsContainer.Visible = false
                 Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 
@@ -1486,6 +1538,9 @@ function Library:CreateLabel(section, config)
         BorderSizePixel = 0
     }, section.Content)
     
+    -- Store original transparency
+    label.Frame:SetAttribute("OriginalTransparency", 0.7)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, label.Frame)
@@ -1511,6 +1566,9 @@ function Library:CreateSeparator(section)
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, section.Content)
+    
+    -- Store original transparency
+    separator:SetAttribute("OriginalTransparency", 0.5)
     
     return separator
 end
@@ -1610,6 +1668,9 @@ function Library:CreateKeybind(section, config)
         BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, section.Content)
+    
+    -- Store original transparency
+    keybind.Frame:SetAttribute("OriginalTransparency", 0.5)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
