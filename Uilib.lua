@@ -77,6 +77,13 @@ local Fonts = {
     ArialBold = Enum.Font.ArialBold
 }
 
+-- Available Backgrounds
+local Backgrounds = {
+    ["Blue Sky"] = "rbxassetid://98784591713474",
+    ["Mountains"] = "rbxassetid://128738385973775",
+    ["Blurred Stars"] = "rbxassetid://83743690094319"
+}
+
 -- Utility Functions
 local function CreateInstance(class, properties, parent)
     local instance = Instance.new(class)
@@ -159,6 +166,8 @@ function Library:Create(config)
     self.ActiveFunctions = {}
     self.UIVisible = true
     self.ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift
+    self.ToggleDebounce = false
+    self.CurrentBackground = config.Background or "Blue Sky"
     
     -- Customization Options
     self.ButtonDarkness = config.ButtonDarkness or 0.5  -- 0 = fully transparent, 1 = fully opaque
@@ -167,6 +176,17 @@ function Library:Create(config)
     self.SectionHeaderEnabled = config.SectionHeaderEnabled ~= false  -- Default true
     self.SectionHeaderWhite = config.SectionHeaderWhite or false  -- Default colored
     self.DropdownSections = config.DropdownSections or false  -- Default false (normal sections)
+    
+    -- Section Header Customization
+    self.SectionHeaderConfig = config.SectionHeaderConfig or {
+        Size = 22,
+        Font = Enum.Font.GothamBold,
+        Color = nil, -- Will use theme accent if nil
+        Position = "Center", -- Center, Left, Right
+        UnderlineEnabled = true,
+        UnderlineSize = 0.5, -- Fraction of header width
+        UnderlineThickness = 2
+    }
     
     -- Create ScreenGui
     self.ScreenGui = CreateInstance("ScreenGui", {
@@ -187,12 +207,12 @@ function Library:Create(config)
     }, self.ScreenGui)
     
     -- Add background image to main frame
-    CreateInstance("ImageLabel", {
+    self.BackgroundImage = CreateInstance("ImageLabel", {
         Name = "BackgroundImage",
         Size = UDim2.new(1, 0, 1, 0),
         Position = UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
-        Image = "rbxassetid://98784591713474",
+        Image = Backgrounds[self.CurrentBackground],
         ImageTransparency = 0.8,
         ScaleType = Enum.ScaleType.Stretch,
         ZIndex = -2
@@ -206,7 +226,7 @@ function Library:Create(config)
     -- Apply corner to background image too
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 8)
-    }, self.MainFrame.BackgroundImage)
+    }, self.BackgroundImage)
     
     -- Edge glow effect (made shorter)
     self.EdgeGlow = CreateInstance("ImageLabel", {
@@ -369,7 +389,7 @@ function Library:Create(config)
         Size = UDim2.new(1, 0, 1, 0),
         Position = UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
-        Image = "rbxassetid://98784591713474",
+        Image = Backgrounds[self.CurrentBackground],
         ImageTransparency = 0.8,
         ScaleType = Enum.ScaleType.Stretch,
         ZIndex = 998
@@ -477,17 +497,25 @@ function Library:Create(config)
     -- Add resizing
     self:AddResizing()
     
-    -- Setup toggle keybind
+    -- Setup toggle keybind with debounce
     self:SetupToggleKeybind()
+    
+    -- Create Settings Section
+    self:CreateSettingsSection()
     
     return self
 end
 
--- New toggle keybind setup
+-- Fixed toggle keybind setup with debounce
 function Library:SetupToggleKeybind()
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.KeyCode == self.ToggleKey then
-            self:ToggleUI()
+            if not self.ToggleDebounce then
+                self.ToggleDebounce = true
+                self:ToggleUI()
+                wait(0.3) -- Debounce time
+                self.ToggleDebounce = false
+            end
         end
     end)
 end
@@ -881,34 +909,43 @@ function Library:CreateSection(name)
             Padding = UDim.new(0, 8)
         }, section.Content)
         
-        -- Section Header (if enabled)
+        -- Section Header (if enabled) with customization
         if self.SectionHeaderEnabled then
+            local headerAlignment = Enum.TextXAlignment.Center
+            if self.SectionHeaderConfig.Position == "Left" then
+                headerAlignment = Enum.TextXAlignment.Left
+            elseif self.SectionHeaderConfig.Position == "Right" then
+                headerAlignment = Enum.TextXAlignment.Right
+            end
+            
             section.Header = CreateInstance("TextLabel", {
                 Name = "SectionHeader",
                 Size = UDim2.new(1, -20, 0, 35),
                 Position = UDim2.new(0, 10, 0, 5),
                 BackgroundTransparency = 1,
                 Text = name,
-                TextColor3 = self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent,
-                TextSize = 22,
-                Font = Enum.Font.GothamBold,
-                TextXAlignment = Enum.TextXAlignment.Center,
+                TextColor3 = self.SectionHeaderConfig.Color or (self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent),
+                TextSize = self.SectionHeaderConfig.Size,
+                Font = self.SectionHeaderConfig.Font,
+                TextXAlignment = headerAlignment,
                 Visible = false
             }, self.ContentContainer)
             
             -- Header Underline
-            section.HeaderUnderline = CreateInstance("Frame", {
-                Size = UDim2.new(0.5, 0, 0, 2),
-                Position = UDim2.new(0.25, 0, 0, 35),
-                BackgroundColor3 = self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent,
-                BackgroundTransparency = 0.3,
-                BorderSizePixel = 0,
-                Visible = false
-            }, section.Header)
-            
-            CreateInstance("UICorner", {
-                CornerRadius = UDim.new(0, 1)
-            }, section.HeaderUnderline)
+            if self.SectionHeaderConfig.UnderlineEnabled then
+                section.HeaderUnderline = CreateInstance("Frame", {
+                    Size = UDim2.new(self.SectionHeaderConfig.UnderlineSize, 0, 0, self.SectionHeaderConfig.UnderlineThickness),
+                    Position = UDim2.new((1 - self.SectionHeaderConfig.UnderlineSize) / 2, 0, 0, 35),
+                    BackgroundColor3 = self.SectionHeaderConfig.Color or (self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent),
+                    BackgroundTransparency = 0.3,
+                    BorderSizePixel = 0,
+                    Visible = false
+                }, section.Header)
+                
+                CreateInstance("UICorner", {
+                    CornerRadius = UDim.new(0, 1)
+                }, section.HeaderUnderline)
+            end
         end
         
         -- Section Selection
@@ -969,7 +1006,9 @@ function Library:SelectSection(section)
             -- Fade out header if exists
             if s.Header and s.Header.Visible then
                 Tween(s.Header, {TextTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
-                Tween(s.HeaderUnderline, {BackgroundTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                if s.HeaderUnderline then
+                    Tween(s.HeaderUnderline, {BackgroundTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                end
             end
             
             -- Fade out all content elements at the same time
@@ -1014,7 +1053,9 @@ function Library:SelectSection(section)
                     s.Highlight.Size = UDim2.new(0, 3, 1, -10)
                     if s.Header then
                         s.Header.Visible = false
-                        s.HeaderUnderline.Visible = false
+                        if s.HeaderUnderline then
+                            s.HeaderUnderline.Visible = false
+                        end
                     end
                 end)
             end
@@ -1037,10 +1078,14 @@ function Library:SelectSection(section)
     end
     if section.Header then
         section.Header.Visible = true
-        section.HeaderUnderline.Visible = true
+        if section.HeaderUnderline then
+            section.HeaderUnderline.Visible = true
+        end
         -- Reset header transparency
         section.Header.TextTransparency = 0
-        section.HeaderUnderline.BackgroundTransparency = 0.3
+        if section.HeaderUnderline then
+            section.HeaderUnderline.BackgroundTransparency = 0.3
+        end
     end
     
     -- Animate highlight appearing
@@ -1051,8 +1096,8 @@ function Library:SelectSection(section)
     
     -- Animate header underline
     if section.HeaderUnderline then
-        section.HeaderUnderline.Size = UDim2.new(0, 0, 0, 2)
-        Tween(section.HeaderUnderline, {Size = UDim2.new(0.5, 0, 0, 2)}, animationTime * 2, Enum.EasingStyle.Back)
+        section.HeaderUnderline.Size = UDim2.new(0, 0, 0, self.SectionHeaderConfig.UnderlineThickness)
+        Tween(section.HeaderUnderline, {Size = UDim2.new(self.SectionHeaderConfig.UnderlineSize, 0, 0, self.SectionHeaderConfig.UnderlineThickness)}, animationTime * 2, Enum.EasingStyle.Back)
     end
     
     -- Animate section button
@@ -1094,14 +1139,39 @@ function Library:SelectSection(section)
     self.CurrentSection = section
 end
 
+-- Fixed minimize function with synchronized animations
 function Library:Minimize()
     self.Minimized = true
     self.UIVisible = false
     -- Store current size before minimizing
     self.OriginalSize = self.MainFrame.Size
-    Tween(self.MainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.3)
-    Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, 50, 0, 20)}, 0.3)
-    wait(0.3)
+    
+    -- Fade out all elements at once
+    local animationTime = 0.3
+    
+    -- Main frame elements
+    Tween(self.MainFrame, {BackgroundTransparency = 1}, animationTime)
+    Tween(self.Title, {TextTransparency = 1}, animationTime)
+    Tween(self.CloseButton, {TextTransparency = 1}, animationTime)
+    Tween(self.MinimizeButton, {TextTransparency = 1}, animationTime)
+    Tween(self.TopDivider, {BackgroundTransparency = 1}, animationTime)
+    Tween(self.VerticalDivider, {BackgroundTransparency = 1}, animationTime)
+    Tween(self.EdgeGlow, {ImageTransparency = 1}, animationTime)
+    Tween(self.BackgroundImage, {ImageTransparency = 1}, animationTime)
+    
+    -- Hide all content
+    for _, section in pairs(self.Sections) do
+        section.Button.Visible = false
+        section.Content.Visible = false
+    end
+    
+    -- Shrink frame
+    Tween(self.MainFrame, {Size = UDim2.new(0, 0, 0, 0)}, animationTime)
+    
+    -- Move active functions frame
+    Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, 50, 0, 20)}, animationTime)
+    
+    wait(animationTime)
     self.MainFrame.Visible = false
     self.MinimizedFrame.Visible = true
     Tween(self.MinimizedFrame, {BackgroundTransparency = 0.1}, 0.2)
@@ -1112,9 +1182,201 @@ function Library:Restore()
     self.UIVisible = true
     self.MinimizedFrame.Visible = false
     self.MainFrame.Visible = true
-    -- Restore to the original size, not a fixed size
-    Tween(self.MainFrame, {Size = self.OriginalSize, BackgroundTransparency = 0.05}, 0.3)
+    
+    -- Reset transparencies
+    self.MainFrame.BackgroundTransparency = 0.05
+    self.Title.TextTransparency = 0
+    self.CloseButton.TextTransparency = 0
+    self.MinimizeButton.TextTransparency = 0
+    self.TopDivider.BackgroundTransparency = 0.5
+    self.VerticalDivider.BackgroundTransparency = 0.5
+    self.EdgeGlow.ImageTransparency = 0.9
+    self.BackgroundImage.ImageTransparency = 0.8
+    
+    -- Show all sections
+    for _, section in pairs(self.Sections) do
+        section.Button.Visible = true
+    end
+    
+    -- Show current section content
+    if self.CurrentSection then
+        self.CurrentSection.Content.Visible = true
+    end
+    
+    -- Restore to the original size
+    Tween(self.MainFrame, {Size = self.OriginalSize}, 0.3)
     Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
+end
+
+-- Create Settings Section
+function Library:CreateSettingsSection()
+    if self.SettingsSection then return end
+    
+    self.SettingsSection = self:CreateSection("UI Settings")
+    
+    -- Button Darkness Slider
+    self:CreateSlider(self.SettingsSection, {
+        Text = "Button Darkness",
+        Min = 0,
+        Max = 100,
+        Default = self.ButtonDarkness * 100,
+        Callback = function(value)
+            self:SetButtonDarkness(value / 100)
+        end
+    })
+    
+    -- Stroke Thickness Slider
+    self:CreateSlider(self.SettingsSection, {
+        Text = "Stroke Thickness",
+        Min = 0,
+        Max = 5,
+        Default = self.StrokeThickness,
+        Callback = function(value)
+            self:SetStrokeThickness(value)
+        end
+    })
+    
+    -- Font Dropdown
+    local fontNames = {}
+    for name, _ in pairs(Fonts) do
+        table.insert(fontNames, name)
+    end
+    
+    self:CreateDropdown(self.SettingsSection, {
+        Text = "Font",
+        Options = fontNames,
+        Default = "Ubuntu",
+        Callback = function(font)
+            self:SetFont(font)
+        end
+    })
+    
+    -- Theme Dropdown
+    local themeNames = {}
+    for name, _ in pairs(Themes) do
+        table.insert(themeNames, name)
+    end
+    
+    self:CreateDropdown(self.SettingsSection, {
+        Text = "Theme",
+        Options = themeNames,
+        Default = "Ocean",
+        Callback = function(theme)
+            self:SetTheme(theme)
+        end
+    })
+    
+    -- Background Dropdown
+    local backgroundNames = {}
+    for name, _ in pairs(Backgrounds) do
+        table.insert(backgroundNames, name)
+    end
+    
+    self:CreateDropdown(self.SettingsSection, {
+        Text = "Background",
+        Options = backgroundNames,
+        Default = self.CurrentBackground,
+        Callback = function(background)
+            self:SetBackground(background)
+        end
+    })
+    
+    self:CreateSeparator(self.SettingsSection)
+    
+    -- Section Header Settings
+    self:CreateLabel(self.SettingsSection, {
+        Text = "Section Header Settings",
+        Color = self.Theme.Accent
+    })
+    
+    -- Header Size Slider
+    self:CreateSlider(self.SettingsSection, {
+        Text = "Header Size",
+        Min = 14,
+        Max = 30,
+        Default = self.SectionHeaderConfig.Size,
+        Callback = function(value)
+            self.SectionHeaderConfig.Size = value
+            self:UpdateSectionHeaders()
+        end
+    })
+    
+    -- Header Position Dropdown
+    self:CreateDropdown(self.SettingsSection, {
+        Text = "Header Position",
+        Options = {"Center", "Left", "Right"},
+        Default = self.SectionHeaderConfig.Position,
+        Callback = function(position)
+            self.SectionHeaderConfig.Position = position
+            self:UpdateSectionHeaders()
+        end
+    })
+    
+    -- Header Font Dropdown
+    self:CreateDropdown(self.SettingsSection, {
+        Text = "Header Font",
+        Options = fontNames,
+        Default = "GothamBold",
+        Callback = function(font)
+            self.SectionHeaderConfig.Font = Fonts[font]
+            self:UpdateSectionHeaders()
+        end
+    })
+    
+    -- Underline Toggle
+    self:CreateToggle(self.SettingsSection, {
+        Text = "Header Underline",
+        Default = self.SectionHeaderConfig.UnderlineEnabled,
+        Callback = function(enabled)
+            self.SectionHeaderConfig.UnderlineEnabled = enabled
+            self:UpdateSectionHeaders()
+        end
+    })
+    
+    -- Underline Size Slider
+    self:CreateSlider(self.SettingsSection, {
+        Text = "Underline Size",
+        Min = 10,
+        Max = 100,
+        Default = self.SectionHeaderConfig.UnderlineSize * 100,
+        Callback = function(value)
+            self.SectionHeaderConfig.UnderlineSize = value / 100
+            self:UpdateSectionHeaders()
+        end
+    })
+end
+
+-- Update Section Headers
+function Library:UpdateSectionHeaders()
+    for _, section in pairs(self.Sections) do
+        if section.Header then
+            section.Header.TextSize = self.SectionHeaderConfig.Size
+            section.Header.Font = self.SectionHeaderConfig.Font
+            
+            local headerAlignment = Enum.TextXAlignment.Center
+            if self.SectionHeaderConfig.Position == "Left" then
+                headerAlignment = Enum.TextXAlignment.Left
+            elseif self.SectionHeaderConfig.Position == "Right" then
+                headerAlignment = Enum.TextXAlignment.Right
+            end
+            section.Header.TextXAlignment = headerAlignment
+            
+            if section.HeaderUnderline then
+                section.HeaderUnderline.Visible = self.SectionHeaderConfig.UnderlineEnabled
+                section.HeaderUnderline.Size = UDim2.new(self.SectionHeaderConfig.UnderlineSize, 0, 0, self.SectionHeaderConfig.UnderlineThickness)
+                section.HeaderUnderline.Position = UDim2.new((1 - self.SectionHeaderConfig.UnderlineSize) / 2, 0, 0, 35)
+            end
+        end
+    end
+end
+
+-- New method to set background
+function Library:SetBackground(backgroundName)
+    if Backgrounds[backgroundName] then
+        self.CurrentBackground = backgroundName
+        self.BackgroundImage.Image = Backgrounds[backgroundName]
+        self.MinimizedFrame.MinimizedBackgroundImage.Image = Backgrounds[backgroundName]
+    end
 end
 
 -- Enhanced UI Elements with proper cursor and click indicators
@@ -1165,8 +1427,7 @@ function Library:CreateButton(section, config)
         ImageTransparency = 0.3,
         ScaleType = Enum.ScaleType.Fit
     }, button.Frame)
-    
-    button.ClickIndicator:SetAttribute("OriginalImageTransparency", 0.3)
+        button.ClickIndicator:SetAttribute("OriginalImageTransparency", 0.3)
     
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
@@ -1361,7 +1622,8 @@ function Library:CreateSlider(section, config)
         CreateInstance("UIStroke", {
             Color = self.Theme.Border,
             Transparency = 0.7,
-            Thickness = self.StrokeThickness        }, slider.Frame)
+            Thickness = self.StrokeThickness
+        }, slider.Frame)
     end
     
     slider.Label = CreateInstance("TextLabel", {
@@ -1802,6 +2064,194 @@ function Library:CreateDropdown(section, config)
     return dropdown
 end
 
+-- New BigDropdown element type
+function Library:CreateBigDropdown(section, config)
+    config = config or {}
+    local bigDropdown = {}
+    bigDropdown.Open = false
+    bigDropdown.Elements = {}
+    
+    -- Main button that acts like a regular button but opens dropdown
+    bigDropdown.Frame = CreateInstance("Frame", {
+        Size = UDim2.new(1, 0, 0, 35),
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = self.ButtonDarkness,
+        BorderSizePixel = 0,
+        ClipsDescendants = true
+    }, section.Content)
+    
+    -- Store original transparency
+    bigDropdown.Frame:SetAttribute("OriginalTransparency", self.ButtonDarkness)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 6)
+    }, bigDropdown.Frame)
+    
+    -- Add stroke if thickness > 0
+    if self.StrokeThickness > 0 then
+        CreateInstance("UIStroke", {
+            Color = self.Theme.Border,
+            Transparency = 0.7,
+            Thickness = self.StrokeThickness
+        }, bigDropdown.Frame)
+    end
+    
+    bigDropdown.Button = CreateInstance("TextButton", {
+        Size = UDim2.new(1, -30, 1, 0),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        Text = config.Text or "Big Dropdown",
+        TextColor3 = self.Theme.Text,
+        TextSize = 14,
+        Font = self.Font
+    }, bigDropdown.Frame)
+    
+    -- Dropdown arrow
+    bigDropdown.Arrow = CreateInstance("TextLabel", {
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -25, 0.5, -10),
+        BackgroundTransparency = 1,
+        Text = "▼",
+        TextColor3 = self.Theme.Text,
+        TextSize = 12,
+        Font = self.Font,
+        Rotation = 0
+    }, bigDropdown.Frame)
+    
+    -- Content container for dropdown elements
+    bigDropdown.ContentContainer = CreateInstance("ScrollingFrame", {
+        Size = UDim2.new(1, 0, 0, 0),
+        Position = UDim2.new(0, 0, 1, 5),
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = 0.1,
+        BorderSizePixel = 0,
+        ScrollBarThickness = 3,
+        ScrollBarImageColor3 = self.Theme.Accent,
+        Visible = true,
+        ClipsDescendants = true
+    }, bigDropdown.Frame)
+    
+    bigDropdown.ContentContainer:SetAttribute("OriginalBackgroundTransparency", 0.1)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 6)
+    }, bigDropdown.ContentContainer)
+    
+    CreateInstance("UIStroke", {
+        Color = self.Theme.Accent,
+        Transparency = 0.7,
+        Thickness = self.StrokeThickness
+    }, bigDropdown.ContentContainer)
+    
+    CreateInstance("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 5)
+    }, bigDropdown.ContentContainer)
+    
+    CreateInstance("UIPadding", {
+        PaddingTop = UDim.new(0, 8),
+        PaddingBottom = UDim.new(0, 8),
+        PaddingLeft = UDim.new(0, 8),
+        PaddingRight = UDim.new(0, 8)
+    }, bigDropdown.ContentContainer)
+    
+    -- Methods to add elements to the big dropdown
+    bigDropdown.AddToggle = function(toggleConfig)
+        local toggle = self:CreateToggle({Content = bigDropdown.ContentContainer, UpdateContentSize = function() end}, toggleConfig)
+        table.insert(bigDropdown.Elements, toggle)
+        return toggle
+    end
+    
+    bigDropdown.AddSlider = function(sliderConfig)
+        local slider = self:CreateSlider({Content = bigDropdown.ContentContainer, UpdateContentSize = function() end}, sliderConfig)
+        table.insert(bigDropdown.Elements, slider)
+        return slider
+    end
+    
+    bigDropdown.AddButton = function(buttonConfig)
+        local button = self:CreateButton({Content = bigDropdown.ContentContainer, UpdateContentSize = function() end}, buttonConfig)
+        table.insert(bigDropdown.Elements, button)
+        return button
+    end
+    
+    bigDropdown.AddInput = function(inputConfig)
+        local input = self:CreateInput({Content = bigDropdown.ContentContainer, UpdateContentSize = function() end}, inputConfig)
+        table.insert(bigDropdown.Elements, input)
+        return input
+    end
+    
+    bigDropdown.AddLabel = function(labelConfig)
+        local label = self:CreateLabel({Content = bigDropdown.ContentContainer, UpdateContentSize = function() end}, labelConfig)
+        table.insert(bigDropdown.Elements, label)
+        return label
+    end
+    
+    bigDropdown.AddSeparator = function()
+        local separator = self:CreateSeparator({Content = bigDropdown.ContentContainer, UpdateContentSize = function() end})
+        table.insert(bigDropdown.Elements, separator)
+        return separator
+    end
+    
+    -- Update content size
+    local function UpdateContentSize()
+        local contentHeight = 0
+        for _, child in pairs(bigDropdown.ContentContainer:GetChildren()) do
+            if child:IsA("GuiObject") then
+                contentHeight = contentHeight + child.AbsoluteSize.Y + 5
+            end
+        end
+        contentHeight = math.min(contentHeight + 10, 300) -- Max height of 300
+        
+        if bigDropdown.Open then
+            Tween(bigDropdown.ContentContainer, {Size = UDim2.new(1, 0, 0, contentHeight)}, 0.3, Enum.EasingStyle.Back)
+            Tween(bigDropdown.Frame, {Size = UDim2.new(1, 0, 0, 35 + contentHeight + 5)}, 0.3, Enum.EasingStyle.Back)
+        end
+    end
+    
+    -- Toggle dropdown
+    bigDropdown.Button.MouseButton1Click:Connect(function()
+        bigDropdown.Open = not bigDropdown.Open
+        
+        if bigDropdown.Open then
+            UpdateContentSize()
+            Tween(bigDropdown.Arrow, {Rotation = 180}, 0.3, Enum.EasingStyle.Back)
+        else
+            Tween(bigDropdown.ContentContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.3, Enum.EasingStyle.Back)
+            Tween(bigDropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
+            Tween(bigDropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
+        end
+        
+        -- Update section size if dropdown
+        if section.UpdateContentSize then
+            wait(0.3)
+            section.UpdateContentSize()
+        end
+    end)
+    
+    bigDropdown.Frame.MouseEnter:Connect(function()
+        Tween(bigDropdown.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/Hand"
+    end)
+    
+    bigDropdown.Frame.MouseLeave:Connect(function()
+        Tween(bigDropdown.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
+        Mouse.Icon = ""
+    end)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
+    
+    -- Call the creation callback if provided
+    if config.CreateElements then
+        config.CreateElements(bigDropdown)
+        UpdateContentSize()
+    end
+    
+    return bigDropdown
+end
+
 function Library:CreateSearchBox(section, config)
     config = config or {}
     local search = {}
@@ -2127,14 +2577,19 @@ function Library:SetTheme(themeName)
     end
 end
 
--- Methods to change customization settings
+-- Methods to change customization settings  
 function Library:SetButtonDarkness(darkness)
     self.ButtonDarkness = math.clamp(darkness, 0, 1)
     -- Update all existing buttons
     for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
         if descendant:IsA("Frame") and descendant:GetAttribute("OriginalTransparency") then
-            descendant.BackgroundTransparency = self.ButtonDarkness
-            descendant:SetAttribute("OriginalTransparency", self.ButtonDarkness)
+            local newTransparency = self.ButtonDarkness
+            -- Special handling for labels and other elements with different base transparency
+            if descendant.Parent and descendant.Parent:IsA("Frame") and descendant.Parent.Name:find("Label") then
+                newTransparency = self.ButtonDarkness + 0.2
+            end
+            descendant.BackgroundTransparency = newTransparency
+            descendant:SetAttribute("OriginalTransparency", newTransparency)
         end
     end
 end
