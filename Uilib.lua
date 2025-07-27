@@ -87,12 +87,15 @@ end
 local function AddDragging(frame, handle)
     handle = handle or frame
     local dragging, dragInput, dragStart, startPos
+    local clickTime = 0
+    local clickThreshold = 0.3 -- Time threshold for click vs drag
     
     handle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
+            clickTime = tick()
             
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
@@ -111,16 +114,20 @@ local function AddDragging(frame, handle)
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
-            Tween(frame, {
-                Position = UDim2.new(
-                    startPos.X.Scale,
-                    startPos.X.Offset + delta.X,
-                    startPos.Y.Scale,
-                    startPos.Y.Offset + delta.Y
-                )
-            }, 0.1, Enum.EasingStyle.Linear)
+            if delta.Magnitude > 5 then -- Only start dragging after 5 pixels of movement
+                Tween(frame, {
+                    Position = UDim2.new(
+                        startPos.X.Scale,
+                        startPos.X.Offset + delta.X,
+                        startPos.Y.Scale,
+                        startPos.Y.Offset + delta.Y
+                    )
+                }, 0.1, Enum.EasingStyle.Linear)
+            end
         end
     end)
+    
+    return clickTime, clickThreshold
 end
 
 -- Main Library Functions
@@ -318,7 +325,7 @@ function Library:Create(config)
         BorderSizePixel = 0
     }, self.MainFrame)
     
-    -- Minimized Frame (Floating Square) - FIXED with proper ZIndex
+    -- Minimized Frame (Floating Square) - FIXED with proper dragging
     self.MinimizedFrame = CreateInstance("Frame", {
         Name = "MinimizedFrame",
         Size = UDim2.new(0, 150, 0, 40),
@@ -327,7 +334,7 @@ function Library:Create(config)
         BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
         Visible = false,
-        ZIndex = 999,  -- High ZIndex to ensure it's on top
+        ZIndex = 999,
         Active = true,
         Selectable = true
     }, self.ScreenGui)
@@ -386,13 +393,44 @@ function Library:Create(config)
         ZIndex = 1000
     }, self.MinimizedFrame)
     
-    -- Make minimized frame draggable
-    AddDragging(self.MinimizedFrame)
+    -- Improved minimized frame dragging and clicking
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    local clickStart = 0
     
-    -- Click to restore
     self.MinimizedFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            self:Restore()
+            dragging = true
+            dragStart = input.Position
+            startPos = self.MinimizedFrame.Position
+            clickStart = tick()
+        end
+    end)
+    
+    self.MinimizedFrame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local clickDuration = tick() - clickStart
+            local dragDistance = (input.Position - dragStart).Magnitude
+            
+            -- Only restore if it was a quick click without much movement
+            if clickDuration < 0.3 and dragDistance < 5 then
+                self:Restore()
+            end
+            
+            dragging = false
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            self.MinimizedFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
         end
     end)
     
@@ -712,58 +750,105 @@ function Library:CreateSection(name)
 end
 
 function Library:SelectSection(section)
-    -- Hide all sections with fade out animation
+    local animationTime = 0.15 -- Synchronized animation time
+    
+    -- Hide all sections with synchronized fade out
     for _, s in pairs(self.Sections) do
         if s.Content.Visible and s ~= section then
-            -- Fade out content
+            -- Fade out all content elements at the same time
             for _, child in pairs(s.Content:GetChildren()) do
                 if child:IsA("Frame") then
                     spawn(function()
-                        Tween(child, {BackgroundTransparency = 1}, 0.2, Enum.EasingStyle.Quad)
+                        -- Store transparency values for inner elements
+                        local transparencies = {}
+                        for _, innerChild in pairs(child:GetDescendants()) do
+                            if innerChild:IsA("Frame") or innerChild:IsA("TextBox") then
+                                transparencies[innerChild] = innerChild.BackgroundTransparency
+                            elseif innerChild:IsA("TextLabel") or innerChild:IsA("TextButton") then
+                                transparencies[innerChild] = innerChild.TextTransparency or 0
+                            elseif innerChild:IsA("ImageLabel") or innerChild:IsA("ImageButton") then
+                                transparencies[innerChild] = innerChild.ImageTransparency or 0
+                            end
+                        end
+                        
+                        -- Fade out main frame
+                        Tween(child, {BackgroundTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                        
+                        -- Fade out inner elements
+                        for element, _ in pairs(transparencies) do
+                            if element:IsA("Frame") or element:IsA("TextBox") then
+                                Tween(element, {BackgroundTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                            elseif element:IsA("TextLabel") or element:IsA("TextButton") then
+                                Tween(element, {TextTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                            elseif element:IsA("ImageLabel") or element:IsA("ImageButton") then
+                                Tween(element, {ImageTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
+                            end
+                        end
                     end)
                 end
             end
             
             -- Hide highlight with animation
             if s.Highlight.Visible then
-                Tween(s.Highlight, {Size = UDim2.new(0, 0, 1, -10)}, 0.2)
+                Tween(s.Highlight, {Size = UDim2.new(0, 0, 1, -10)}, animationTime)
                 spawn(function()
-                    wait(0.2)
+                    wait(animationTime)
                     s.Highlight.Visible = false
                     s.Highlight.Size = UDim2.new(0, 3, 1, -10)
                 end)
             end
             
-            Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
-            Tween(s.Button, {BackgroundTransparency = 0.3}, 0.2)
+            Tween(s.Label, {TextColor3 = self.Theme.TextDark}, animationTime)
+            Tween(s.Button, {BackgroundTransparency = 0.3}, animationTime)
             
             spawn(function()
-                wait(0.2)
+                wait(animationTime)
                 s.Content.Visible = false
             end)
         end
     end
     
-    -- Show selected section with fade in animation
-    wait(0.2)
+    -- Show selected section with synchronized fade in
+    wait(animationTime)
     section.Content.Visible = true
     section.Highlight.Visible = true
     
     -- Animate highlight appearing
     section.Highlight.Size = UDim2.new(0, 0, 1, -10)
-    Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, 0.3)
+    Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, animationTime * 1.5)
     
     -- Animate section button
-    Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
-    Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
+    Tween(section.Label, {TextColor3 = self.Theme.Text}, animationTime)
+    Tween(section.Button, {BackgroundTransparency = 0.1}, animationTime)
     
-    -- Fade in content elements
-    for _, child in pairs(section.Content:GetChildren()) do
+    -- Fade in content elements with synchronized timing
+    for i, child in pairs(section.Content:GetChildren()) do
         if child:IsA("Frame") then
-            child.BackgroundTransparency = 1
             spawn(function()
-                wait(0.1)
-                Tween(child, {BackgroundTransparency = child:GetAttribute("OriginalTransparency") or 0.5}, 0.3, Enum.EasingStyle.Quad)
+                wait(i * 0.02) -- Slight stagger for visual appeal
+                
+                -- Restore transparency values for inner elements
+                for _, innerChild in pairs(child:GetDescendants()) do
+                    if innerChild:IsA("Frame") or innerChild:IsA("TextBox") then
+                        local originalTransparency = innerChild:GetAttribute("OriginalBackgroundTransparency") or 0.5
+                        if innerChild.BackgroundTransparency ~= originalTransparency then
+                            Tween(innerChild, {BackgroundTransparency = originalTransparency}, animationTime, Enum.EasingStyle.Quad)
+                        end
+                    elseif innerChild:IsA("TextLabel") or innerChild:IsA("TextButton") then
+                        if innerChild.TextTransparency ~= 0 then
+                            Tween(innerChild, {TextTransparency = 0}, animationTime, Enum.EasingStyle.Quad)
+                        end
+                    elseif innerChild:IsA("ImageLabel") or innerChild:IsA("ImageButton") then
+                        local originalTransparency = innerChild:GetAttribute("OriginalImageTransparency") or 0
+                        if innerChild.ImageTransparency ~= originalTransparency then
+                            Tween(innerChild, {ImageTransparency = originalTransparency}, animationTime, Enum.EasingStyle.Quad)
+                        end
+                    end
+                end
+                
+                -- Fade in main frame
+                local originalTransparency = child:GetAttribute("OriginalTransparency") or 0.5
+                Tween(child, {BackgroundTransparency = originalTransparency}, animationTime, Enum.EasingStyle.Quad)
             end)
         end
     end
@@ -828,8 +913,11 @@ function Library:CreateButton(section, config)
         BackgroundTransparency = 1,
         Image = "rbxassetid://86509207249522",
         ImageColor3 = Color3.fromRGB(255, 255, 255), -- Always white
+        ImageTransparency = 0.3,
         ScaleType = Enum.ScaleType.Fit
     }, button.Frame)
+    
+    button.ClickIndicator:SetAttribute("OriginalImageTransparency", 0.3)
     
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
@@ -891,6 +979,7 @@ function Library:CreateToggle(section, config)
         Font = Enum.Font.Ubuntu
     }, toggle.Frame)
     
+    -- Toggle background with smooth animation
     toggle.Button = CreateInstance("TextButton", {
         Size = UDim2.new(0, 36, 0, 18),
         Position = UDim2.new(1, -46, 0.5, -9),
@@ -899,10 +988,13 @@ function Library:CreateToggle(section, config)
         Text = ""
     }, toggle.Frame)
     
+    toggle.Button:SetAttribute("OriginalBackgroundTransparency", 0)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0.5, 0)
     }, toggle.Button)
     
+    -- Toggle indicator with smooth animation
     toggle.Indicator = CreateInstance("Frame", {
         Size = UDim2.new(0, 14, 0, 14),
         Position = toggle.Enabled and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7),
@@ -910,20 +1002,40 @@ function Library:CreateToggle(section, config)
         BorderSizePixel = 0
     }, toggle.Button)
     
+    toggle.Indicator:SetAttribute("OriginalBackgroundTransparency", 0)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0.5, 0)
     }, toggle.Indicator)
+    
+    -- Add shadow for depth effect
+    local shadow = CreateInstance("Frame", {
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = toggle.Enabled and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6),
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BackgroundTransparency = 0.7,
+        BorderSizePixel = 0,
+        ZIndex = toggle.Indicator.ZIndex - 1
+    }, toggle.Button)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0.5, 0)
+    }, shadow)
     
     local function SetToggle(value)
         toggle.Enabled = value
         
         if toggle.Enabled then
-            Tween(toggle.Button, {BackgroundColor3 = self.Theme.Accent}, 0.2)
-            Tween(toggle.Indicator, {Position = UDim2.new(1, -16, 0.5, -7)}, 0.2)
+            -- Smooth color transition
+            Tween(toggle.Button, {BackgroundColor3 = self.Theme.Accent}, 0.3, Enum.EasingStyle.Quart)
+            -- Smooth position transition with bounce
+            Tween(toggle.Indicator, {Position = UDim2.new(1, -16, 0.5, -7)}, 0.3, Enum.EasingStyle.Back)
+            Tween(shadow, {Position = UDim2.new(1, -15, 0.5, -6)}, 0.3, Enum.EasingStyle.Back)
             self:AddActiveFunction(config.Text or "Toggle")
         else
-            Tween(toggle.Button, {BackgroundColor3 = self.Theme.Tertiary}, 0.2)
-            Tween(toggle.Indicator, {Position = UDim2.new(0, 2, 0.5, -7)}, 0.2)
+            Tween(toggle.Button, {BackgroundColor3 = self.Theme.Tertiary}, 0.3, Enum.EasingStyle.Quart)
+            Tween(toggle.Indicator, {Position = UDim2.new(0, 2, 0.5, -7)}, 0.3, Enum.EasingStyle.Back)
+            Tween(shadow, {Position = UDim2.new(0, 3, 0.5, -6)}, 0.3, Enum.EasingStyle.Back)
             self:RemoveActiveFunction(config.Text or "Toggle")
         end
         
@@ -938,11 +1050,15 @@ function Library:CreateToggle(section, config)
     
     toggle.Frame.MouseEnter:Connect(function()
         Tween(toggle.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        -- Scale up toggle slightly on hover
+        Tween(toggle.Button, {Size = UDim2.new(0, 38, 0, 20), Position = UDim2.new(1, -47, 0.5, -10)}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     toggle.Frame.MouseLeave:Connect(function()
         Tween(toggle.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        -- Scale back to normal
+        Tween(toggle.Button, {Size = UDim2.new(0, 36, 0, 18), Position = UDim2.new(1, -46, 0.5, -9)}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -1000,6 +1116,8 @@ function Library:CreateSlider(section, config)
         BorderSizePixel = 0
     }, slider.Frame)
     
+    slider.SliderFrame:SetAttribute("OriginalBackgroundTransparency", 0)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0.5, 0)
     }, slider.SliderFrame)
@@ -1009,6 +1127,8 @@ function Library:CreateSlider(section, config)
         BackgroundColor3 = self.Theme.Accent,
         BorderSizePixel = 0
     }, slider.SliderFrame)
+    
+    slider.Fill:SetAttribute("OriginalBackgroundTransparency", 0)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0.5, 0)
@@ -1020,6 +1140,8 @@ function Library:CreateSlider(section, config)
         BackgroundColor3 = self.Theme.Text,
         BorderSizePixel = 0
     }, slider.SliderFrame)
+    
+    slider.Knob:SetAttribute("OriginalBackgroundTransparency", 0)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0.5, 0)
@@ -1137,6 +1259,8 @@ function Library:CreateInput(section, config)
         ClearTextOnFocus = false
     }, input.Frame)
     
+    input.TextBox:SetAttribute("OriginalBackgroundTransparency", 0.3)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 4)
     }, input.TextBox)
@@ -1236,6 +1360,8 @@ function Library:CreateDropdown(section, config)
         Visible = true
     }, dropdown.Frame)
     
+    dropdown.OptionContainer:SetAttribute("OriginalBackgroundTransparency", 0.1)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 6)
     }, dropdown.OptionContainer)
@@ -1252,8 +1378,7 @@ function Library:CreateDropdown(section, config)
     }, dropdown.OptionContainer)
     
     CreateInstance("UIPadding", {
-        PaddingTop = UDim.new(0, 3),
-        PaddingBottom = UDim.new(0, 3),
+           PaddingBottom = UDim.new(0, 3),
         PaddingLeft = UDim.new(0, 3),
         PaddingRight = UDim.new(0, 3)
     }, dropdown.OptionContainer)
@@ -1288,6 +1413,8 @@ function Library:CreateDropdown(section, config)
                 BorderSizePixel = 0,
                 ZIndex = optionButton.ZIndex - 1
             }, optionButton)
+            
+            highlightFrame:SetAttribute("OriginalBackgroundTransparency", 1)
             
             CreateInstance("UICorner", {
                 CornerRadius = UDim.new(0, 3)
@@ -1389,6 +1516,8 @@ function Library:CreateSearchBox(section, config)
         ClearTextOnFocus = false
     }, search.Frame)
     
+    search.SearchBox:SetAttribute("OriginalBackgroundTransparency", 0.3)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 4)
     }, search.SearchBox)
@@ -1413,7 +1542,9 @@ function Library:CreateSearchBox(section, config)
         Visible = false
     }, search.Frame)
     
-        CreateInstance("UICorner", {
+    search.ResultsContainer:SetAttribute("OriginalBackgroundTransparency", 0.3)
+    
+    CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 4)
     }, search.ResultsContainer)
     
@@ -1450,6 +1581,8 @@ function Library:CreateSearchBox(section, config)
                 TextSize = 13,
                 Font = Enum.Font.Ubuntu
             }, search.ResultsContainer)
+            
+            resultButton:SetAttribute("OriginalBackgroundTransparency", 0.5)
             
             CreateInstance("UICorner", {
                 CornerRadius = UDim.new(0, 3)
@@ -1698,6 +1831,8 @@ function Library:CreateKeybind(section, config)
         TextSize = 12,
         Font = Enum.Font.Ubuntu
     }, keybind.Frame)
+    
+    keybind.KeyLabel:SetAttribute("OriginalBackgroundTransparency", 0.3)
     
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 4)
