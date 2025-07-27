@@ -1,4 +1,4 @@
-# Eps1llon Hub Premium UI Library
+# Eps1llon Hub UI Library
 
 A modern, sleek Roblox UI library with smooth animations, resizable interface, and comprehensive features. Features a floating active functions display, multiple themes, and intuitive drag-and-drop functionality.
 
@@ -9,7 +9,7 @@ A modern, sleek Roblox UI library with smooth animations, resizable interface, a
 - **Resizable Interface**: Drag corners to resize the main window
 - **Draggable Windows**: Move windows by dragging the title bar
 - **Active Functions Display**: Floating sidebar showing currently active toggles/keybinds
-- **Click Indicators**: Visual indicators on clickable buttons (👆)
+- **Click Indicators**: Visual indicators on clickable buttons (
 - **Minimizable**: Minimize to a compact floating window
 - **Notification System**: Built-in notifications with auto-dismiss
 - **Comprehensive Elements**: Buttons, toggles, sliders, inputs, dropdowns, search boxes, and more
