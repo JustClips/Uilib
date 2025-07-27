@@ -1,0 +1,40 @@
+# Eps1llon Hub .gitignore
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+
+# Build artifacts
+dist/
+build/
+output/
+
+# Dependencies (if any)
+node_modules/
+vendor/
+
+# User-specific configuration
+config.local.lua
+settings.local.lua
