@@ -2885,4 +2885,53 @@ function Library:Notify(config)
         CornerRadius = UDim.new(0, 6)
     }, notification)
     
-    CreateInstance("UIStroke", {
+    CreateInstance("UIStroke", { 
+                Color = self.Theme.Accent,
+        Transparency = 0.5,
+        Thickness = self.StrokeThickness
+    }, notification)
+    
+    CreateInstance("TextLabel", {
+        Size = UDim2.new(1, -20, 0, 20),
+        Position = UDim2.new(0, 10, 0, 8),
+        BackgroundTransparency = 1,
+        Text = config.Title or "Notification",
+        TextColor3 = self.Theme.Text,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Font = self.Font
+    }, notification)
+    
+    CreateInstance("TextLabel", {
+        Size = UDim2.new(1, -20, 0, 30),
+        Position = UDim2.new(0, 10, 0, 30),
+        BackgroundTransparency = 1,
+        Text = config.Text or "Notification text",
+        TextColor3 = self.Theme.TextDark,
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextWrapped = true,
+        Font = self.Font
+    }, notification)
+    
+    -- Animate in
+    Tween(notification, {Position = UDim2.new(1, -270, 1, -90)}, 0.5)
+    
+    -- Auto close
+    spawn(function()
+        wait(config.Duration or 3)
+        
+        -- Animate out
+        Tween(notification, {Position = UDim2.new(1, 270, 1, -90)}, 0.5)
+        wait(0.5)
+        notification:Destroy()
+    end)
+end
+
+function Library:Destroy()
+    if self.ScreenGui then
+        self.ScreenGui:Destroy()
+    end
+end
+
+return Library
