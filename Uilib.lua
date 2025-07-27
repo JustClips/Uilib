@@ -157,11 +157,16 @@ function Library:Create(config)
     self.MaxSize = Vector2.new(800, 600)
     self.OriginalSize = UDim2.new(0, 650, 0, 450)
     self.ActiveFunctions = {}
+    self.UIVisible = true
+    self.ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift
     
     -- Customization Options
     self.ButtonDarkness = config.ButtonDarkness or 0.5  -- 0 = fully transparent, 1 = fully opaque
     self.StrokeThickness = config.StrokeThickness or 1  -- Default stroke thickness
     self.Font = Fonts[config.Font] or Fonts.Ubuntu      -- Default font
+    self.SectionHeaderEnabled = config.SectionHeaderEnabled ~= false  -- Default true
+    self.SectionHeaderWhite = config.SectionHeaderWhite or false  -- Default colored
+    self.DropdownSections = config.DropdownSections or false  -- Default false (normal sections)
     
     -- Create ScreenGui
     self.ScreenGui = CreateInstance("ScreenGui", {
@@ -434,7 +439,7 @@ function Library:Create(config)
             
             -- Only restore if it was a quick click without much movement
             if clickDuration < 0.3 and dragDistance < 5 then
-                self:Restore()
+                self:ToggleUI()
             end
             
             dragging = false
@@ -472,7 +477,29 @@ function Library:Create(config)
     -- Add resizing
     self:AddResizing()
     
+    -- Setup toggle keybind
+    self:SetupToggleKeybind()
+    
     return self
+end
+
+-- New toggle keybind setup
+function Library:SetupToggleKeybind()
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == self.ToggleKey then
+            self:ToggleUI()
+        end
+    end)
+end
+
+function Library:ToggleUI()
+    self.UIVisible = not self.UIVisible
+    
+    if self.UIVisible then
+        self:Restore()
+    else
+        self:Minimize()
+    end
 end
 
 -- New Active Functions Display
@@ -679,117 +706,252 @@ function Library:CreateSection(name)
     local section = {}
     section.Name = name
     section.Elements = {}
+    section.Open = not self.DropdownSections -- If dropdown sections, start closed
     
-    -- Individual Section Button with its own background (separated from others)
-    section.Button = CreateInstance("TextButton", {
-        Name = name .. "Section",
-        Size = UDim2.new(1, 0, 0, 35),
-        BackgroundColor3 = self.Theme.SectionBackground,
-        BackgroundTransparency = 0.3,
-        BorderSizePixel = 0,
-        Text = ""
-    }, self.SectionContainer)
-    
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 6)
-    }, section.Button)
-    
-    -- Section Highlight (left line)
-    section.Highlight = CreateInstance("Frame", {
-        Name = "Highlight",
-        Size = UDim2.new(0, 3, 1, -10),
-        Position = UDim2.new(0, 0, 0, 5),
-        BackgroundColor3 = self.Theme.SectionHighlight,
-        BorderSizePixel = 0,
-        Visible = false
-    }, section.Button)
-    
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 2)
-    }, section.Highlight)
-    
-    -- Section Label
-    section.Label = CreateInstance("TextLabel", {
-        Size = UDim2.new(1, -20, 1, 0),
-        Position = UDim2.new(0, 15, 0, 0),
-        BackgroundTransparency = 1,
-        Text = name,
-        TextColor3 = self.Theme.TextDark,
-        TextSize = 14,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Font = self.Font
-    }, section.Button)
-    
-    -- Section Content
-    section.Content = CreateInstance("ScrollingFrame", {
-        Name = name .. "Content",
-        Size = UDim2.new(1, -20, 1, -50), -- Made room for header
-        Position = UDim2.new(0, 10, 0, 45), -- Moved down for header
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        ScrollBarThickness = 3,
-        ScrollBarImageColor3 = self.Theme.Accent,
-        ScrollBarImageTransparency = 0.5,
-        Visible = false
-    }, self.ContentContainer)
-    
-    CreateInstance("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 8)
-    }, section.Content)
-    
-    -- Section Header (New Feature)
-    section.Header = CreateInstance("TextLabel", {
-        Name = "SectionHeader",
-        Size = UDim2.new(1, -20, 0, 35),
-        Position = UDim2.new(0, 10, 0, 5),
-        BackgroundTransparency = 1,
-        Text = name,
-        TextColor3 = self.Theme.Accent,
-        TextSize = 22,
-        Font = Enum.Font.GothamBold,
-        TextXAlignment = Enum.TextXAlignment.Center,
-        Visible = false
-    }, self.ContentContainer)
-    
-    -- Header Underline
-    section.HeaderUnderline = CreateInstance("Frame", {
-        Size = UDim2.new(0.5, 0, 0, 2),
-        Position = UDim2.new(0.25, 0, 0, 35),
-        BackgroundColor3 = self.Theme.Accent,
-        BackgroundTransparency = 0.3,
-        BorderSizePixel = 0,
-        Visible = false
-    }, section.Header)
-    
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 1)
-    }, section.HeaderUnderline)
-    
-    -- Section Selection
-    section.Button.MouseButton1Click:Connect(function()
-        self:SelectSection(section)
-    end)
-    
-    section.Button.MouseEnter:Connect(function()
-        if self.CurrentSection ~= section then
-            Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
+    if self.DropdownSections then
+        -- Create dropdown section
+        section.Button = CreateInstance("TextButton", {
+            Name = name .. "Section",
+            Size = UDim2.new(1, 0, 0, 35),
+            BackgroundColor3 = self.Theme.SectionBackground,
+            BackgroundTransparency = 0.3,
+            BorderSizePixel = 0,
+            Text = "",
+            ClipsDescendants = true
+        }, self.SectionContainer)
+        
+        CreateInstance("UICorner", {
+            CornerRadius = UDim.new(0, 6)
+        }, section.Button)
+        
+        -- Dropdown arrow
+        section.Arrow = CreateInstance("TextLabel", {
+            Size = UDim2.new(0, 20, 0, 20),
+            Position = UDim2.new(0, 5, 0.5, -10),
+            BackgroundTransparency = 1,
+            Text = "▶",
+            TextColor3 = self.Theme.Text,
+            TextSize = 12,
+            Font = self.Font,
+            Rotation = 0
+        }, section.Button)
+        
+        -- Section Label
+        section.Label = CreateInstance("TextLabel", {
+            Size = UDim2.new(1, -30, 1, 0),
+            Position = UDim2.new(0, 25, 0, 0),
+            BackgroundTransparency = 1,
+            Text = name,
+            TextColor3 = self.Theme.Text,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Font = self.Font
+        }, section.Button)
+        
+        -- Section Content Container (inside the button for dropdown)
+        section.ContentContainer = CreateInstance("Frame", {
+            Name = "ContentContainer",
+            Size = UDim2.new(1, 0, 0, 0),
+            Position = UDim2.new(0, 0, 0, 35),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ClipsDescendants = true
+        }, section.Button)
+        
+        -- Section Content
+        section.Content = CreateInstance("ScrollingFrame", {
+            Name = name .. "Content",
+            Size = UDim2.new(1, -10, 1, 0),
+            Position = UDim2.new(0, 5, 0, 0),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = self.Theme.Accent,
+            ScrollBarImageTransparency = 0.5,
+            Visible = true
+        }, section.ContentContainer)
+        
+        CreateInstance("UIListLayout", {
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 8)
+        }, section.Content)
+        
+        CreateInstance("UIPadding", {
+            PaddingTop = UDim.new(0, 5),
+            PaddingBottom = UDim.new(0, 5)
+        }, section.Content)
+        
+        -- Toggle dropdown
+        section.Label.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                section.Open = not section.Open
+                
+                if section.Open then
+                    -- Calculate content height
+                    local contentHeight = 0
+                    for _, child in pairs(section.Content:GetChildren()) do
+                        if child:IsA("GuiObject") then
+                            contentHeight = contentHeight + child.AbsoluteSize.Y + 8
+                        end
+                    end
+                    contentHeight = math.min(contentHeight, 300) -- Max height
+                    
+                    -- Animate opening
+                    Tween(section.Arrow, {Rotation = 90}, 0.3, Enum.EasingStyle.Back)
+                    Tween(section.ContentContainer, {Size = UDim2.new(1, 0, 0, contentHeight)}, 0.3, Enum.EasingStyle.Back)
+                    Tween(section.Button, {Size = UDim2.new(1, 0, 0, 35 + contentHeight)}, 0.3, Enum.EasingStyle.Back)
+                else
+                    -- Animate closing
+                    Tween(section.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
+                    Tween(section.ContentContainer, {Size = UDim2.new(1, 0, 0, 0)}, 0.3, Enum.EasingStyle.Back)
+                    Tween(section.Button, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
+                end
+            end
+        end)
+        
+        section.Label.MouseEnter:Connect(function()
             Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
-        end
-        Mouse.Icon = "rbxasset://SystemCursors/Hand"
-    end)
-    
-    section.Button.MouseLeave:Connect(function()
-        if self.CurrentSection ~= section then
-            Tween(section.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
+            Mouse.Icon = "rbxasset://SystemCursors/Hand"
+        end)
+        
+        section.Label.MouseLeave:Connect(function()
             Tween(section.Button, {BackgroundTransparency = 0.3}, 0.2)
+            Mouse.Icon = ""
+        end)
+        
+    else
+        -- Normal section (non-dropdown)
+        section.Button = CreateInstance("TextButton", {
+            Name = name .. "Section",
+            Size = UDim2.new(1, 0, 0, 35),
+            BackgroundColor3 = self.Theme.SectionBackground,
+            BackgroundTransparency = 0.3,
+            BorderSizePixel = 0,
+            Text = ""
+        }, self.SectionContainer)
+        
+        CreateInstance("UICorner", {
+            CornerRadius = UDim.new(0, 6)
+        }, section.Button)
+        
+        -- Section Highlight (left line)
+        section.Highlight = CreateInstance("Frame", {
+            Name = "Highlight",
+            Size = UDim2.new(0, 3, 1, -10),
+            Position = UDim2.new(0, 0, 0, 5),
+            BackgroundColor3 = self.Theme.SectionHighlight,
+            BorderSizePixel = 0,
+            Visible = false
+        }, section.Button)
+        
+        CreateInstance("UICorner", {
+            CornerRadius = UDim.new(0, 2)
+        }, section.Highlight)
+        
+        -- Section Label
+        section.Label = CreateInstance("TextLabel", {
+            Size = UDim2.new(1, -20, 1, 0),
+            Position = UDim2.new(0, 15, 0, 0),
+            BackgroundTransparency = 1,
+            Text = name,
+            TextColor3 = self.Theme.TextDark,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Font = self.Font
+        }, section.Button)
+        
+        -- Section Content
+        local yOffset = self.SectionHeaderEnabled and 45 or 5
+        local ySize = self.SectionHeaderEnabled and 50 or 10
+        
+        section.Content = CreateInstance("ScrollingFrame", {
+            Name = name .. "Content",
+            Size = UDim2.new(1, -20, 1, -ySize),
+            Position = UDim2.new(0, 10, 0, yOffset),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = self.Theme.Accent,
+            ScrollBarImageTransparency = 0.5,
+            Visible = false
+        }, self.ContentContainer)
+        
+        CreateInstance("UIListLayout", {
+            SortOrder = Enum.SortOrder.LayoutOrder,
+            Padding = UDim.new(0, 8)
+        }, section.Content)
+        
+        -- Section Header (if enabled)
+        if self.SectionHeaderEnabled then
+            section.Header = CreateInstance("TextLabel", {
+                Name = "SectionHeader",
+                Size = UDim2.new(1, -20, 0, 35),
+                Position = UDim2.new(0, 10, 0, 5),
+                BackgroundTransparency = 1,
+                Text = name,
+                TextColor3 = self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent,
+                TextSize = 22,
+                Font = Enum.Font.GothamBold,
+                TextXAlignment = Enum.TextXAlignment.Center,
+                Visible = false
+            }, self.ContentContainer)
+            
+            -- Header Underline
+            section.HeaderUnderline = CreateInstance("Frame", {
+                Size = UDim2.new(0.5, 0, 0, 2),
+                Position = UDim2.new(0.25, 0, 0, 35),
+                BackgroundColor3 = self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255) or self.Theme.Accent,
+                BackgroundTransparency = 0.3,
+                BorderSizePixel = 0,
+                Visible = false
+            }, section.Header)
+            
+            CreateInstance("UICorner", {
+                CornerRadius = UDim.new(0, 1)
+            }, section.HeaderUnderline)
         end
-        Mouse.Icon = ""
-    end)
+        
+        -- Section Selection
+        section.Button.MouseButton1Click:Connect(function()
+            self:SelectSection(section)
+        end)
+        
+        section.Button.MouseEnter:Connect(function()
+            if self.CurrentSection ~= section then
+                Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
+                Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
+            end
+            Mouse.Icon = "rbxasset://SystemCursors/Hand"
+        end)
+        
+        section.Button.MouseLeave:Connect(function()
+            if self.CurrentSection ~= section then
+                Tween(section.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
+                Tween(section.Button, {BackgroundTransparency = 0.3}, 0.2)
+            end
+            Mouse.Icon = ""
+        end)
+    end
+    
+    -- Update content size when elements are added
+    section.UpdateContentSize = function()
+        if self.DropdownSections and section.Open then
+            local contentHeight = 0
+            for _, child in pairs(section.Content:GetChildren()) do
+                if child:IsA("GuiObject") then
+                    contentHeight = contentHeight + child.AbsoluteSize.Y + 8
+                end
+            end
+            contentHeight = math.min(contentHeight, 300)
+            
+            Tween(section.ContentContainer, {Size = UDim2.new(1, 0, 0, contentHeight)}, 0.2)
+            Tween(section.Button, {Size = UDim2.new(1, 0, 0, 35 + contentHeight)}, 0.2)
+        end
+    end
     
     table.insert(self.Sections, section)
     
-    if #self.Sections == 1 then
+    if #self.Sections == 1 and not self.DropdownSections then
         self:SelectSection(section)
     end
     
@@ -797,13 +959,15 @@ function Library:CreateSection(name)
 end
 
 function Library:SelectSection(section)
+    if self.DropdownSections then return end -- Dropdown sections don't use selection
+    
     local animationTime = 0.15 -- Synchronized animation time
     
     -- Hide all sections with synchronized fade out
     for _, s in pairs(self.Sections) do
         if s.Content.Visible and s ~= section then
-            -- Fade out header
-            if s.Header.Visible then
+            -- Fade out header if exists
+            if s.Header and s.Header.Visible then
                 Tween(s.Header, {TextTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
                 Tween(s.HeaderUnderline, {BackgroundTransparency = 1}, animationTime, Enum.EasingStyle.Quad)
             end
@@ -842,14 +1006,16 @@ function Library:SelectSection(section)
             end
             
             -- Hide highlight with animation
-            if s.Highlight.Visible then
+            if s.Highlight and s.Highlight.Visible then
                 Tween(s.Highlight, {Size = UDim2.new(0, 0, 1, -10)}, animationTime)
                 spawn(function()
                     wait(animationTime)
                     s.Highlight.Visible = false
                     s.Highlight.Size = UDim2.new(0, 3, 1, -10)
-                    s.Header.Visible = false
-                    s.HeaderUnderline.Visible = false
+                    if s.Header then
+                        s.Header.Visible = false
+                        s.HeaderUnderline.Visible = false
+                    end
                 end)
             end
             
@@ -866,21 +1032,28 @@ function Library:SelectSection(section)
     -- Show selected section with synchronized fade in
     wait(animationTime)
     section.Content.Visible = true
-    section.Highlight.Visible = true
-    section.Header.Visible = true
-    section.HeaderUnderline.Visible = true
-    
-    -- Reset header transparency
-    section.Header.TextTransparency = 0
-    section.HeaderUnderline.BackgroundTransparency = 0.3
+    if section.Highlight then
+        section.Highlight.Visible = true
+    end
+    if section.Header then
+        section.Header.Visible = true
+        section.HeaderUnderline.Visible = true
+        -- Reset header transparency
+        section.Header.TextTransparency = 0
+        section.HeaderUnderline.BackgroundTransparency = 0.3
+    end
     
     -- Animate highlight appearing
-    section.Highlight.Size = UDim2.new(0, 0, 1, -10)
-    Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, animationTime * 1.5)
+    if section.Highlight then
+        section.Highlight.Size = UDim2.new(0, 0, 1, -10)
+        Tween(section.Highlight, {Size = UDim2.new(0, 3, 1, -10)}, animationTime * 1.5)
+    end
     
     -- Animate header underline
-    section.HeaderUnderline.Size = UDim2.new(0, 0, 0, 2)
-    Tween(section.HeaderUnderline, {Size = UDim2.new(0.5, 0, 0, 2)}, animationTime * 2, Enum.EasingStyle.Back)
+    if section.HeaderUnderline then
+        section.HeaderUnderline.Size = UDim2.new(0, 0, 0, 2)
+        Tween(section.HeaderUnderline, {Size = UDim2.new(0.5, 0, 0, 2)}, animationTime * 2, Enum.EasingStyle.Back)
+    end
     
     -- Animate section button
     Tween(section.Label, {TextColor3 = self.Theme.Text}, animationTime)
@@ -923,6 +1096,7 @@ end
 
 function Library:Minimize()
     self.Minimized = true
+    self.UIVisible = false
     -- Store current size before minimizing
     self.OriginalSize = self.MainFrame.Size
     Tween(self.MainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.3)
@@ -935,6 +1109,7 @@ end
 
 function Library:Restore()
     self.Minimized = false
+    self.UIVisible = true
     self.MinimizedFrame.Visible = false
     self.MainFrame.Visible = true
     -- Restore to the original size, not a fixed size
@@ -1019,6 +1194,11 @@ function Library:CreateButton(section, config)
             config.Callback()
         end
     end)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
     
     return button
 end
@@ -1147,6 +1327,11 @@ function Library:CreateToggle(section, config)
     
     toggle.Set = SetToggle
     
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
+    
     return toggle
 end
 
@@ -1176,8 +1361,7 @@ function Library:CreateSlider(section, config)
         CreateInstance("UIStroke", {
             Color = self.Theme.Border,
             Transparency = 0.7,
-            Thickness = self.StrokeThickness
-        }, slider.Frame)
+            Thickness = self.StrokeThickness        }, slider.Frame)
     end
     
     slider.Label = CreateInstance("TextLabel", {
@@ -1304,6 +1488,11 @@ function Library:CreateSlider(section, config)
         end
     end)
     
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
+    
     return slider
 end
 
@@ -1368,7 +1557,7 @@ function Library:CreateInput(section, config)
     
     input.TextBox.FocusLost:Connect(function(enterPressed)
         if config.Callback then
-               config.Callback(input.TextBox.Text, enterPressed)
+            config.Callback(input.TextBox.Text, enterPressed)
         end
     end)
     
@@ -1381,6 +1570,11 @@ function Library:CreateInput(section, config)
         Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
     
     return input
 end
@@ -1552,6 +1746,12 @@ function Library:CreateDropdown(section, config)
                 Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
                 
+                -- Update section size if dropdown
+                if section.UpdateContentSize then
+                    wait(0.3)
+                    section.UpdateContentSize()
+                end
+                
                 if config.Callback then
                     config.Callback(option)
                 end
@@ -1576,6 +1776,12 @@ function Library:CreateDropdown(section, config)
             Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
             Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
         end
+        
+        -- Update section size if dropdown
+        if section.UpdateContentSize then
+            wait(0.4)
+            section.UpdateContentSize()
+        end
     end)
     
     dropdown.Frame.MouseEnter:Connect(function()
@@ -1587,6 +1793,11 @@ function Library:CreateDropdown(section, config)
         Tween(dropdown.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
     
     return dropdown
 end
@@ -1733,6 +1944,12 @@ function Library:CreateSearchBox(section, config)
                 search.ResultsContainer.Visible = false
                 Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 
+                -- Update section size if dropdown
+                if section.UpdateContentSize then
+                    wait(0.3)
+                    section.UpdateContentSize()
+                end
+                
                 if search.SelectedCallback then
                     search.SelectedCallback(item)
                 end
@@ -1750,6 +1967,12 @@ function Library:CreateSearchBox(section, config)
             search.ResultsContainer.Visible = false
             Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
         end
+        
+        -- Update section size if dropdown
+        if section.UpdateContentSize then
+            wait(0.4)
+            section.UpdateContentSize()
+        end
     end
     
     search.SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1759,6 +1982,12 @@ function Library:CreateSearchBox(section, config)
         if searchText == "" then
             search.ResultsContainer.Visible = false
             Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
+            
+            -- Update section size if dropdown
+            if section.UpdateContentSize then
+                wait(0.3)
+                section.UpdateContentSize()
+            end
         else
             -- Call search callback if provided
             if search.SearchCallback then
@@ -1780,6 +2009,12 @@ function Library:CreateSearchBox(section, config)
         if search.SearchBox.Text == "" then
             search.ResultsContainer.Visible = false
             Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
+            
+            -- Update section size if dropdown
+            if section.UpdateContentSize then
+                wait(0.3)
+                section.UpdateContentSize()
+            end
         end
     end)
     
@@ -1792,6 +2027,11 @@ function Library:CreateSearchBox(section, config)
         Tween(search.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
     
     return search
 end
@@ -1825,6 +2065,11 @@ function Library:CreateLabel(section, config)
         Font = self.Font
     }, label.Frame)
     
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
+    
     return label
 end
 
@@ -1838,6 +2083,11 @@ function Library:CreateSeparator(section)
     
     -- Store original transparency
     separator:SetAttribute("OriginalTransparency", 0.5)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
     
     return separator
 end
@@ -1857,7 +2107,9 @@ function Library:SetTheme(themeName)
             if descendant.Name == "Highlight" then
                 descendant.BackgroundColor3 = self.Theme.SectionHighlight
             elseif descendant.Name == "SectionHeader" then
-                descendant.TextColor3 = self.Theme.Accent
+                if not self.SectionHeaderWhite then
+                    descendant.TextColor3 = self.Theme.Accent
+                end
             elseif descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
                 if descendant.TextColor3 ~= self.Theme.TextDark then
                     descendant.TextColor3 = self.Theme.Text
@@ -1907,6 +2159,10 @@ function Library:SetFont(fontName)
             end
         end
     end
+end
+
+function Library:SetToggleKey(keyCode)
+    self.ToggleKey = keyCode
 end
 
 function Library:Notify(config)
@@ -2046,6 +2302,11 @@ function Library:CreateKeybind(section, config)
         Tween(keybind.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
         Mouse.Icon = ""
     end)
+    
+    -- Update section size if dropdown
+    if section.UpdateContentSize then
+        section.UpdateContentSize()
+    end
     
     return keybind
 end
