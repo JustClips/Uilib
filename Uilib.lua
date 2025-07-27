@@ -24,9 +24,9 @@ local Themes = {
         Accent = Color3.fromRGB(100, 100, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(150, 150, 150),
-        Border = Color3.fromRGB(80, 80, 80), -- Made less visible
+        Border = Color3.fromRGB(80, 80, 80),
         SectionHighlight = Color3.fromRGB(100, 100, 255),
-        SectionBackground = Color3.fromRGB(25, 25, 25) -- New section background
+        SectionBackground = Color3.fromRGB(25, 25, 25)
     },
     Light = {
         Background = Color3.fromRGB(240, 240, 240),
@@ -35,9 +35,9 @@ local Themes = {
         Accent = Color3.fromRGB(50, 50, 200),
         Text = Color3.fromRGB(0, 0, 0),
         TextDark = Color3.fromRGB(100, 100, 100),
-        Border = Color3.fromRGB(180, 180, 180), -- Made less visible
+        Border = Color3.fromRGB(180, 180, 180),
         SectionHighlight = Color3.fromRGB(50, 50, 200),
-        SectionBackground = Color3.fromRGB(250, 250, 250) -- New section background
+        SectionBackground = Color3.fromRGB(250, 250, 250)
     },
     Purple = {
         Background = Color3.fromRGB(25, 20, 35),
@@ -46,9 +46,9 @@ local Themes = {
         Accent = Color3.fromRGB(150, 100, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(180, 180, 200),
-        Border = Color3.fromRGB(70, 60, 85), -- Made less visible
+        Border = Color3.fromRGB(70, 60, 85),
         SectionHighlight = Color3.fromRGB(150, 100, 255),
-        SectionBackground = Color3.fromRGB(30, 25, 40) -- New section background
+        SectionBackground = Color3.fromRGB(30, 25, 40)
     },
     Ocean = {
         Background = Color3.fromRGB(15, 25, 35),
@@ -57,9 +57,9 @@ local Themes = {
         Accent = Color3.fromRGB(100, 200, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(180, 200, 220),
-        Border = Color3.fromRGB(60, 80, 95), -- Made less visible
+        Border = Color3.fromRGB(60, 80, 95),
         SectionHighlight = Color3.fromRGB(100, 200, 255),
-        SectionBackground = Color3.fromRGB(20, 30, 40) -- New section background
+        SectionBackground = Color3.fromRGB(20, 30, 40)
     }
 }
 
@@ -134,7 +134,7 @@ function Library:Create(config)
     self.Minimized = false
     self.MinSize = Vector2.new(500, 400)
     self.MaxSize = Vector2.new(800, 600)
-    self.OriginalSize = UDim2.new(0, 650, 0, 450) -- Store original size
+    self.OriginalSize = UDim2.new(0, 650, 0, 450)
     self.ActiveFunctions = {}
     
     -- Create ScreenGui
@@ -162,7 +162,7 @@ function Library:Create(config)
         Position = UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
         Image = "rbxassetid://98784591713474",
-        ImageTransparency = 0.8, -- Made visible but not too much
+        ImageTransparency = 0.8,
         ScaleType = Enum.ScaleType.Stretch,
         ZIndex = -2
     }, self.MainFrame)
@@ -180,7 +180,7 @@ function Library:Create(config)
     -- Edge glow effect (made shorter)
     local EdgeGlow = CreateInstance("ImageLabel", {
         Name = "EdgeGlow",
-        Size = UDim2.new(1, 10, 1, 10), -- Reduced from 20 to 10
+        Size = UDim2.new(1, 10, 1, 10),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundTransparency = 1,
@@ -191,7 +191,7 @@ function Library:Create(config)
     }, self.MainFrame)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 10) -- Reduced from 12 to 10
+        CornerRadius = UDim.new(0, 10)
     }, EdgeGlow)
     
     -- Title Bar
@@ -218,12 +218,12 @@ function Library:Create(config)
     -- Close Button (X) - Made bigger
     self.CloseButton = CreateInstance("TextButton", {
         Name = "CloseButton",
-        Size = UDim2.new(0, 25, 0, 25), -- Increased from 20x20 to 25x25
+        Size = UDim2.new(0, 25, 0, 25),
         Position = UDim2.new(1, -32, 0.5, -12.5),
         BackgroundTransparency = 1,
         Text = "×",
         TextColor3 = self.Theme.Text,
-        TextSize = 26, -- Increased from 22 to 26
+        TextSize = 26,
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
@@ -244,8 +244,8 @@ function Library:Create(config)
     -- Minimize Button (-) - Moved left and made shorter
     self.MinimizeButton = CreateInstance("TextButton", {
         Name = "MinimizeButton",
-        Size = UDim2.new(0, 20, 0, 18), -- Made shorter (height from 20 to 18)
-        Position = UDim2.new(1, -62, 0.5, -9), -- Moved left (from -55 to -62)
+        Size = UDim2.new(0, 20, 0, 18),
+        Position = UDim2.new(1, -62, 0.5, -9),
         BackgroundTransparency = 1,
         Text = "—",
         TextColor3 = self.Theme.Text,
@@ -270,10 +270,10 @@ function Library:Create(config)
     -- Top divider line (connects all the way)
     self.TopDivider = CreateInstance("Frame", {
         Name = "TopDivider",
-        Size = UDim2.new(1, 0, 0, 1), -- Full width instead of -30
-        Position = UDim2.new(0, 0, 0, 35), -- Start from 0 instead of 15
+        Size = UDim2.new(1, 0, 0, 1),
+        Position = UDim2.new(0, 0, 0, 35),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5, -- Made less visible (was 0.7)
+        BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, self.MainFrame)
     
@@ -282,14 +282,14 @@ function Library:Create(config)
         Name = "SectionContainer",
         Size = UDim2.new(0, 150, 1, -45),
         Position = UDim2.new(0, 10, 0, 40),
-        BackgroundTransparency = 1, -- Made completely transparent
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 0
     }, self.MainFrame)
     
     CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 8) -- Increased spacing between sections
+        Padding = UDim.new(0, 8)
     }, self.SectionContainer)
     
     CreateInstance("UIPadding", {
@@ -302,10 +302,10 @@ function Library:Create(config)
     -- Vertical divider line (connects all the way)
     self.VerticalDivider = CreateInstance("Frame", {
         Name = "VerticalDivider",
-        Size = UDim2.new(0, 1, 1, -35), -- Extended to connect from top to bottom
-        Position = UDim2.new(0, 170, 0, 35), -- Start from top line
+        Size = UDim2.new(0, 1, 1, -35),
+        Position = UDim2.new(0, 170, 0, 35),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5, -- Made less visible (was 0.7)
+        BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, self.MainFrame)
     
@@ -324,19 +324,19 @@ function Library:Create(config)
         Size = UDim2.new(0, 150, 0, 40),
         Position = UDim2.new(0, 20, 0, 20),
         BackgroundColor3 = self.Theme.Background,
-        BackgroundTransparency = 0.1, -- More solid background for better visibility
+        BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
         Visible = false
     }, self.ScreenGui)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 8) -- Slightly more rounded for better aesthetics
+        CornerRadius = UDim.new(0, 8)
     }, self.MinimizedFrame)
     
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
-        Transparency = 0.3, -- More visible border
-        Thickness = 1.5 -- Slightly thicker border
+        Transparency = 0.3,
+        Thickness = 1.5
     }, self.MinimizedFrame)
     
     -- Add subtle glow effect to minimized frame
@@ -376,7 +376,7 @@ function Library:Create(config)
     end)
     
     self.MinimizedButton.MouseEnter:Connect(function()
-        Tween(self.MinimizedFrame, {BackgroundTransparency = 0.05}, 0.2) -- Slight highlight on hover
+        Tween(self.MinimizedFrame, {BackgroundTransparency = 0.05}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
@@ -724,7 +724,7 @@ function Library:Minimize()
     wait(0.3)
     self.MainFrame.Visible = false
     self.MinimizedFrame.Visible = true
-    Tween(self.MinimizedFrame, {BackgroundTransparency = 0.1}, 0.2) -- Use the improved transparency
+    Tween(self.MinimizedFrame, {BackgroundTransparency = 0.1}, 0.2)
 end
 
 function Library:Restore()
@@ -736,7 +736,7 @@ function Library:Restore()
     Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
 end
 
--- Enhanced UI Elements with proper cursor
+-- Enhanced UI Elements with proper cursor and click indicators
 function Library:CreateButton(section, config)
     config = config or {}
     local button = {}
@@ -753,7 +753,7 @@ function Library:CreateButton(section, config)
     }, button.Frame)
     
     button.Button = CreateInstance("TextButton", {
-        Size = UDim2.new(1, 0, 1, 0),
+        Size = UDim2.new(1, -30, 1, 0), -- Made room for click indicator
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Text = config.Text or "Button",
@@ -762,13 +762,26 @@ function Library:CreateButton(section, config)
         Font = Enum.Font.Ubuntu
     }, button.Frame)
     
+    -- Click Indicator (Pointer hand icon)
+    button.ClickIndicator = CreateInstance("TextLabel", {
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -25, 0.5, -10),
+        BackgroundTransparency = 1,
+        Text = "👆", -- Hand pointer emoji
+        TextColor3 = self.Theme.Accent,
+        TextSize = 16,
+        Font = Enum.Font.Ubuntu
+    }, button.Frame)
+    
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Text}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     button.Button.MouseLeave:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Accent}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -776,8 +789,11 @@ function Library:CreateButton(section, config)
         -- Create temporary visual feedback without changing the base color
         local originalColor = button.Frame.BackgroundColor3
         Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
+        -- Animate click indicator
+        Tween(button.ClickIndicator, {Size = UDim2.new(0, 24, 0, 24), Position = UDim2.new(1, -27, 0.5, -12)}, 0.1)
         wait(0.1)
         Tween(button.Frame, {BackgroundColor3 = originalColor}, 0.1)
+        Tween(button.ClickIndicator, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(1, -25, 0.5, -10)}, 0.1)
         
         if config.Callback then
             config.Callback()
@@ -1098,7 +1114,7 @@ function Library:CreateDropdown(section, config)
     dropdown.Button = CreateInstance("TextButton", {
         Size = UDim2.new(0.65, -10, 0, 27),
         Position = UDim2.new(0.35, 5, 0, 4),
-        BackgroundTransparency = 1, -- Remove background behind button
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Text = dropdown.Selected,
         TextColor3 = self.Theme.Text,
@@ -1106,8 +1122,7 @@ function Library:CreateDropdown(section, config)
         Font = Enum.Font.Ubuntu,
         TextTruncate = Enum.TextTruncate.AtEnd
     }, dropdown.Frame)
-
-    -- Add a subtle border around the button area
+    
     CreateInstance("UIStroke", {
         Color = self.Theme.Border,
         Transparency = 0.6,
@@ -1131,8 +1146,8 @@ function Library:CreateDropdown(section, config)
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(0.65, -10, 0, 0),
         Position = UDim2.new(0.35, 5, 0, 35),
-        BackgroundColor3 = self.Theme.Secondary, -- Proper background for content area
-        BackgroundTransparency = 0.1, -- More visible background
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
@@ -1140,10 +1155,9 @@ function Library:CreateDropdown(section, config)
     }, dropdown.Frame)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 6) -- Increased corner radius
+        CornerRadius = UDim.new(0, 6)
     }, dropdown.OptionContainer)
     
-    -- Add border around the dropdown content
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
         Transparency = 0.7,
@@ -1172,7 +1186,7 @@ function Library:CreateDropdown(section, config)
         for _, option in pairs(dropdown.Options) do
             local optionButton = CreateInstance("TextButton", {
                 Size = UDim2.new(1, 0, 0, 22),
-                BackgroundTransparency = 1, -- Remove background behind option buttons
+                BackgroundTransparency = 1,
                 BorderSizePixel = 0,
                 Text = option,
                 TextColor3 = self.Theme.Text,
@@ -1184,12 +1198,11 @@ function Library:CreateDropdown(section, config)
                 CornerRadius = UDim.new(0, 3)
             }, optionButton)
             
-            -- Add highlight background that appears on hover
             local highlightFrame = CreateInstance("Frame", {
                 Size = UDim2.new(1, 0, 1, 0),
                 Position = UDim2.new(0, 0, 0, 0),
                 BackgroundColor3 = self.Theme.Accent,
-                BackgroundTransparency = 1, -- Start invisible
+                BackgroundTransparency = 1,
                 BorderSizePixel = 0,
                 ZIndex = optionButton.ZIndex - 1
             }, optionButton)
@@ -1199,7 +1212,6 @@ function Library:CreateDropdown(section, config)
             }, highlightFrame)
             
             optionButton.MouseEnter:Connect(function()
-                -- Smooth highlight animation like sections
                 Tween(highlightFrame, {BackgroundTransparency = 0.8}, 0.2)
                 Mouse.Icon = "rbxasset://SystemCursors/Hand"
             end)
@@ -1463,7 +1475,7 @@ function Library:CreateSeparator(section)
     local separator = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 1),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5, -- Made less visible
+        BackgroundTransparency = 0.5,
         BorderSizePixel = 0
     }, section.Content)
     
