@@ -1,537 +1,396 @@
--- ╔═══════════════════════════════════════════════════════════════════════════════╗
--- ║                     EPS1LLON HUB UI LIBRARY DOCUMENTATION                       ║
--- ║                          Complete Usage Guide & Examples                        ║
--- ║                              By: JustClips                                      ║
--- ║                         Date: 2025-07-27 17:41:03 UTC                          ║
--- ╚═══════════════════════════════════════════════════════════════════════════════╝
+# Eps1llon Hub Premium UI Library
 
---[[
-    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-    █                                                                              █
-    █                           TABLE OF CONTENTS                                  █
-    █                                                                              █
-    █  1. GETTING STARTED                                                          █
-    █     - Loading the Library                                                    █
-    █     - Creating the UI                                                        █
-    █     - Configuration Options                                                  █
-    █                                                                              █
-    █  2. UI ELEMENTS                                                              █
-    █     - Button                                                                 █
-    █     - Toggle                                                                 █
-    █     - Slider                                                                 █
-    █     - Input Box                                                              █
-    █     - Dropdown                                                               █
-    █     - BigDropdown                                                            █
-    █     - SearchBox                                                              █
-    █     - Keybind                                                                █
-    █     - Label                                                                  █
-    █     - Separator                                                              █
-    █                                                                              █
-    █  3. CUSTOMIZATION                                                            █
-    █     - Themes                                                                 █
-    █     - Fonts                                                                  █
-    █     - Backgrounds                                                            █
-    █     - UI Settings                                                            █
-    █                                                                              █
-    █  4. ADVANCED FEATURES                                                        █
-    █     - Notifications                                                          █
-    █     - Active Functions Display                                               █
-    █     - Programmatic Control                                                   █
-    █     - Section Management                                                     █
-    █                                                                              █
-    █  5. COMPLETE EXAMPLES                                                        █
-    █                                                                              █
-    ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-]]
+A modern, feature-rich UI library for Roblox with smooth animations, customizable themes, and a sleek design inspired by popular UI frameworks.
 
--- ═══════════════════════════════════════════════════════════════════════════════════
--- 1. GETTING STARTED
--- ═══════════════════════════════════════════════════════════════════════════════════
+![Version](https://img.shields.io/badge/version-2.0-blue)
+![Roblox](https://img.shields.io/badge/platform-Roblox-red)
+![License](https://img.shields.io/badge/license-MIT-green)
 
--- Loading the Library
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Uilib.lua"))()
+## 🌟 Features
 
--- Creating the UI with all available options
-local UI = Library:Create({
-    -- THEMES (Choose one)
-    Theme = "Ocean",              -- Options: "Dark" | "Light" | "Purple" | "Ocean"
-    
-    -- KEYBIND
-    ToggleKey = Enum.KeyCode.RightShift,  -- Key to show/hide UI
-    
-    -- BACKGROUNDS (Choose one)
-    Background = "Blue Sky",      -- Options: "Blue Sky" | "Mountains" | "Blurred Stars"
-    
-    -- FONTS (Choose one)
-    Font = "Ubuntu",              -- Options: "Ubuntu" | "Gotham" | "GothamBold" | "SourceSans" | 
-                                 -- "SourceSansBold" | "Code" | "Highway" | "SciFi" | "Arial" | "ArialBold"
-    
-    -- UI APPEARANCE
-    ButtonDarkness = 0.5,         -- 0 = fully transparent, 1 = fully opaque
-    StrokeThickness = 1,          -- Border thickness (0-5)
-    
-    -- SECTION HEADERS
-    SectionHeaderEnabled = true,   -- Show headers in content area
-    SectionHeaderWhite = false,    -- Make headers white instead of accent color
-    
-    -- UI SETTINGS SECTION
-    HideUISettings = false,        -- Hide the default UI Settings section
-    UISettingsAtBottom = true,     -- Keep UI Settings at bottom of sections
-    
-    -- ADVANCED SECTION HEADER CONFIG
+- **Modern Design**: Clean, minimalist interface with smooth animations
+- **Fully Customizable**: Themes, fonts, colors, and more
+- **Rayfield-style BigDropdowns**: Collapsible sections with preview functionality
+- **Resizable & Draggable**: Windows can be resized and moved freely
+- **Active Functions Display**: Track enabled features in real-time
+- **Floating UI Settings**: Gear icon opens customizable settings panel
+- **Multiple Themes**: Dark, Light, Purple, and Ocean themes included
+- **Background Images**: Built-in scenic backgrounds
+- **Responsive Elements**: All UI elements respond to hover and click
+- **Section Headers**: Customizable headers with optional underlines
+- **Minimize to Icon**: Minimize UI to a small draggable widget
+
+## 📦 Installation
+
+```lua
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/eps1llon-hub/main/library.lua"))()
+```
+
+## 🚀 Quick Start
+
+```lua
+-- Create Window
+local Window = Library:Create({
+    Theme = "Ocean",           -- Dark, Light, Purple, Ocean
+    Background = "Blue Sky",   -- Blue Sky, Mountains, Blurred Stars
+    ToggleKey = Enum.KeyCode.RightShift,
+    Font = "Ubuntu"           -- See font list below
+})
+
+-- Create Section
+local MainSection = Window:CreateSection("Main")
+
+-- Add Elements
+Window:CreateButton(MainSection, {
+    Text = "Click Me",
+    Callback = function()
+        print("Button clicked!")
+    end
+})
+```
+
+## 📖 Documentation
+
+### Window Creation
+
+```lua
+local Window = Library:Create({
+    Theme = "Ocean",                    -- Theme name (string)
+    Background = "Blue Sky",            -- Background name (string)
+    ToggleKey = Enum.KeyCode.RightShift, -- Toggle UI visibility key
+    Font = "Ubuntu",                    -- Font name (string)
+    ButtonDarkness = 0.5,              -- Button transparency (0-1)
+    StrokeThickness = 1,               -- Border thickness (0-5)
+    SectionHeaderEnabled = true,        -- Show section headers
+    SectionHeaderWhite = false,        -- Make headers white
+    HideUISettings = false,            -- Hide UI settings button
     SectionHeaderConfig = {
-        Size = 22,                        -- Font size
-        Font = Enum.Font.GothamBold,      -- Font style
-        Color = nil,                      -- Custom color (nil = theme accent)
-        Position = "Center",              -- "Center" | "Left" | "Right"
-        UnderlineEnabled = true,          -- Show underline
-        UnderlineSize = 0.5,              -- Width (0-1, fraction of header width)
-        UnderlineThickness = 2            -- Thickness in pixels
+        Size = 22,                     -- Header text size
+        Font = Enum.Font.GothamBold,   -- Header font
+        Color = nil,                   -- Custom header color (optional)
+        Position = "Center",           -- Left, Center, Right
+        UnderlineEnabled = true,       -- Show underline
+        UnderlineSize = 0.5,          -- Underline width (0-1)
+        UnderlineThickness = 2         -- Underline height
     }
 })
+```
 
--- ═══════════════════════════════════════════════════════════════════════════════════
--- 2. UI ELEMENTS - Complete Reference
--- ═══════════════════════════════════════════════════════════════════════════════════
+### Creating Sections
 
--- First, create sections to organize your UI
-local Section1 = UI:CreateSection("Main")
-local Section2 = UI:CreateSection("Features")
-local Section3 = UI:CreateSection("Settings")
+```lua
+-- Basic section
+local Section = Window:CreateSection("Section Name")
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- BUTTON - Clickable button with hover effects
--- ───────────────────────────────────────────────────────────────────────────────────
-local Button = UI:CreateButton(Section1, {
-    Text = "Click Me!",                    -- Button text
-    Callback = function()                  -- Function to run when clicked
-        print("Button was clicked!")
-        -- Your code here
+-- Section with custom header color
+local ColoredSection = Window:CreateSection("Colored Section", Color3.fromRGB(255, 100, 100))
+```
+
+### UI Elements
+
+#### Button
+```lua
+Window:CreateButton(Section, {
+    Text = "Button Text",
+    Callback = function()
+        print("Clicked!")
     end
 })
+```
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- TOGGLE - On/Off switch with animation
--- ───────────────────────────────────────────────────────────────────────────────────
-local Toggle = UI:CreateToggle(Section1, {
-    Text = "Enable Feature",               -- Toggle label
-    Default = false,                       -- Starting state (true/false)
-    Callback = function(enabled)           -- Function called when toggled
-        print("Toggle is now:", enabled)
-        if enabled then
-            -- Code when enabled
-        else
-            -- Code when disabled
-        end
+#### Toggle
+```lua
+Window:CreateToggle(Section, {
+    Text = "Toggle Name",
+    Default = false,
+    Callback = function(value)
+        print("Toggle:", value)
     end
 })
+```
 
--- You can also set toggle state programmatically:
--- Toggle.Set(true)  -- Enable
--- Toggle.Set(false) -- Disable
-
--- ───────────────────────────────────────────────────────────────────────────────────
--- SLIDER - Value slider with live updates
--- ───────────────────────────────────────────────────────────────────────────────────
-local Slider = UI:CreateSlider(Section1, {
-    Text = "Speed",                        -- Slider label
-    Min = 0,                               -- Minimum value
-    Max = 100,                             -- Maximum value
-    Default = 50,                          -- Starting value
-    Callback = function(value)             -- Called when value changes
-        print("Slider value:", value)
-        -- Your code here
+#### Slider
+```lua
+Window:CreateSlider(Section, {
+    Text = "Slider Name",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Callback = function(value)
+        print("Value:", value)
     end
 })
+```
 
--- Access current value: Slider.Value
-
--- ───────────────────────────────────────────────────────────────────────────────────
--- INPUT BOX - Text input field
--- ───────────────────────────────────────────────────────────────────────────────────
-local Input = UI:CreateInput(Section1, {
-    Text = "Username",                     -- Label
-    Default = "Player",                    -- Default text
-    Placeholder = "Enter username...",     -- Placeholder when empty
-    Callback = function(text, enterPressed) -- Called when focus lost or enter pressed
-        print("Input text:", text)
-        print("Enter pressed:", enterPressed)
-        -- Your code here
+#### Input Box
+```lua
+Window:CreateInput(Section, {
+    Text = "Input Name",
+    Default = "Default Text",
+    Placeholder = "Enter text...",
+    Callback = function(text, enterPressed)
+        print("Input:", text)
     end
 })
+```
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- DROPDOWN - Selection menu
--- ───────────────────────────────────────────────────────────────────────────────────
-local Dropdown = UI:CreateDropdown(Section1, {
-    Text = "Select Option",                -- Label
-    Options = {"Option 1", "Option 2", "Option 3"}, -- Available options
-    Default = "Option 1",                  -- Default selection
-    Callback = function(selected)          -- Called when option selected
+#### Dropdown
+```lua
+Window:CreateDropdown(Section, {
+    Text = "Dropdown Name",
+    Options = {"Option 1", "Option 2", "Option 3"},
+    Default = "Option 1",
+    Callback = function(selected)
         print("Selected:", selected)
-        -- Your code here
     end
 })
+```
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- BIGDROPDOWN - Expandable container for multiple elements
--- ───────────────────────────────────────────────────────────────────────────────────
-local BigDropdown = UI:CreateBigDropdown(Section2, {
-    Text = "⚙️ Advanced Settings",         -- Dropdown title
-    CreateElements = function(dropdown)     -- Function to add elements
-        -- Add any UI element inside the dropdown
-        
+#### BigDropdown (Rayfield-style)
+```lua
+Window:CreateBigDropdown(Section, {
+    Text = "Settings",
+    CreateElements = function(dropdown)
         dropdown.AddToggle({
-            Text = "Sub Feature 1",
-            Default = false,
-            Callback = function(enabled)
-                print("Sub feature 1:", enabled)
+            Text = "Enable Feature",
+            Default = true,
+            Callback = function(value)
+                print("Feature:", value)
             end
         })
         
         dropdown.AddSlider({
-            Text = "Sub Slider",
+            Text = "Power",
             Min = 0,
-            Max = 10,
-            Default = 5,
+            Max = 100,
+            Default = 50,
             Callback = function(value)
-                print("Sub slider:", value)
+                print("Power:", value)
             end
         })
         
         dropdown.AddButton({
-            Text = "Sub Button",
+            Text = "Reset",
             Callback = function()
-                print("Sub button clicked")
+                print("Reset!")
             end
         })
         
         dropdown.AddInput({
-            Text = "Sub Input",
-            Placeholder = "Type here...",
+            Text = "Name",
+            Default = "Player",
             Callback = function(text)
-                print("Sub input:", text)
+                print("Name:", text)
             end
         })
         
-        dropdown.AddSeparator() -- Visual divider
+        dropdown.AddDropdown({
+            Text = "Mode",
+            Options = {"Easy", "Normal", "Hard"},
+            Default = "Normal",
+            Callback = function(mode)
+                print("Mode:", mode)
+            end
+        })
+        
+        dropdown.AddSeparator()
         
         dropdown.AddLabel({
-            Text = "Information Label",
-            Color = UI.Theme.Accent  -- Optional custom color
+            Text = "Additional Options",
+            Color = Color3.fromRGB(255, 255, 0)
         })
     end
 })
+```
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- SEARCHBOX - Dynamic search with filtering
--- ───────────────────────────────────────────────────────────────────────────────────
-local SearchBox = UI:CreateSearchBox(Section2, {
-    Placeholder = "Search items...",       -- Search placeholder
-    Items = {"Apple", "Banana", "Orange", "Grape"}, -- Items to search
-    OnSelected = function(item)            -- Called when item selected
-        print("Selected item:", item)
-        -- Your code here
+#### Search Box
+```lua
+Window:CreateSearchBox(Section, {
+    Placeholder = "Search players...",
+    Items = {"Player1", "Player2", "Player3"},
+    OnSelected = function(selected)
+        print("Selected:", selected)
     end,
-    OnSearch = function(searchText, items) -- Custom search logic (optional)
-        -- Return filtered items based on searchText
-        local results = {}
+    OnSearch = function(query, items)
+        -- Custom search logic (optional)
+        local filtered = {}
         for _, item in pairs(items) do
-            if item:lower():find(searchText:lower()) then
-                table.insert(results, item)
+            if item:lower():find(query) then
+                table.insert(filtered, item)
             end
         end
-        return results
+        return filtered
     end
 })
+```
 
--- Update search items dynamically:
--- SearchBox.UpdateItems({"New", "Items", "Here"})
-
--- ───────────────────────────────────────────────────────────────────────────────────
--- KEYBIND - Key binding functionality
--- ───────────────────────────────────────────────────────────────────────────────────
-local Keybind = UI:CreateKeybind(Section2, {
-    Text = "Hotkey",                       -- Label
-    Default = Enum.KeyCode.F,              -- Default key
-    Callback = function()                  -- Called when key pressed
-        print("Keybind pressed!")
-        -- Your code here
+#### Keybind
+```lua
+Window:CreateKeybind(Section, {
+    Text = "Keybind Name",
+    Default = Enum.KeyCode.F,
+    Callback = function()
+        print("Key pressed!")
     end
 })
+```
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- LABEL - Text display
--- ───────────────────────────────────────────────────────────────────────────────────
-local Label = UI:CreateLabel(Section2, {
-    Text = "Information Text",             -- Label text
-    Color = Color3.fromRGB(255, 255, 0)   -- Optional text color
+#### Label
+```lua
+Window:CreateLabel(Section, {
+    Text = "This is a label",
+    Color = Color3.fromRGB(255, 255, 0)  -- Optional
+})
+```
+
+#### Separator
+```lua
+Window:CreateSeparator(Section)
+```
+
+### Notifications
+
+```lua
+Window:Notify({
+    Title = "Success",
+    Text = "Operation completed successfully!",
+    Duration = 3  -- Seconds (optional, default: 3)
+})
+```
+
+### Available Themes
+- `Dark` - Classic dark theme
+- `Light` - Clean light theme  
+- `Purple` - Purple accent theme
+- `Ocean` - Blue ocean theme (default)
+
+### Available Fonts
+- `Ubuntu` (default)
+- `Gotham`
+- `GothamBold`
+- `SourceSans`
+- `SourceSansBold`
+- `Code`
+- `Highway`
+- `SciFi`
+- `Arial`
+- `ArialBold`
+
+### Available Backgrounds
+- `Blue Sky` (default)
+- `Mountains`
+- `Blurred Stars`
+
+### Methods
+
+#### Change Theme
+```lua
+Window:SetTheme("Dark")
+```
+
+#### Change Background
+```lua
+Window:SetBackground("Mountains")
+```
+
+#### Change Font
+```lua
+Window:SetFont("GothamBold")
+```
+
+#### Change Toggle Key
+```lua
+Window:SetToggleKey(Enum.KeyCode.LeftAlt)
+```
+
+#### Add UI Settings to Any Section
+```lua
+Window:AddUISettingsToSection(Section)
+```
+
+#### Destroy UI
+```lua
+Window:Destroy()
+```
+
+## 🎨 Customization
+
+### Button Darkness
+Controls the transparency of buttons (0 = transparent, 1 = opaque)
+```lua
+Window:SetButtonDarkness(0.7)
+```
+
+### Stroke Thickness
+Controls the border thickness of UI elements (0-5)
+```lua
+Window:SetStrokeThickness(2)
+```
+
+### Custom Section Headers
+You can customize section headers globally during window creation or individually per section:
+```lua
+-- Global configuration
+local Window = Library:Create({
+    SectionHeaderConfig = {
+        Size = 24,
+        Font = Enum.Font.GothamBold,
+        Color = Color3.fromRGB(255, 100, 100),
+        Position = "Left",
+        UnderlineEnabled = true,
+        UnderlineSize = 0.8,
+        UnderlineThickness = 3
+    }
 })
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- SEPARATOR - Visual divider line
--- ───────────────────────────────────────────────────────────────────────────────────
-UI:CreateSeparator(Section2)  -- No configuration needed
+-- Per-section color
+local Section = Window:CreateSection("Custom Section", Color3.fromRGB(100, 255, 100))
+```
 
--- ═══════════════════════════════════════════════════════════════════════════════════
--- 3. CUSTOMIZATION - Runtime Changes
--- ═══════════════════════════════════════════════════════════════════════════════════
+## 🔥 Advanced Features
 
--- Change theme at runtime
-UI:SetTheme("Purple")  -- "Dark" | "Light" | "Purple" | "Ocean"
+### Active Functions Display
+The library automatically tracks active toggles and keybinds in a floating panel that appears when features are enabled.
 
--- Change font at runtime
-UI:SetFont("GothamBold")  -- Any available font
+### UI Settings Panel
+Click the gear icon in the title bar to open a floating settings panel where you can customize:
+- Button darkness
+- Stroke thickness
+- Font
+- Theme
+- Background
+- Section header settings
 
--- Change background at runtime
-UI:SetBackground("Mountains")  -- "Blue Sky" | "Mountains" | "Blurred Stars"
+### Minimize Functionality
+- Click the minimize button (-) to shrink the UI to a small draggable widget
+- Click the minimized widget to restore the UI
+- The UI remembers its size when restored
 
--- Adjust UI appearance
-UI:SetButtonDarkness(0.7)   -- 0-1
-UI:SetStrokeThickness(2)    -- 0-5
+### Dynamic BigDropdown Updates
+BigDropdowns show a preview of their first element's state:
+- Toggles show "Enabled/Disabled"
+- Sliders show their current value
+- Inputs show their text content
+- Dropdowns show the selected option
 
--- Change toggle key
-UI:SetToggleKey(Enum.KeyCode.Insert)
+## 📝 Example Script
 
--- ═══════════════════════════════════════════════════════════════════════════════════
--- 4. ADVANCED FEATURES
--- ═══════════════════════════════════════════════════════════════════════════════════
+See `example.lua` for a complete implementation example.
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- NOTIFICATIONS - Show temporary messages
--- ───────────────────────────────────────────────────────────────────────────────────
-UI:Notify({
-    Title = "Success!",                    -- Notification title
-    Text = "Operation completed",          -- Notification text
-    Duration = 3                           -- Duration in seconds
-})
+## 🤝 Contributing
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- ACTIVE FUNCTIONS DISPLAY
--- ───────────────────────────────────────────────────────────────────────────────────
--- The UI automatically shows active toggles and features in a floating window
--- This happens automatically when toggles are enabled
+Feel free to submit issues and enhancement requests!
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- CUSTOM UI SETTINGS PLACEMENT
--- ───────────────────────────────────────────────────────────────────────────────────
--- If you hide default UI Settings, you can add them to any section:
-if UI.HideUISettings then
-    UI:AddUISettingsToSection(Section3)
-end
+## 📄 License
 
--- ───────────────────────────────────────────────────────────────────────────────────
--- SECTION MANAGEMENT
--- ───────────────────────────────────────────────────────────────────────────────────
--- Sections are automatically managed, but you can control their order:
-local FirstSection = UI:CreateSection("First")   -- Will appear first
-local LastSection = UI:CreateSection("Last")     -- Will appear after First
--- UI Settings will always be at bottom if UISettingsAtBottom = true
+This project is licensed under the MIT License.
 
--- ═══════════════════════════════════════════════════════════════════════════════════
--- 5. COMPLETE WORKING EXAMPLE
--- ═══════════════════════════════════════════════════════════════════════════════════
+## 👤 Credits
 
--- Clean example showing all features
-local ExampleUI = Library:Create({
-    Theme = "Ocean",
-    ToggleKey = Enum.KeyCode.RightShift,
-    Background = "Blue Sky"
-})
+Created by Eps1llon
+- Inspired by popular UI libraries like Rayfield, Orion, and others
+- Built with performance and user experience in mind
 
--- Create sections
-local MainSection = ExampleUI:CreateSection("Main")
-local PlayerSection = ExampleUI:CreateSection("Player")
-local VisualsSection = ExampleUI:CreateSection("Visuals")
+---
 
--- Main Features
-ExampleUI:CreateLabel(MainSection, {
-    Text = "Game Enhancements",
-    Color = ExampleUI.Theme.Accent
-})
-
-ExampleUI:CreateToggle(MainSection, {
-    Text = "God Mode",
-    Default = false,
-    Callback = function(enabled)
-        if enabled then
-            game.Players.LocalPlayer.Character.Humanoid.MaxHealth = math.huge
-            game.Players.LocalPlayer.Character.Humanoid.Health = math.huge
-        else
-            game.Players.LocalPlayer.Character.Humanoid.MaxHealth = 100
-        end
-    end
-})
-
--- Player Controls
-local PlayerControls = ExampleUI:CreateBigDropdown(PlayerSection, {
-    Text = "🏃 Movement Settings",
-    CreateElements = function(dropdown)
-        dropdown.AddSlider({
-            Text = "Walk Speed",
-            Min = 16,
-            Max = 200,
-            Default = 16,
-            Callback = function(value)
-                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-            end
-        })
-        
-        dropdown.AddSlider({
-            Text = "Jump Power",
-            Min = 50,
-            Max = 300,
-            Default = 50,
-            Callback = function(value)
-                game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
-            end
-        })
-        
-        dropdown.AddToggle({
-            Text = "Infinite Jump",
-            Default = false,
-            Callback = function(enabled)
-                -- Infinite jump implementation
-                local InfiniteJump = enabled
-                game:GetService("UserInputService").JumpRequest:Connect(function()
-                    if InfiniteJump then
-                        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-                    end
-                end)
-            end
-        })
-        
-        dropdown.AddButton({
-            Text = "Reset Character",
-            Callback = function()
-                game.Players.LocalPlayer.Character:BreakJoints()
-            end
-        })
-    end
-})
-
--- Visual Settings
-ExampleUI:CreateSearchBox(VisualsSection, {
-    Placeholder = "Search players to highlight...",
-    Items = {},
-    OnSelected = function(playerName)
-        local player = game.Players:FindFirstChild(playerName)
-        if player and player.Character then
-            -- Highlight player logic
-            ExampleUI:Notify({
-                Title = "Player Selected",
-                Text = "Now tracking: " .. playerName,
-                Duration = 3
-            })
-        end
-    end
-})
-
--- Update player list
-local function UpdatePlayerList()
-    local players = {}
-    for _, player in pairs(game.Players:GetPlayers()) do
-        table.insert(players, player.Name)
-    end
-    -- Update search box items (assuming you stored the searchbox)
-end
-
-game.Players.PlayerAdded:Connect(UpdatePlayerList)
-UpdatePlayerList()
-
--- Show welcome notification
-ExampleUI:Notify({
-    Title = "Welcome!",
-    Text = "Press " .. ExampleUI.ToggleKey.Name .. " to toggle UI",
-    Duration = 5
-})
-
--- ═══════════════════════════════════════════════════════════════════════════════════
--- ADDITIONAL TIPS & TRICKS
--- ═══════════════════════════════════════════════════════════════════════════════════
-
---[[
-    💡 TIPS:
-    
-    1. UI ORGANIZATION
-       - Use sections to group related features
-       - Use BigDropdowns to create collapsible feature groups
-       - Use separators and labels to visually organize elements
-    
-    2. PERFORMANCE
-       - The UI automatically handles cleanup when destroyed
-       - Animations are optimized for smooth performance
-       - Active functions display updates automatically
-    
-    3. USER EXPERIENCE
-       - All interactive elements show visual feedback
-       - Hover effects indicate clickable areas
-       - Smooth animations make the UI feel professional
-    
-    4. BEST PRACTICES
-       - Always provide clear labels for features
-       - Use appropriate input types (toggle for on/off, slider for ranges)
-       - Group related settings in BigDropdowns
-       - Show notifications for important actions
-    
-    5. KEYBOARD SHORTCUTS
-       - Default toggle: RightShift (customizable)
-       - UI is draggable by the title bar
-       - UI is resizable by dragging the bottom-right corner
-       - Minimize button creates a floating icon
-    
-    6. DESTROY UI
-       - When done, clean up with: UI:Destroy()
-]]
-
--- ═══════════════════════════════════════════════════════════════════════════════════
--- ERROR HANDLING EXAMPLE
--- ═══════════════════════════════════════════════════════════════════════════════════
-
--- Safe UI creation with error handling
-local success, UI = pcall(function()
-    return Library:Create({Theme = "Ocean"})
-end)
-
-if success then
-    print("UI created successfully!")
-else
-    warn("Failed to create UI:", UI)
-end
-
--- ═══════════════════════════════════════════════════════════════════════════════════
--- QUICK REFERENCE CARD
--- ═══════════════════════════════════════════════════════════════════════════════════
-
---[[
-╔════════════════════════════════════════════════════════════════════════════════╗
-║                              QUICK REFERENCE                                    ║
-╠════════════════════════════════════════════════════════════════════════════════╣
-║ ELEMENT          │ RETURNS          │ KEY METHODS/PROPERTIES                   ║
-╠══════════════════╪══════════════════╪══════════════════════════════════════════╣
-║ CreateButton     │ button object    │ .Frame, .Button                          ║
-║ CreateToggle     │ toggle object    │ .Set(bool), .Enabled                     ║
-║ CreateSlider     │ slider object    │ .Value                                   ║
-║ CreateInput      │ input object     │ .TextBox                                 ║
-║ CreateDropdown   │ dropdown object  │ .Selected, .Options                      ║
-║ CreateBigDropdown│ bigdropdown obj  │ .AddToggle(), .AddSlider(), etc.         ║
-║ CreateSearchBox  │ searchbox object │ .UpdateItems(table)                      ║
-║ CreateKeybind    │ keybind object   │ .Key                                     ║
-║ CreateLabel      │ label object     │ .Label                                   ║
-║ CreateSeparator  │ separator object │ (none)                                   ║
-╠══════════════════╪══════════════════╪══════════════════════════════════════════╣
-║ LIBRARY METHODS  │                  │                                          ║
-╠══════════════════╪══════════════════╪══════════════════════════════════════════╣
-║ :Create()        │ UI object        │ Creates main UI                          ║
-║ :CreateSection() │ section object   │ Creates a new section                    ║
-║ :SetTheme()      │ void             │ Changes theme                            ║
-║ :SetFont()       │ void             │ Changes font                             ║
-║ :SetBackground() │ void             │ Changes background                       ║
-║ :Notify()        │ void             │ Shows notification                       ║
-║ :Destroy()       │ void             │Destroys UI                             ║
-╚════════════════════════════════════════════════════════════════════════════════╝
-]]
-
-print("Eps1llon Hub UI Library loaded successfully!")
-print("Documentation by: JustClips")
-print("GitHub: https://github.com/JustClips/Uilib")
+**Note**: This library is for educational purposes. Always respect game rules and terms of service when using UI libraries.
