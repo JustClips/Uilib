@@ -1,4 +1,4 @@
--- Eps1llon Hub Premium UI Library
+-- Eps1llon Hub Premium UI Library (Enhanced Version)
 -- Modern, sleek design with smooth animations and resizable interface
 
 local Library = {}
@@ -24,8 +24,9 @@ local Themes = {
         Accent = Color3.fromRGB(100, 100, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(150, 150, 150),
-        Border = Color3.fromRGB(255, 255, 255),
-        SectionHighlight = Color3.fromRGB(100, 100, 255)
+        Border = Color3.fromRGB(80, 80, 80), -- Made less visible
+        SectionHighlight = Color3.fromRGB(100, 100, 255),
+        SectionBackground = Color3.fromRGB(25, 25, 25) -- New section background
     },
     Light = {
         Background = Color3.fromRGB(240, 240, 240),
@@ -34,8 +35,9 @@ local Themes = {
         Accent = Color3.fromRGB(50, 50, 200),
         Text = Color3.fromRGB(0, 0, 0),
         TextDark = Color3.fromRGB(100, 100, 100),
-        Border = Color3.fromRGB(200, 200, 200),
-        SectionHighlight = Color3.fromRGB(50, 50, 200)
+        Border = Color3.fromRGB(180, 180, 180), -- Made less visible
+        SectionHighlight = Color3.fromRGB(50, 50, 200),
+        SectionBackground = Color3.fromRGB(250, 250, 250) -- New section background
     },
     Purple = {
         Background = Color3.fromRGB(25, 20, 35),
@@ -44,8 +46,9 @@ local Themes = {
         Accent = Color3.fromRGB(150, 100, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(180, 180, 200),
-        Border = Color3.fromRGB(255, 255, 255),
-        SectionHighlight = Color3.fromRGB(150, 100, 255)
+        Border = Color3.fromRGB(70, 60, 85), -- Made less visible
+        SectionHighlight = Color3.fromRGB(150, 100, 255),
+        SectionBackground = Color3.fromRGB(30, 25, 40) -- New section background
     },
     Ocean = {
         Background = Color3.fromRGB(15, 25, 35),
@@ -54,8 +57,9 @@ local Themes = {
         Accent = Color3.fromRGB(100, 200, 255),
         Text = Color3.fromRGB(255, 255, 255),
         TextDark = Color3.fromRGB(180, 200, 220),
-        Border = Color3.fromRGB(255, 255, 255),
-        SectionHighlight = Color3.fromRGB(100, 200, 255)
+        Border = Color3.fromRGB(60, 80, 95), -- Made less visible
+        SectionHighlight = Color3.fromRGB(100, 200, 255),
+        SectionBackground = Color3.fromRGB(20, 30, 40) -- New section background
     }
 }
 
@@ -130,6 +134,7 @@ function Library:Create(config)
     self.Minimized = false
     self.MinSize = Vector2.new(500, 400)
     self.MaxSize = Vector2.new(800, 600)
+    self.ActiveFunctions = {}
     
     -- Create ScreenGui
     self.ScreenGui = CreateInstance("ScreenGui", {
@@ -154,10 +159,10 @@ function Library:Create(config)
         CornerRadius = UDim.new(0, 8)
     }, self.MainFrame)
     
-    -- Edge glow effect
+    -- Edge glow effect (made shorter)
     local EdgeGlow = CreateInstance("ImageLabel", {
         Name = "EdgeGlow",
-        Size = UDim2.new(1, 20, 1, 20),
+        Size = UDim2.new(1, 10, 1, 10), -- Reduced from 20 to 10
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundTransparency = 1,
@@ -168,7 +173,7 @@ function Library:Create(config)
     }, self.MainFrame)
     
     CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 12)
+        CornerRadius = UDim.new(0, 10) -- Reduced from 12 to 10
     }, EdgeGlow)
     
     -- Title Bar
@@ -192,35 +197,48 @@ function Library:Create(config)
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
-    -- Close Button (X)
+    -- Close Button (X) - Made bigger
     self.CloseButton = CreateInstance("TextButton", {
         Name = "CloseButton",
-        Size = UDim2.new(0, 20, 0, 20),
-        Position = UDim2.new(1, -30, 0.5, -10),
+        Size = UDim2.new(0, 25, 0, 25), -- Increased from 20x20 to 25x25
+        Position = UDim2.new(1, -32, 0.5, -12.5),
         BackgroundTransparency = 1,
         Text = "×",
         TextColor3 = self.Theme.Text,
-        TextSize = 22,
+        TextSize = 26, -- Increased from 22 to 26
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
+    -- Add cursor icon to close button
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -10, 0, 2),
+        BackgroundTransparency = 1,
+        Text = "🖱️",
+        TextSize = 8,
+        TextTransparency = 0.7
+    }, self.CloseButton)
+    
     self.CloseButton.MouseEnter:Connect(function()
         Tween(self.CloseButton, {TextColor3 = Color3.fromRGB(255, 100, 100)}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     self.CloseButton.MouseLeave:Connect(function()
         Tween(self.CloseButton, {TextColor3 = self.Theme.Text}, 0.2)
+        Mouse.Icon = ""
     end)
     
     self.CloseButton.MouseButton1Click:Connect(function()
         self:Destroy()
     end)
     
-    -- Minimize Button (-)
+    -- Minimize Button (-) - Moved left and made shorter
     self.MinimizeButton = CreateInstance("TextButton", {
         Name = "MinimizeButton",
-        Size = UDim2.new(0, 20, 0, 20),
-        Position = UDim2.new(1, -55, 0.5, -10),
+        Size = UDim2.new(0, 20, 0, 18), -- Made shorter (height from 20 to 18)
+        Position = UDim2.new(1, -62, 0.5, -9), -- Moved left (from -55 to -62)
         BackgroundTransparency = 1,
         Text = "—",
         TextColor3 = self.Theme.Text,
@@ -228,50 +246,75 @@ function Library:Create(config)
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
+    -- Add cursor icon to minimize button
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 10, 0, 10),
+        Position = UDim2.new(1, -8, 0, 2),
+        BackgroundTransparency = 1,
+        Text = "🖱️",
+        TextSize = 6,
+        TextTransparency = 0.7
+    }, self.MinimizeButton)
+    
     self.MinimizeButton.MouseEnter:Connect(function()
         Tween(self.MinimizeButton, {TextColor3 = self.Theme.Accent}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     self.MinimizeButton.MouseLeave:Connect(function()
         Tween(self.MinimizeButton, {TextColor3 = self.Theme.Text}, 0.2)
+        Mouse.Icon = ""
     end)
     
     self.MinimizeButton.MouseButton1Click:Connect(function()
         self:Minimize()
     end)
     
-    -- Top divider line
+    -- Top divider line (connects all the way)
     self.TopDivider = CreateInstance("Frame", {
         Name = "TopDivider",
-        Size = UDim2.new(1, -30, 0, 1),
-        Position = UDim2.new(0, 15, 0, 35),
+        Size = UDim2.new(1, 0, 0, 1), -- Full width instead of -30
+        Position = UDim2.new(0, 0, 0, 35), -- Start from 0 instead of 15
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.7,
+        BackgroundTransparency = 0.5, -- Made less visible (was 0.7)
         BorderSizePixel = 0
     }, self.MainFrame)
     
-    -- Left Section Container
+    -- Left Section Container with background
     self.SectionContainer = CreateInstance("ScrollingFrame", {
         Name = "SectionContainer",
         Size = UDim2.new(0, 150, 1, -45),
         Position = UDim2.new(0, 10, 0, 40),
-        BackgroundTransparency = 1,
+        BackgroundColor3 = self.Theme.SectionBackground,
+        BackgroundTransparency = 0.3,
         BorderSizePixel = 0,
         ScrollBarThickness = 0
     }, self.MainFrame)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 8)
+    }, self.SectionContainer)
     
     CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
         Padding = UDim.new(0, 5)
     }, self.SectionContainer)
     
-    -- Vertical divider line
+    CreateInstance("UIPadding", {
+        PaddingTop = UDim.new(0, 10),
+        PaddingBottom = UDim.new(0, 10),
+        PaddingLeft = UDim.new(0, 5),
+        PaddingRight = UDim.new(0, 5)
+    }, self.SectionContainer)
+    
+    -- Vertical divider line (connects all the way)
     self.VerticalDivider = CreateInstance("Frame", {
         Name = "VerticalDivider",
-        Size = UDim2.new(0, 1, 1, -45),
-        Position = UDim2.new(0, 170, 0, 40),
+        Size = UDim2.new(0, 1, 1, -35), -- Extended to connect from top to bottom
+        Position = UDim2.new(0, 170, 0, 35), -- Start from top line
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.7,
+        BackgroundTransparency = 0.5, -- Made less visible (was 0.7)
         BorderSizePixel = 0
     }, self.MainFrame)
     
@@ -324,6 +367,9 @@ function Library:Create(config)
         self:Restore()
     end)
     
+    -- Create Active Functions Display
+    self:CreateActiveFunctionsDisplay()
+    
     -- Make frames draggable
     AddDragging(self.MainFrame, self.TitleBar)
     AddDragging(self.MinimizedFrame)
@@ -332,6 +378,147 @@ function Library:Create(config)
     self:AddResizing()
     
     return self
+end
+
+-- New Active Functions Display
+function Library:CreateActiveFunctionsDisplay()
+    self.ActiveFunctionsFrame = CreateInstance("Frame", {
+        Name = "ActiveFunctionsFrame",
+        Size = UDim2.new(0, 200, 0, 150),
+        Position = UDim2.new(1, -220, 0, 20),
+        BackgroundColor3 = self.Theme.Background,
+        BackgroundTransparency = 0.1,
+        BorderSizePixel = 0,
+        Visible = true
+    }, self.ScreenGui)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 8)
+    }, self.ActiveFunctionsFrame)
+    
+    CreateInstance("UIStroke", {
+        Color = self.Theme.Accent,
+        Transparency = 0.6,
+        Thickness = 1
+    }, self.ActiveFunctionsFrame)
+    
+    -- Header
+    local header = CreateInstance("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 25),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Text = "Active Functions",
+        TextColor3 = self.Theme.Accent,
+        TextSize = 14,
+        Font = Enum.Font.Ubuntu,
+        TextXAlignment = Enum.TextXAlignment.Center
+    }, self.ActiveFunctionsFrame)
+    
+    -- Divider
+    CreateInstance("Frame", {
+        Size = UDim2.new(1, -20, 0, 1),
+        Position = UDim2.new(0, 10, 0, 25),
+        BackgroundColor3 = self.Theme.Border,
+        BackgroundTransparency = 0.5,
+        BorderSizePixel = 0
+    }, self.ActiveFunctionsFrame)
+    
+    -- Content area
+    self.ActiveFunctionsContent = CreateInstance("ScrollingFrame", {
+        Size = UDim2.new(1, -10, 1, -35),
+        Position = UDim2.new(0, 5, 0, 30),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        ScrollBarThickness = 2,
+        ScrollBarImageColor3 = self.Theme.Accent
+    }, self.ActiveFunctionsFrame)
+    
+    CreateInstance("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 3)
+    }, self.ActiveFunctionsContent)
+    
+    -- Floating animation
+    local floatTween1 = TweenService:Create(
+        self.ActiveFunctionsFrame,
+        TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+        {Position = UDim2.new(1, -220, 0, 30)}
+    )
+    floatTween1:Play()
+    
+    -- Make draggable
+    AddDragging(self.ActiveFunctionsFrame)
+    
+    -- Update content
+    self:UpdateActiveFunctions()
+end
+
+function Library:AddActiveFunction(name)
+    if not table.find(self.ActiveFunctions, name) then
+        table.insert(self.ActiveFunctions, name)
+        self:UpdateActiveFunctions()
+    end
+end
+
+function Library:RemoveActiveFunction(name)
+    local index = table.find(self.ActiveFunctions, name)
+    if index then
+        table.remove(self.ActiveFunctions, index)
+        self:UpdateActiveFunctions()
+    end
+end
+
+function Library:UpdateActiveFunctions()
+    if not self.ActiveFunctionsContent then return end
+    
+    -- Clear existing
+    for _, child in pairs(self.ActiveFunctionsContent:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    
+    -- Add active functions
+    for i, func in pairs(self.ActiveFunctions) do
+        local funcFrame = CreateInstance("Frame", {
+            Size = UDim2.new(1, -5, 0, 20),
+            BackgroundColor3 = self.Theme.Secondary,
+            BackgroundTransparency = 0.3,
+            BorderSizePixel = 0
+        }, self.ActiveFunctionsContent)
+        
+        CreateInstance("UICorner", {
+            CornerRadius = UDim.new(0, 4)
+        }, funcFrame)
+        
+        -- Status indicator
+        CreateInstance("Frame", {
+            Size = UDim2.new(0, 6, 0, 6),
+            Position = UDim2.new(0, 8, 0.5, -3),
+            BackgroundColor3 = Color3.fromRGB(0, 255, 0),
+            BorderSizePixel = 0
+        }, funcFrame)
+        
+        CreateInstance("UICorner", {
+            CornerRadius = UDim.new(0.5, 0)
+        }, funcFrame:GetChildren()[2])
+        
+        -- Function name
+        CreateInstance("TextLabel", {
+            Size = UDim2.new(1, -25, 1, 0),
+            Position = UDim2.new(0, 20, 0, 0),
+            BackgroundTransparency = 1,
+            Text = func,
+            TextColor3 = self.Theme.Text,
+            TextSize = 11,
+            Font = Enum.Font.Ubuntu,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd
+        }, funcFrame)
+    end
+    
+    -- Update canvas size
+    self.ActiveFunctionsContent.CanvasSize = UDim2.new(0, 0, 0, #self.ActiveFunctions * 23)
 end
 
 function Library:AddResizing()
@@ -391,14 +578,19 @@ function Library:CreateSection(name)
     section.Name = name
     section.Elements = {}
     
-    -- Section Button
+    -- Section Button with background
     section.Button = CreateInstance("TextButton", {
         Name = name .. "Section",
         Size = UDim2.new(1, 0, 0, 35),
-        BackgroundTransparency = 1,
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = 0.6,
         BorderSizePixel = 0,
         Text = ""
     }, self.SectionContainer)
+    
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 6)
+    }, section.Button)
     
     -- Section Highlight (left line)
     section.Highlight = CreateInstance("Frame", {
@@ -452,13 +644,17 @@ function Library:CreateSection(name)
     section.Button.MouseEnter:Connect(function()
         if self.CurrentSection ~= section then
             Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
+            Tween(section.Button, {BackgroundTransparency = 0.4}, 0.2)
         end
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     section.Button.MouseLeave:Connect(function()
         if self.CurrentSection ~= section then
             Tween(section.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
+            Tween(section.Button, {BackgroundTransparency = 0.6}, 0.2)
         end
+        Mouse.Icon = ""
     end)
     
     table.insert(self.Sections, section)
@@ -475,17 +671,20 @@ function Library:SelectSection(section)
         s.Content.Visible = false
         s.Highlight.Visible = false
         Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
+        Tween(s.Button, {BackgroundTransparency = 0.6}, 0.2)
     end
     
     section.Content.Visible = true
     section.Highlight.Visible = true
     Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
+    Tween(section.Button, {BackgroundTransparency = 0.3}, 0.2)
     self.CurrentSection = section
 end
 
 function Library:Minimize()
     self.Minimized = true
     Tween(self.MainFrame, {Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1}, 0.3)
+    Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, 50, 0, 20)}, 0.3)
     wait(0.3)
     self.MainFrame.Visible = false
     self.MinimizedFrame.Visible = true
@@ -497,9 +696,10 @@ function Library:Restore()
     self.MinimizedFrame.Visible = false
     self.MainFrame.Visible = true
     Tween(self.MainFrame, {Size = UDim2.new(0, 650, 0, 450), BackgroundTransparency = 0.05}, 0.3)
+    Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
 end
 
--- UI Elements
+-- Enhanced UI Elements with cursor indicators
 function Library:CreateButton(section, config)
     config = config or {}
     local button = {}
@@ -525,12 +725,25 @@ function Library:CreateButton(section, config)
         Font = Enum.Font.Ubuntu
     }, button.Frame)
     
+    -- Add cursor icon
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 15, 0, 15),
+        Position = UDim2.new(1, -20, 0.5, -7.5),
+        BackgroundTransparency = 1,
+        Text = "🖱️",
+        TextSize = 10,
+        TextTransparency = 0.7
+    }, button.Frame)
+    
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     button.Button.MouseLeave:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
     end)
     
     button.Button.MouseButton1Click:Connect(function()
@@ -563,7 +776,7 @@ function Library:CreateToggle(section, config)
     }, toggle.Frame)
     
     toggle.Label = CreateInstance("TextLabel", {
-        Size = UDim2.new(1, -50, 1, 0),
+        Size = UDim2.new(1, -70, 1, 0),
         Position = UDim2.new(0, 10, 0, 0),
         BackgroundTransparency = 1,
         Text = config.Text or "Toggle",
@@ -596,15 +809,28 @@ function Library:CreateToggle(section, config)
         CornerRadius = UDim.new(0.5, 0)
     }, toggle.Indicator)
     
+    -- Add cursor icon
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -15, 0.5, -6),
+        BackgroundTransparency = 1,
+        Text = "🖱️",
+        TextSize = 8,
+        TextTransparency = 0.7
+    }, toggle.Frame)
+    
     local function SetToggle(value)
         toggle.Enabled = value
         
         if toggle.Enabled then
             Tween(toggle.Button, {BackgroundColor3 = self.Theme.Accent}, 0.2)
             Tween(toggle.Indicator, {Position = UDim2.new(1, -16, 0.5, -7)}, 0.2)
+            self:AddActiveFunction(config.Text or "Toggle")
         else
             Tween(toggle.Button, {BackgroundColor3 = self.Theme.Tertiary}, 0.2)
             Tween(toggle.Indicator, {Position = UDim2.new(0, 2, 0.5, -7)}, 0.2)
+            self:RemoveActiveFunction(config.Text or "Toggle")
         end
         
         if config.Callback then
@@ -618,10 +844,12 @@ function Library:CreateToggle(section, config)
     
     toggle.Frame.MouseEnter:Connect(function()
         Tween(toggle.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     toggle.Frame.MouseLeave:Connect(function()
         Tween(toggle.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
     end)
     
     toggle.Set = SetToggle
@@ -700,6 +928,17 @@ function Library:CreateSlider(section, config)
         CornerRadius = UDim.new(0.5, 0)
     }, slider.Knob)
     
+    -- Add cursor icon
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -15, 0, 8),
+        BackgroundTransparency = 1,
+        Text = "🖱️",
+        TextSize = 8,
+        TextTransparency = 0.7
+    }, slider.Frame)
+    
     local dragging = false
     
     local function UpdateSlider(input)
@@ -745,10 +984,12 @@ function Library:CreateSlider(section, config)
     
     slider.Frame.MouseEnter:Connect(function()
         Tween(slider.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     slider.Frame.MouseLeave:Connect(function()
         Tween(slider.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
     end)
     
     return slider
@@ -807,10 +1048,12 @@ function Library:CreateInput(section, config)
     
     input.Frame.MouseEnter:Connect(function()
         Tween(input.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/IBeam"
     end)
     
     input.Frame.MouseLeave:Connect(function()
         Tween(input.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
     end)
     
     return input
@@ -873,6 +1116,17 @@ function Library:CreateDropdown(section, config)
         Font = Enum.Font.Ubuntu
     }, dropdown.Button)
     
+    -- Add cursor icon
+    CreateInstance("TextLabel", {
+        Name = "CursorIcon",
+        Size = UDim2.new(0, 12, 0, 12),
+        Position = UDim2.new(1, -15, 0.5, -6),
+        BackgroundTransparency = 1,
+        Text = "🖱️",
+        TextSize = 8,
+        TextTransparency = 0.7
+    }, dropdown.Frame)
+    
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(0.65, -10, 0, 0),
         Position = UDim2.new(0.35, 5, 0, 35),
@@ -925,10 +1179,12 @@ function Library:CreateDropdown(section, config)
             
             optionButton.MouseEnter:Connect(function()
                 Tween(optionButton, {BackgroundTransparency = 0.2}, 0.2)
+                Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
             end)
             
             optionButton.MouseLeave:Connect(function()
                 Tween(optionButton, {BackgroundTransparency = 0.5}, 0.2)
+                Mouse.Icon = ""
             end)
             
             optionButton.MouseButton1Click:Connect(function()
@@ -970,10 +1226,12 @@ function Library:CreateDropdown(section, config)
     
     dropdown.Frame.MouseEnter:Connect(function()
         Tween(dropdown.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
     end)
     
     dropdown.Frame.MouseLeave:Connect(function()
         Tween(dropdown.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
     end)
     
     return dropdown
@@ -1080,10 +1338,12 @@ function Library:CreateSearchBox(section, config)
             
             resultButton.MouseEnter:Connect(function()
                 Tween(resultButton, {BackgroundTransparency = 0.2}, 0.2)
+                Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
             end)
             
             resultButton.MouseLeave:Connect(function()
                 Tween(resultButton, {BackgroundTransparency = 0.5}, 0.2)
+                Mouse.Icon = ""
             end)
             
             resultButton.MouseButton1Click:Connect(function()
@@ -1137,10 +1397,12 @@ function Library:CreateSearchBox(section, config)
     
     search.Frame.MouseEnter:Connect(function()
         Tween(search.Frame, {BackgroundTransparency = 0.3}, 0.2)
+        Mouse.Icon = "rbxasset://SystemCursors/IBeam"
     end)
     
     search.Frame.MouseLeave:Connect(function()
         Tween(search.Frame, {BackgroundTransparency = 0.5}, 0.2)
+        Mouse.Icon = ""
     end)
     
     return search
@@ -1179,7 +1441,7 @@ function Library:CreateSeparator(section)
     local separator = CreateInstance("Frame", {
         Size = UDim2.new(1, 0, 0, 1),
         BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.7,
+        BackgroundTransparency = 0.5, -- Made less visible
         BorderSizePixel = 0
     }, section.Content)
     
@@ -1195,6 +1457,7 @@ function Library:SetTheme(themeName)
         self.EdgeGlow.ImageColor3 = self.Theme.Accent
         self.TopDivider.BackgroundColor3 = self.Theme.Border
         self.VerticalDivider.BackgroundColor3 = self.Theme.Border
+        self.SectionContainer.BackgroundColor3 = self.Theme.SectionBackground
         
         -- Update all existing elements
         for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
@@ -1259,12 +1522,14 @@ function Library:Notify(config)
     Tween(notification, {Position = UDim2.new(1, -270, 1, -90)}, 0.5)
     
     -- Auto close
-    task.wait(config.Duration or 3)
-    
-    -- Animate out
-    Tween(notification, {Position = UDim2.new(1, 270, 1, -90)}, 0.5)
-    task.wait(0.5)
-    notification:Destroy()
+    spawn(function()
+        wait(config.Duration or 3)
+        
+        -- Animate out
+        Tween(notification, {Position = UDim2.new(1, 270, 1, -90)}, 0.5)
+        wait(0.5)
+        notification:Destroy()
+    end)
 end
 
 function Library:Destroy()
