@@ -1378,7 +1378,7 @@ function Library:CreateDropdown(section, config)
     }, dropdown.OptionContainer)
     
     CreateInstance("UIPadding", {
-           PaddingBottom = UDim.new(0, 3),
+                PaddingBottom = UDim.new(0, 3),
         PaddingLeft = UDim.new(0, 3),
         PaddingRight = UDim.new(0, 3)
     }, dropdown.OptionContainer)
