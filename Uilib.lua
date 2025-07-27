@@ -154,10 +154,27 @@ function Library:Create(config)
         ClipsDescendants = false
     }, self.ScreenGui)
     
+    -- Add background image to main frame
+    CreateInstance("ImageLabel", {
+        Name = "BackgroundImage",
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://98784591713474",
+        ImageTransparency = 0.8, -- Made visible but not too much
+        ScaleType = Enum.ScaleType.Stretch,
+        ZIndex = -2
+    }, self.MainFrame)
+    
     -- Add slight rounded corners
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 8)
     }, self.MainFrame)
+    
+    -- Apply corner to background image too
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 8)
+    }, self.MainFrame.BackgroundImage)
     
     -- Edge glow effect (made shorter)
     local EdgeGlow = CreateInstance("ImageLabel", {
@@ -209,20 +226,9 @@ function Library:Create(config)
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
-    -- Add cursor icon to close button
-    CreateInstance("TextLabel", {
-        Name = "CursorIcon",
-        Size = UDim2.new(0, 12, 0, 12),
-        Position = UDim2.new(1, -10, 0, 2),
-        BackgroundTransparency = 1,
-        Text = "🖱️",
-        TextSize = 8,
-        TextTransparency = 0.7
-    }, self.CloseButton)
-    
     self.CloseButton.MouseEnter:Connect(function()
         Tween(self.CloseButton, {TextColor3 = Color3.fromRGB(255, 100, 100)}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     self.CloseButton.MouseLeave:Connect(function()
@@ -246,20 +252,9 @@ function Library:Create(config)
         Font = Enum.Font.Ubuntu
     }, self.TitleBar)
     
-    -- Add cursor icon to minimize button
-    CreateInstance("TextLabel", {
-        Name = "CursorIcon",
-        Size = UDim2.new(0, 10, 0, 10),
-        Position = UDim2.new(1, -8, 0, 2),
-        BackgroundTransparency = 1,
-        Text = "🖱️",
-        TextSize = 6,
-        TextTransparency = 0.7
-    }, self.MinimizeButton)
-    
     self.MinimizeButton.MouseEnter:Connect(function()
         Tween(self.MinimizeButton, {TextColor3 = self.Theme.Accent}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     self.MinimizeButton.MouseLeave:Connect(function()
@@ -281,24 +276,19 @@ function Library:Create(config)
         BorderSizePixel = 0
     }, self.MainFrame)
     
-    -- Left Section Container with background
+    -- Left Section Container WITHOUT background (transparent)
     self.SectionContainer = CreateInstance("ScrollingFrame", {
         Name = "SectionContainer",
         Size = UDim2.new(0, 150, 1, -45),
         Position = UDim2.new(0, 10, 0, 40),
-        BackgroundColor3 = self.Theme.SectionBackground,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = 1, -- Made completely transparent
         BorderSizePixel = 0,
         ScrollBarThickness = 0
     }, self.MainFrame)
     
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 8)
-    }, self.SectionContainer)
-    
     CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 5)
+        Padding = UDim.new(0, 8) -- Increased spacing between sections
     }, self.SectionContainer)
     
     CreateInstance("UIPadding", {
@@ -578,12 +568,12 @@ function Library:CreateSection(name)
     section.Name = name
     section.Elements = {}
     
-    -- Section Button with background
+    -- Individual Section Button with its own background (separated from others)
     section.Button = CreateInstance("TextButton", {
         Name = name .. "Section",
         Size = UDim2.new(1, 0, 0, 35),
-        BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.6,
+        BackgroundColor3 = self.Theme.SectionBackground,
+        BackgroundTransparency = 0.3,
         BorderSizePixel = 0,
         Text = ""
     }, self.SectionContainer)
@@ -644,15 +634,15 @@ function Library:CreateSection(name)
     section.Button.MouseEnter:Connect(function()
         if self.CurrentSection ~= section then
             Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
-            Tween(section.Button, {BackgroundTransparency = 0.4}, 0.2)
+            Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
         end
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     section.Button.MouseLeave:Connect(function()
         if self.CurrentSection ~= section then
             Tween(section.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
-            Tween(section.Button, {BackgroundTransparency = 0.6}, 0.2)
+            Tween(section.Button, {BackgroundTransparency = 0.3}, 0.2)
         end
         Mouse.Icon = ""
     end)
@@ -671,13 +661,13 @@ function Library:SelectSection(section)
         s.Content.Visible = false
         s.Highlight.Visible = false
         Tween(s.Label, {TextColor3 = self.Theme.TextDark}, 0.2)
-        Tween(s.Button, {BackgroundTransparency = 0.6}, 0.2)
+        Tween(s.Button, {BackgroundTransparency = 0.3}, 0.2)
     end
     
     section.Content.Visible = true
     section.Highlight.Visible = true
     Tween(section.Label, {TextColor3 = self.Theme.Text}, 0.2)
-    Tween(section.Button, {BackgroundTransparency = 0.3}, 0.2)
+    Tween(section.Button, {BackgroundTransparency = 0.1}, 0.2)
     self.CurrentSection = section
 end
 
@@ -699,7 +689,7 @@ function Library:Restore()
     Tween(self.ActiveFunctionsFrame, {Position = UDim2.new(1, -220, 0, 20)}, 0.3)
 end
 
--- Enhanced UI Elements with cursor indicators
+-- Enhanced UI Elements with proper cursor
 function Library:CreateButton(section, config)
     config = config or {}
     local button = {}
@@ -725,20 +715,9 @@ function Library:CreateButton(section, config)
         Font = Enum.Font.Ubuntu
     }, button.Frame)
     
-    -- Add cursor icon
-    CreateInstance("TextLabel", {
-        Name = "CursorIcon",
-        Size = UDim2.new(0, 15, 0, 15),
-        Position = UDim2.new(1, -20, 0.5, -7.5),
-        BackgroundTransparency = 1,
-        Text = "🖱️",
-        TextSize = 10,
-        TextTransparency = 0.7
-    }, button.Frame)
-    
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     button.Button.MouseLeave:Connect(function()
@@ -776,7 +755,7 @@ function Library:CreateToggle(section, config)
     }, toggle.Frame)
     
     toggle.Label = CreateInstance("TextLabel", {
-        Size = UDim2.new(1, -70, 1, 0),
+        Size = UDim2.new(1, -50, 1, 0),
         Position = UDim2.new(0, 10, 0, 0),
         BackgroundTransparency = 1,
         Text = config.Text or "Toggle",
@@ -809,17 +788,6 @@ function Library:CreateToggle(section, config)
         CornerRadius = UDim.new(0.5, 0)
     }, toggle.Indicator)
     
-    -- Add cursor icon
-    CreateInstance("TextLabel", {
-        Name = "CursorIcon",
-        Size = UDim2.new(0, 12, 0, 12),
-        Position = UDim2.new(1, -15, 0.5, -6),
-        BackgroundTransparency = 1,
-        Text = "🖱️",
-        TextSize = 8,
-        TextTransparency = 0.7
-    }, toggle.Frame)
-    
     local function SetToggle(value)
         toggle.Enabled = value
         
@@ -844,7 +812,7 @@ function Library:CreateToggle(section, config)
     
     toggle.Frame.MouseEnter:Connect(function()
         Tween(toggle.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     toggle.Frame.MouseLeave:Connect(function()
@@ -928,17 +896,6 @@ function Library:CreateSlider(section, config)
         CornerRadius = UDim.new(0.5, 0)
     }, slider.Knob)
     
-    -- Add cursor icon
-    CreateInstance("TextLabel", {
-        Name = "CursorIcon",
-        Size = UDim2.new(0, 12, 0, 12),
-        Position = UDim2.new(1, -15, 0, 8),
-        BackgroundTransparency = 1,
-        Text = "🖱️",
-        TextSize = 8,
-        TextTransparency = 0.7
-    }, slider.Frame)
-    
     local dragging = false
     
     local function UpdateSlider(input)
@@ -984,7 +941,7 @@ function Library:CreateSlider(section, config)
     
     slider.Frame.MouseEnter:Connect(function()
         Tween(slider.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     slider.Frame.MouseLeave:Connect(function()
@@ -1116,17 +1073,6 @@ function Library:CreateDropdown(section, config)
         Font = Enum.Font.Ubuntu
     }, dropdown.Button)
     
-    -- Add cursor icon
-    CreateInstance("TextLabel", {
-        Name = "CursorIcon",
-        Size = UDim2.new(0, 12, 0, 12),
-        Position = UDim2.new(1, -15, 0.5, -6),
-        BackgroundTransparency = 1,
-        Text = "🖱️",
-        TextSize = 8,
-        TextTransparency = 0.7
-    }, dropdown.Frame)
-    
     dropdown.OptionContainer = CreateInstance("ScrollingFrame", {
         Size = UDim2.new(0.65, -10, 0, 0),
         Position = UDim2.new(0.35, 5, 0, 35),
@@ -1179,7 +1125,7 @@ function Library:CreateDropdown(section, config)
             
             optionButton.MouseEnter:Connect(function()
                 Tween(optionButton, {BackgroundTransparency = 0.2}, 0.2)
-                Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+                Mouse.Icon = "rbxassetid://86509207249522"
             end)
             
             optionButton.MouseLeave:Connect(function()
@@ -1226,7 +1172,7 @@ function Library:CreateDropdown(section, config)
     
     dropdown.Frame.MouseEnter:Connect(function()
         Tween(dropdown.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+        Mouse.Icon = "rbxassetid://86509207249522"
     end)
     
     dropdown.Frame.MouseLeave:Connect(function()
@@ -1338,7 +1284,7 @@ function Library:CreateSearchBox(section, config)
             
             resultButton.MouseEnter:Connect(function()
                 Tween(resultButton, {BackgroundTransparency = 0.2}, 0.2)
-                Mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+                Mouse.Icon = "rbxassetid://86509207249522"
             end)
             
             resultButton.MouseLeave:Connect(function()
@@ -1457,7 +1403,6 @@ function Library:SetTheme(themeName)
         self.EdgeGlow.ImageColor3 = self.Theme.Accent
         self.TopDivider.BackgroundColor3 = self.Theme.Border
         self.VerticalDivider.BackgroundColor3 = self.Theme.Border
-        self.SectionContainer.BackgroundColor3 = self.Theme.SectionBackground
         
         -- Update all existing elements
         for _, descendant in pairs(self.ScreenGui:GetDescendants()) do
@@ -1479,6 +1424,7 @@ function Library:Notify(config)
     
     local notification = CreateInstance("Frame", {
         Size = UDim2.new(0, 250, 0, 70),
+        Position = UDim2.new(1, 270, 1,
         Position = UDim2.new(1, 270, 1, -90),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = 0.1,
