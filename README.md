@@ -2,23 +2,22 @@
 
 A modern, feature-rich UI library for Roblox with smooth animations, resizable interface, and multiple themes.
 
-## 🌟 Features
+## 🌟 Key Features
 
 - **Multiple Themes**: Dark, Light, Purple, and Ocean themes
-- **Smooth Animations**: All UI elements have smooth fade-in/out transitions
+- **Ultra-Smooth Animations**: Synchronized fade transitions and smooth toggle animations
 - **Resizable Window**: Drag from bottom-right corner to resize
-- **Minimizable**: Minimize to a small floating window that's fully draggable
-- **Active Functions Display**: Shows currently active toggles/functions in a floating panel
-- **Section Animations**: Smooth transitions when switching between sections
-- **Multiple UI Elements**: Buttons, Toggles, Sliders, Dropdowns, Input fields, Search boxes, and more
+- **Smart Minimization**: Click to restore, drag to move the minimized window
+- **Active Functions Display**: Real-time display of active toggles/functions
+- **Advanced UI Elements**: Buttons, Toggles, Sliders, Dropdowns, Input fields, Search boxes, and more
 - **Custom Background**: Includes custom background image with proper transparency
 
-## 🛠️ Fixed Issues
+## 🛠️ Latest Updates (2025-07-27)
 
-1. **Button Click Indicator**: Uses RBX asset ID 86509207249522 with always-white color
-2. **Minimized Window**: Fully draggable with proper ZIndex to prevent blocking
-3. **Smooth Slider**: Ultra-smooth dragging using RunService.Heartbeat
-4. **Section Transitions**: Smooth fade animations when switching sections
+1. **Synchronized Section Animations**: All elements fade in/out at the same speed (0.15s)
+2. **Fixed Minimized Window**: Proper drag detection - only restores on quick clicks, not while dragging
+3. **Enhanced Toggle Animation**: Smooth color transitions with bounce effect and shadow
+4. **Improved Element Transparency**: Proper handling of all element transparencies during transitions
 
 ## 📥 Installation
 
@@ -26,7 +25,7 @@ A modern, feature-rich UI library for Roblox with smooth animations, resizable i
 local Library = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
 ```
 
-## 📚 Usage Example
+## 📚 Complete Usage Example
 
 ```lua
 -- Load the library
@@ -146,7 +145,7 @@ Window:CreateInput(SettingsSection, {
 
 Window:CreateSearchBox(SettingsSection, {
     Placeholder = "Search players...",
-    Items = game.Players:GetPlayers():GetChildren(),
+    Items = {"Player1", "Player2", "Player3", "Player4"},
     Callback = function(selected)
         print("Selected player:", selected)
     end
@@ -225,7 +224,7 @@ Window:CreateButton(section, {
 })
 ```
 
-**Toggle**
+**Toggle** (with smooth animations)
 ```lua
 local toggle = Window:CreateToggle(section, {
     Text = "Toggle Text",
@@ -235,7 +234,7 @@ local toggle = Window:CreateToggle(section, {
 toggle.Set(true) -- Set programmatically
 ```
 
-**Slider**
+**Slider** (ultra-smooth)
 ```lua
 Window:CreateSlider(section, {
     Text = "Slider Text",
@@ -320,22 +319,25 @@ Window:Restore() -- Restore from minimized state
 Window:Destroy() -- Destroy the UI
 ```
 
-## 💡 Tips
+## 💡 Tips & Tricks
 
-1. The UI is fully resizable - drag from the bottom-right corner
-2. Click the minimize button or the minimized window to toggle states
-3. Active functions (toggles, keybinds) appear in a floating side panel
-4. All elements have smooth hover effects and animations
-5. The UI saves its size when minimized and restores to the same size
+1. **Minimized Window**: Click quickly to restore, drag to move around
+2. **Smooth Animations**: All section transitions are synchronized at 0.15s
+3. **Toggle Effects**: Toggles have bounce animation and shadow effects
+4. **Active Functions**: Toggle and keybind states appear in the floating panel
+5. **Resizing**: Drag from bottom-right corner to resize (500x400 to 800x600)
 
-## 🐛 Troubleshooting
+## 🐛 Known Issues & Fixes
 
-If you encounter any issues:
-1. Make sure you're using the latest version
-2. Check that you're in a game that allows loadstring
-3. Verify that the CoreGui is accessible
-4. Ensure all theme names are spelled correctly
+- ✅ Fixed: Minimized window dragging vs clicking detection
+- ✅ Fixed: Synchronized fade animations for all elements
+- ✅ Fixed: Toggle animations with smooth transitions
+- ✅ Fixed: Proper transparency handling during section switches
+
+## 📄 License
+
+This UI library is created by the Eps1llon Hub Team. Feel free to use and modify for your projects.
 
 ---
 
-Made with ❤️ by Eps1llon Hub Team
+Made with ❤️ by Eps1llon Hub Team | Last Updated: 2025-07-27
