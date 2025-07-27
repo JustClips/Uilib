@@ -1,6 +1,6 @@
-# Eps1llon Hub UI Library
+# Eps1llon Hub UI library
 
-A modern, sleek Roblox UI library with smooth animations, resizable interface, and comprehensive features. Features a floating active functions display, multiple themes, and intuitive drag-and-drop functionality.
+
 
 ## ✨ Features
 
@@ -9,7 +9,7 @@ A modern, sleek Roblox UI library with smooth animations, resizable interface, a
 - **Resizable Interface**: Drag corners to resize the main window
 - **Draggable Windows**: Move windows by dragging the title bar
 - **Active Functions Display**: Floating sidebar showing currently active toggles/keybinds
-- **Click Indicators**: Visual indicators on clickable buttons (
+- **Click Indicators**: Visual indicators on clickable buttons (RBX asset pointer icon)
 - **Minimizable**: Minimize to a compact floating window
 - **Notification System**: Built-in notifications with auto-dismiss
 - **Comprehensive Elements**: Buttons, toggles, sliders, inputs, dropdowns, search boxes, and more
@@ -53,7 +53,7 @@ local UtilsSection = Window:CreateSection("Utils")
 
 ### Buttons
 
-Clickable buttons with visual feedback and click indicators (👆):
+Clickable buttons with visual feedback and click indicators (RBX asset pointer icon):
 
 ```lua
 MainSection:CreateButton({
@@ -230,16 +230,21 @@ Window:Notify({
 
 ## 🎯 Advanced Features
 
+### Enhanced Animations
+- **Smooth Dropdowns**: Dropdowns open and close with Back easing style for natural motion
+- **Responsive Sliders**: Ultra-smooth dragging with minimal lag (0.05s response time)
+- **Bouncy Search Boxes**: Search results appear and disappear with satisfying animations
+
 ### Active Functions Display
 
 The library automatically tracks active toggles and keybinds in a floating sidebar. This shows users what features are currently enabled.
 
 ### Window Controls
 
-- **Minimize**: Click the "—" button to minimize to a floating icon
+- **Minimize**: Click the "—" button to minimize to a draggable floating icon with the same background
 - **Close**: Click the "×" button to destroy the GUI
 - **Resize**: Drag the bottom-right corner to resize the window
-- **Move**: Drag the title bar to move the window
+- **Move**: Drag the title bar to move the window or drag the minimized window directly
 
 ### Programmatic Control
 
