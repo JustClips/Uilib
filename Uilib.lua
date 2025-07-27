@@ -1452,7 +1452,7 @@ function Library:CreateButton(section, config)
     button.Button.MouseButton1Click:Connect(function()
         -- Create temporary visual feedback without changing the base color
         local originalColor = button.Frame.BackgroundColor3
-        Tween(button.Frame, {BackgroundColor3 = self.        Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
+     Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
         -- Animate click indicator
         Tween(button.ClickIndicator, {Size = UDim2.new(0, 22, 0, 22), Position = UDim2.new(1, -26, 0.5, -11)}, 0.1)
         wait(0.1)
