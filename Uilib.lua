@@ -329,9 +329,26 @@ function Library:Create(config)
         Visible = false
     }, self.ScreenGui)
     
+    -- Add background image to minimized frame (same as main frame)
+    CreateInstance("ImageLabel", {
+        Name = "MinimizedBackgroundImage",
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://98784591713474",
+        ImageTransparency = 0.8,
+        ScaleType = Enum.ScaleType.Stretch,
+        ZIndex = -2
+    }, self.MinimizedFrame)
+    
     CreateInstance("UICorner", {
         CornerRadius = UDim.new(0, 8)
     }, self.MinimizedFrame)
+    
+    -- Apply corner to minimized background image too
+    CreateInstance("UICorner", {
+        CornerRadius = UDim.new(0, 8)
+    }, self.MinimizedFrame.MinimizedBackgroundImage)
     
     CreateInstance("UIStroke", {
         Color = self.Theme.Accent,
@@ -762,26 +779,25 @@ function Library:CreateButton(section, config)
         Font = Enum.Font.Ubuntu
     }, button.Frame)
     
-    -- Click Indicator (Pointer hand icon)
-    button.ClickIndicator = CreateInstance("TextLabel", {
-        Size = UDim2.new(0, 20, 0, 20),
-        Position = UDim2.new(1, -25, 0.5, -10),
+    -- Click Indicator (RBX Asset Pointer)
+    button.ClickIndicator = CreateInstance("ImageLabel", {
+        Size = UDim2.new(0, 18, 0, 18),
+        Position = UDim2.new(1, -24, 0.5, -9),
         BackgroundTransparency = 1,
-        Text = "👆", -- Hand pointer emoji
-        TextColor3 = self.Theme.Accent,
-        TextSize = 16,
-        Font = Enum.Font.Ubuntu
+        Image = "rbxassetid://86509207249522",
+        ImageColor3 = self.Theme.Accent,
+        ScaleType = Enum.ScaleType.Fit
     }, button.Frame)
     
     button.Button.MouseEnter:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.3}, 0.2)
-        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Text}, 0.2)
+        Tween(button.ClickIndicator, {ImageColor3 = self.Theme.Text}, 0.2)
         Mouse.Icon = "rbxasset://SystemCursors/Hand"
     end)
     
     button.Button.MouseLeave:Connect(function()
         Tween(button.Frame, {BackgroundTransparency = 0.5}, 0.2)
-        Tween(button.ClickIndicator, {TextColor3 = self.Theme.Accent}, 0.2)
+        Tween(button.ClickIndicator, {ImageColor3 = self.Theme.Accent}, 0.2)
         Mouse.Icon = ""
     end)
     
@@ -790,10 +806,10 @@ function Library:CreateButton(section, config)
         local originalColor = button.Frame.BackgroundColor3
         Tween(button.Frame, {BackgroundColor3 = self.Theme.Accent}, 0.1)
         -- Animate click indicator
-        Tween(button.ClickIndicator, {Size = UDim2.new(0, 24, 0, 24), Position = UDim2.new(1, -27, 0.5, -12)}, 0.1)
+        Tween(button.ClickIndicator, {Size = UDim2.new(0, 22, 0, 22), Position = UDim2.new(1, -26, 0.5, -11)}, 0.1)
         wait(0.1)
         Tween(button.Frame, {BackgroundColor3 = originalColor}, 0.1)
-        Tween(button.ClickIndicator, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(1, -25, 0.5, -10)}, 0.1)
+        Tween(button.ClickIndicator, {Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(1, -24, 0.5, -9)}, 0.1)
         
         if config.Callback then
             config.Callback()
@@ -971,8 +987,8 @@ function Library:CreateSlider(section, config)
         slider.Value = math.floor(slider.Min + (slider.Max - slider.Min) * percentage)
         slider.ValueLabel.Text = tostring(slider.Value)
         
-        Tween(slider.Fill, {Size = UDim2.new(percentage, 0, 1, 0)}, 0.1)
-        Tween(slider.Knob, {Position = UDim2.new(percentage, -6, 0.5, -6)}, 0.1)
+        Tween(slider.Fill, {Size = UDim2.new(percentage, 0, 1, 0)}, 0.05, Enum.EasingStyle.Linear)
+        Tween(slider.Knob, {Position = UDim2.new(percentage, -6, 0.5, -6)}, 0.05, Enum.EasingStyle.Linear)
         
         if config.Callback then
             config.Callback(slider.Value)
@@ -1229,8 +1245,8 @@ function Library:CreateDropdown(section, config)
                 local optionCount = #dropdown.Options
                 local maxHeight = math.min(optionCount * 24 + 6, 120)
                 
-                Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
-                Tween(dropdown.Arrow, {Rotation = 0}, 0.3)
+                Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
+                Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
                 
                 if config.Callback then
                     config.Callback(option)
@@ -1250,11 +1266,11 @@ function Library:CreateDropdown(section, config)
             local newSize = 35 + maxHeight + 5
             
             dropdown.OptionContainer.Size = UDim2.new(0.65, -10, 0, maxHeight)
-            Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, newSize)}, 0.3)
-            Tween(dropdown.Arrow, {Rotation = 180}, 0.3)
+            Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, newSize)}, 0.4, Enum.EasingStyle.Back)
+            Tween(dropdown.Arrow, {Rotation = 180}, 0.3, Enum.EasingStyle.Back)
         else
-            Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
-            Tween(dropdown.Arrow, {Rotation = 0}, 0.3)
+            Tween(dropdown.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
+            Tween(dropdown.Arrow, {Rotation = 0}, 0.3, Enum.EasingStyle.Back)
         end
     end)
     
@@ -1383,7 +1399,7 @@ function Library:CreateSearchBox(section, config)
             resultButton.MouseButton1Click:Connect(function()
                 search.SearchBox.Text = item
                 search.ResultsContainer.Visible = false
-                Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
+                Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
                 
                 if config.Callback then
                     config.Callback(item)
@@ -1397,10 +1413,10 @@ function Library:CreateSearchBox(section, config)
             
             search.ResultsContainer.Visible = true
             search.ResultsContainer.Size = UDim2.new(1, -20, 0, maxHeight)
-            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, newSize)}, 0.3)
+            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, newSize)}, 0.4, Enum.EasingStyle.Back)
         else
             search.ResultsContainer.Visible = false
-            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
+            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
         end
     end
     
@@ -1410,7 +1426,7 @@ function Library:CreateSearchBox(section, config)
         
         if searchText == "" then
             search.ResultsContainer.Visible = false
-            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
+            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
         else
             for _, item in pairs(search.Items) do
                 if item:lower():find(searchText) then
@@ -1425,7 +1441,7 @@ function Library:CreateSearchBox(section, config)
         wait(0.1)
         if search.SearchBox.Text == "" then
             search.ResultsContainer.Visible = false
-            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3)
+            Tween(search.Frame, {Size = UDim2.new(1, 0, 0, 35)}, 0.3, Enum.EasingStyle.Back)
         end
     end)
     
