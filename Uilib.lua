@@ -1833,41 +1833,6 @@ function Library:CreateInput(section, config)
     
     return input
 end
-        BackgroundTransparency = 0.3,
-        BorderSizePixel = 0,
-        Text = config.Default or "",
-        TextColor3 = self.Theme.Text,
-        TextSize = 14,
-        Font = self.Font,
-        PlaceholderText = config.Placeholder or "Enter text...",
-        PlaceholderColor3 = self.Theme.TextDark,
-        ClearTextOnFocus = false
-    }, input.Frame)
-    
-    input.TextBox:SetAttribute("OriginalBackgroundTransparency", 0.3)
-    
-    CreateInstance("UICorner", {
-        CornerRadius = UDim.new(0, 4)
-    }, input.TextBox)
-    
-    input.TextBox.FocusLost:Connect(function(enterPressed)
-        if config.Callback then
-            config.Callback(input.TextBox.Text, enterPressed)
-        end
-    end)
-    
-    input.Frame.MouseEnter:Connect(function()
-        Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness - 0.2}, 0.2)
-        Mouse.Icon = "rbxasset://SystemCursors/IBeam"
-    end)
-    
-    input.Frame.MouseLeave:Connect(function()
-        Tween(input.Frame, {BackgroundTransparency = self.ButtonDarkness}, 0.2)
-        Mouse.Icon = ""
-    end)
-    
-    return input
-end
 
 function Library:CreateDropdown(section, config)
     config = config or {}
