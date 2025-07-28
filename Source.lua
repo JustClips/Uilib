@@ -1,4 +1,3 @@
-
 local Library = {}
 Library.__index = Library
 
@@ -178,6 +177,8 @@ function Library:Create(config)
     self.ToggleDebounce = false
     self.CurrentBackground = config.Background or 'Blue Sky'
     self.SettingsOpen = false
+    self.IgnoreNextMinimizedClick = false
+    self.LastToggleTime = 0
 
     -- Customization Options
     self.ButtonDarkness = config.ButtonDarkness or 0.5
@@ -552,6 +553,8 @@ function Library:Create(config)
             local clickDuration = tick() - clickStart
             local dragDistance = (input.Position - dragStart).Magnitude
 
+            if self.IgnoreNextMinimizedClick then return end
+
             -- Only restore if it was a quick click without much movement
             if clickDuration < 0.3 and dragDistance < 5 then
                 self:ToggleUI()
@@ -655,12 +658,12 @@ function Library:CreateButton(section, config)
         Position = UDim2.new(1, -24, 0.5, -9),
         BackgroundTransparency = 1,
         Image = 'rbxassetid://86509207249522',
-        ImageColor3 = Color3.fromRGB(255, 255, 255), -- Always white
-        ImageTransparency = 0.3,
+        ImageColor3 = self.Theme.TextDark, -- Changed to TextDark
+        ImageTransparency = 0.5,
         ScaleType = Enum.ScaleType.Fit,
     }, button.Frame)
 
-    button.ClickIndicator:SetAttribute('OriginalImageTransparency', 0.3)
+    button.ClickIndicator:SetAttribute('OriginalImageTransparency', 0.5)
 
     button.Button.MouseEnter:Connect(function()
         Tween(
@@ -668,7 +671,7 @@ function Library:CreateButton(section, config)
             { BackgroundTransparency = self.ButtonDarkness - 0.2 },
             0.2
         )
-        Tween(button.ClickIndicator, { ImageTransparency = 0 }, 0.2) -- Make it more visible on hover
+        Tween(button.ClickIndicator, { ImageTransparency = 0.2 }, 0.2) -- Make it more visible on hover
         if not IsMobile then
             Mouse.Icon = 'rbxasset://SystemCursors/Hand'
         end
@@ -680,7 +683,7 @@ function Library:CreateButton(section, config)
             { BackgroundTransparency = self.ButtonDarkness },
             0.2
         )
-        Tween(button.ClickIndicator, { ImageTransparency = 0.3 }, 0.2) -- Slightly transparent when not hovered
+        Tween(button.ClickIndicator, { ImageTransparency = 0.5 }, 0.2) -- Slightly transparent when not hovered
         if not IsMobile then
             Mouse.Icon = ''
         end
@@ -758,13 +761,13 @@ function Library:CreateBigDropdown(section, config)
         Size = UDim2.new(1, -10, 0, 35),
         Position = UDim2.new(0, 5, 0, 2.5),
         BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
     }, bigDropdown.Frame)
 
     bigDropdown.HeaderContainer:SetAttribute(
         'OriginalBackgroundTransparency',
-        0.3
+        self.ButtonDarkness
     )
 
     CreateInstance('UICorner', {
@@ -821,7 +824,7 @@ function Library:CreateBigDropdown(section, config)
         Size = UDim2.new(1, -10, 0, 0),
         Position = UDim2.new(0, 5, 0, 42),
         BackgroundColor3 = self.Theme.Background, -- Added background color
-        BackgroundTransparency = 0.3, -- Made slightly visible
+        BackgroundTransparency = self.ButtonDarkness, -- Made slightly visible
         BorderSizePixel = 0,
         ScrollBarThickness = 3,
         ScrollBarImageColor3 = self.Theme.Accent,
@@ -831,7 +834,7 @@ function Library:CreateBigDropdown(section, config)
 
     bigDropdown.ContentContainer:SetAttribute(
         'OriginalBackgroundTransparency',
-        0.3
+        self.ButtonDarkness
     )
 
     CreateInstance('UICorner', {
@@ -1087,7 +1090,7 @@ function Library:CreateBigDropdown(section, config)
     bigDropdown.HeaderContainer.MouseEnter:Connect(function()
         Tween(
             bigDropdown.HeaderContainer,
-            { BackgroundTransparency = 0.1 },
+            { BackgroundTransparency = self.ButtonDarkness - 0.2 },
             0.2
         )
         if not IsMobile then
@@ -1098,7 +1101,7 @@ function Library:CreateBigDropdown(section, config)
     bigDropdown.HeaderContainer.MouseLeave:Connect(function()
         Tween(
             bigDropdown.HeaderContainer,
-            { BackgroundTransparency = 0.3 },
+            { BackgroundTransparency = self.ButtonDarkness },
             0.2
         )
         if not IsMobile then
@@ -1384,7 +1387,7 @@ function Library:CreateSlider(section, config)
         BorderSizePixel = 0,
     }, slider.Frame)
 
-    slider.SliderFrame:SetAttribute('OriginalBackgroundTransparency', 0)
+    slider.SliderFrame:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0.5, 0),
@@ -1571,7 +1574,7 @@ function Library:CreateInput(section, config)
         Size = UDim2.new(0.65, -10, 1, -8),
         Position = UDim2.new(0.35, 5, 0, 4),
         BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         Text = config.Default or '',
         TextColor3 = self.Theme.Text,
@@ -1582,7 +1585,7 @@ function Library:CreateInput(section, config)
         ClearTextOnFocus = false,
     }, input.Frame)
 
-    input.TextBox:SetAttribute('OriginalBackgroundTransparency', 0.3)
+    input.TextBox:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 4),
@@ -1697,14 +1700,14 @@ function Library:CreateDropdown(section, config)
         Size = UDim2.new(0.65, -10, 0, 0),
         Position = UDim2.new(0.35, 5, 0, self.ElementSizes.Dropdown),
         BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = 0.1,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
         Visible = true,
     }, dropdown.Frame)
 
-    dropdown.OptionContainer:SetAttribute('OriginalBackgroundTransparency', 0.1)
+    dropdown.OptionContainer:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 6),
@@ -1956,7 +1959,7 @@ function Library:CreateKeybind(section, config)
         Size = UDim2.new(0, 60, 1, 0),
         Position = UDim2.new(1, -70, 0, 0),
         BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         Text = keybind.Key.Name,
         TextColor3 = self.Theme.Text,
@@ -1964,7 +1967,7 @@ function Library:CreateKeybind(section, config)
         Font = self.Font,
     }, keybind.Frame)
 
-    keybind.KeyLabel:SetAttribute('OriginalBackgroundTransparency', 0.3)
+    keybind.KeyLabel:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 4),
@@ -2043,7 +2046,7 @@ function Library:CreateSearchBox(section, config)
         Size = UDim2.new(1, -20, 0, 27),
         Position = UDim2.new(0, 10, 0, 4),
         BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         Text = '',
         TextColor3 = self.Theme.Text,
@@ -2054,7 +2057,7 @@ function Library:CreateSearchBox(section, config)
         ClearTextOnFocus = false,
     }, search.Frame)
 
-    search.SearchBox:SetAttribute('OriginalBackgroundTransparency', 0.3)
+    search.SearchBox:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 4),
@@ -2073,14 +2076,14 @@ function Library:CreateSearchBox(section, config)
         Size = UDim2.new(1, -20, 0, 0),
         Position = UDim2.new(0, 10, 0, self.ElementSizes.Input),
         BackgroundColor3 = self.Theme.Tertiary,
-        BackgroundTransparency = 0.3,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = self.Theme.Accent,
         Visible = false,
     }, search.Frame)
 
-    search.ResultsContainer:SetAttribute('OriginalBackgroundTransparency', 0.3)
+    search.ResultsContainer:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 4),
@@ -3289,6 +3292,12 @@ function Library:Minimize()
 
     self.MinimizedFrame.Visible = true
     Tween(self.MinimizedFrame, { BackgroundTransparency = 0.1 }, 0.2)
+
+    self.IgnoreNextMinimizedClick = true
+    spawn(function()
+        wait(0.5)
+        self.IgnoreNextMinimizedClick = false
+    end)
 end
 
 function Library:Restore()
