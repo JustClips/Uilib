@@ -171,7 +171,6 @@ function Library:Create(config)
     self.MinSize = Vector2.new(500, 400)
     self.MaxSize = Vector2.new(800, 600)
     self.OriginalSize = UDim2.new(0, 650, 0, 450)
-    self.ActiveFunctions = {}
     self.UIVisible = true
     self.ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift
     self.ToggleDebounce = false
@@ -303,9 +302,9 @@ function Library:Create(config)
         BackgroundTransparency = 1,
         Text = 'Eps1llon Hub',
         TextColor3 = self.Theme.Text,
-        TextSize = 18,
+        TextSize = 22,
+        Font = Enum.Font.GothamBold,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Font = self.Font,
     }, self.TitleBar)
 
     -- Close Button (X) - Made bigger
@@ -596,9 +595,6 @@ function Library:Create(config)
         end
     end)
 
-    -- Create Active Functions Display
-    self:CreateActiveFunctionsDisplay()
-
     -- Make main frame draggable
     AddDragging(self.MainFrame, self.TitleBar)
 
@@ -631,7 +627,7 @@ function Library:Create(config)
 
     local usernameLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(1, -60, 0, 30),
-        Position = UDim2.new(0, 60, 0, 0),
+        Position = UDim2.new(0, 55, 0, 5),
         BackgroundTransparency = 1,
         Text = Player.Name,
         TextColor3 = self.Theme.Text,
@@ -642,7 +638,7 @@ function Library:Create(config)
 
     local premiumLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(1, -60, 0, 20),
-        Position = UDim2.new(0, 60, 0, 30),
+        Position = UDim2.new(0, 55, 0, 35),
         BackgroundTransparency = 1,
         Text = "Premium",
         TextColor3 = self.Theme.TextDark,
@@ -795,38 +791,27 @@ function Library:CreateBigDropdown(section, config)
         }, bigDropdown.Frame)
     end
 
-    -- Header container (the main pill that's always visible) - Fixed with transparent background
+    -- Header container (the main pill that's always visible) - Uniform background
     bigDropdown.HeaderContainer = CreateInstance('Frame', {
         Size = UDim2.new(1, -10, 0, 35),
         Position = UDim2.new(0, 5, 0, 2.5),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-    }, bigDropdown.Frame)
-
-    CreateInstance('UICorner', {
-        CornerRadius = UDim.new(0, 6),
-    }, bigDropdown.HeaderContainer)
-
-    -- Left side - Dropdown name with background
-    bigDropdown.NameLabelBackground = CreateInstance('Frame', {
-        Size = UDim2.new(0.5, 0, 1, 0),
-        Position = UDim2.new(0, 0, 0, 0),
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
-    }, bigDropdown.HeaderContainer)
+    }, bigDropdown.Frame)
 
-    bigDropdown.NameLabelBackground:SetAttribute(
+    bigDropdown.HeaderContainer:SetAttribute(
         'OriginalBackgroundTransparency',
         self.ButtonDarkness
     )
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 6),
-    }, bigDropdown.NameLabelBackground)
+    }, bigDropdown.HeaderContainer)
 
+    -- Dropdown name
     bigDropdown.NameLabel = CreateInstance('TextLabel', {
-        Size = UDim2.new(1, -20, 1, 0),
+        Size = UDim2.new(1, -40, 1, 0),
         Position = UDim2.new(0, 10, 0, 0),
         BackgroundTransparency = 1,
         Text = config.Text or 'Dropdown',
@@ -834,47 +819,26 @@ function Library:CreateBigDropdown(section, config)
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
         Font = self.Font,
-    }, bigDropdown.NameLabelBackground)
-
-    -- Right side container for preview content - transparent
-    bigDropdown.PreviewContainer = CreateInstance('Frame', {
-        Size = UDim2.new(0.5, -10, 1, 0),
-        Position = UDim2.new(0.5, 0, 0, 0),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
     }, bigDropdown.HeaderContainer)
-
-    -- Preview text (will show first element info)
-    bigDropdown.PreviewText = CreateInstance('TextLabel', {
-        Size = UDim2.new(1, -25, 1, 0),
-        Position = UDim2.new(0, 5, 0, 0),
-        BackgroundTransparency = 1,
-        Text = 'Empty',
-        TextColor3 = self.Theme.TextDark,
-        TextSize = 13,
-        TextXAlignment = Enum.TextXAlignment.Right,
-        Font = self.Font,
-        TextTruncate = Enum.TextTruncate.AtEnd,
-    }, bigDropdown.PreviewContainer)
 
     -- Dropdown arrow
     bigDropdown.Arrow = CreateInstance('TextLabel', {
         Size = UDim2.new(0, 20, 0, 20),
-        Position = UDim2.new(1, -20, 0.5, -10),
+        Position = UDim2.new(1, -25, 0.5, -10),
         BackgroundTransparency = 1,
         Text = '▼',
         TextColor3 = self.Theme.Text,
         TextSize = 12,
         Font = self.Font,
         Rotation = 0,
-    }, bigDropdown.PreviewContainer)
+    }, bigDropdown.HeaderContainer)
 
-    -- Content container for dropdown elements - Fixed with proper background
+    -- Content container for dropdown elements
     bigDropdown.ContentContainer = CreateInstance('ScrollingFrame', {
         Size = UDim2.new(1, -10, 0, 0),
         Position = UDim2.new(0, 5, 0, 42),
-        BackgroundColor3 = self.Theme.Secondary, -- Changed to Secondary
-        BackgroundTransparency = self.ButtonDarkness, -- Kept as ButtonDarkness
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
         ScrollBarThickness = 3,
         ScrollBarImageColor3 = self.Theme.Accent,
@@ -903,83 +867,13 @@ function Library:CreateBigDropdown(section, config)
         PaddingRight = UDim.new(0, 5),
     }, bigDropdown.ContentContainer)
 
-    -- Update preview text function
-    local function UpdatePreview()
-        if bigDropdown.FirstElement then
-            -- Check what type of element it is and update preview accordingly
-            local elementType = bigDropdown.FirstElement.Type
-            if
-                elementType == 'Toggle'
-                and bigDropdown.FirstElement.Enabled ~= nil
-            then
-                bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Enabled
-                        and 'Enabled'
-                    or 'Disabled'
-                bigDropdown.PreviewText.TextColor3 = bigDropdown.FirstElement.Enabled
-                        and self.Theme.Accent
-                    or self.Theme.TextDark
-            elseif
-                elementType == 'Slider' and bigDropdown.FirstElement.Value
-            then
-                bigDropdown.PreviewText.Text = tostring(
-                    bigDropdown.FirstElement.Value
-                )
-                bigDropdown.PreviewText.TextColor3 = self.Theme.Text
-            elseif
-                elementType == 'Input' and bigDropdown.FirstElement.TextBox
-            then
-                local text = bigDropdown.FirstElement.TextBox.Text
-                bigDropdown.PreviewText.Text = text ~= '' and text or 'Empty'
-                bigDropdown.PreviewText.TextColor3 = text ~= ''
-                        and self.Theme.Text
-                    or self.Theme.TextDark
-            elseif
-                elementType == 'Dropdown' and bigDropdown.FirstElement.Selected
-            then
-                bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Selected
-                bigDropdown.PreviewText.TextColor3 = self.Theme.Text
-            elseif
-                elementType == 'Button' and bigDropdown.FirstElement.Button
-            then
-                bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Button.Text or 'Button'
-                bigDropdown.PreviewText.TextColor3 = self.Theme.Text
-            elseif
-                elementType == 'Label' and bigDropdown.FirstElement.Label
-            then
-                bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Label.Text or 'Label'
-                bigDropdown.PreviewText.TextColor3 = self.Theme.Text
-            else
-                bigDropdown.PreviewText.Text = '...'
-                bigDropdown.PreviewText.TextColor3 = self.Theme.TextDark
-            end
-        else
-            bigDropdown.PreviewText.Text = 'Empty'
-            bigDropdown.PreviewText.TextColor3 = self.Theme.TextDark
-        end
-    end
-
-    -- Methods to add elements to the big dropdown (fixed wrapper section)
+    -- Methods to add elements to the big dropdown
     local wrapperSection = { Content = bigDropdown.ContentContainer }
 
     bigDropdown.AddToggle = function(toggleConfig)
         local toggle = self:CreateToggle(wrapperSection, toggleConfig)
         toggle.Type = 'Toggle'
         table.insert(bigDropdown.Elements, toggle)
-        if not bigDropdown.FirstElement then
-            bigDropdown.FirstElement = toggle
-            UpdatePreview()
-        end
-        -- Update preview when toggle changes
-        local originalCallback = toggleConfig.Callback
-        local newCallback = function(value)
-            if originalCallback then
-                originalCallback(value)
-            end
-            if bigDropdown.FirstElement == toggle then
-                UpdatePreview()
-            end
-        end
-        toggle.Set(toggle.Enabled) -- Reapply with new callback
         return toggle
     end
 
@@ -987,10 +881,6 @@ function Library:CreateBigDropdown(section, config)
         local slider = self:CreateSlider(wrapperSection, sliderConfig)
         slider.Type = 'Slider'
         table.insert(bigDropdown.Elements, slider)
-        if not bigDropdown.FirstElement then
-            bigDropdown.FirstElement = slider
-            UpdatePreview()
-        end
         return slider
     end
 
@@ -998,11 +888,6 @@ function Library:CreateBigDropdown(section, config)
         local button = self:CreateButton(wrapperSection, buttonConfig)
         button.Type = 'Button'
         table.insert(bigDropdown.Elements, button)
-        if not bigDropdown.FirstElement then
-            bigDropdown.FirstElement = button
-            bigDropdown.PreviewText.Text = buttonConfig.Text or 'Button'
-            bigDropdown.PreviewText.TextColor3 = self.Theme.Text
-        end
         return button
     end
 
@@ -1010,16 +895,6 @@ function Library:CreateBigDropdown(section, config)
         local input = self:CreateInput(wrapperSection, inputConfig)
         input.Type = 'Input'
         table.insert(bigDropdown.Elements, input)
-        if not bigDropdown.FirstElement then
-            bigDropdown.FirstElement = input
-            UpdatePreview()
-        end
-        -- Update preview when input changes
-        input.TextBox:GetPropertyChangedSignal('Text'):Connect(function()
-            if bigDropdown.FirstElement == input then
-                UpdatePreview()
-            end
-        end)
         return input
     end
 
@@ -1027,12 +902,6 @@ function Library:CreateBigDropdown(section, config)
         local label = self:CreateLabel(wrapperSection, labelConfig)
         label.Type = 'Label'
         table.insert(bigDropdown.Elements, label)
-        if not bigDropdown.FirstElement then
-            bigDropdown.FirstElement = label
-            bigDropdown.PreviewText.Text = labelConfig.Text or 'Label'
-            bigDropdown.PreviewText.TextColor3 = labelConfig.Color
-                or self.Theme.Text
-        end
         return label
     end
 
@@ -1040,10 +909,6 @@ function Library:CreateBigDropdown(section, config)
         local dropdown = self:CreateDropdown(wrapperSection, dropdownConfig)
         dropdown.Type = 'Dropdown'
         table.insert(bigDropdown.Elements, dropdown)
-        if not bigDropdown.FirstElement then
-            bigDropdown.FirstElement = dropdown
-            UpdatePreview()
-        end
         return dropdown
     end
 
@@ -1139,7 +1004,7 @@ function Library:CreateBigDropdown(section, config)
 
     bigDropdown.HeaderContainer.MouseEnter:Connect(function()
         Tween(
-            bigDropdown.NameLabelBackground,
+            bigDropdown.HeaderContainer,
             { BackgroundTransparency = self.ButtonDarkness - 0.2 },
             0.2
         )
@@ -1150,7 +1015,7 @@ function Library:CreateBigDropdown(section, config)
 
     bigDropdown.HeaderContainer.MouseLeave:Connect(function()
         Tween(
-            bigDropdown.NameLabelBackground,
+            bigDropdown.HeaderContainer,
             { BackgroundTransparency = self.ButtonDarkness },
             0.2
         )
@@ -1179,14 +1044,10 @@ function Library:CreateBigDropdown(section, config)
     if config.CreateElements then
         config.CreateElements(bigDropdown)
         UpdateContentSize()
-        UpdatePreview()
     end
 
     return bigDropdown
 end
-
--- Add remaining methods (CreateToggle, CreateSlider, etc.) with size customization...
--- I'll include the key ones with the size changes:
 
 function Library:CreateToggle(section, config)
     config = config or {}
@@ -1305,7 +1166,6 @@ function Library:CreateToggle(section, config)
                 0.3,
                 Enum.EasingStyle.Back
             )
-            self:AddActiveFunction(config.Text or 'Toggle')
         else
             Tween(
                 toggle.Button,
@@ -1325,7 +1185,6 @@ function Library:CreateToggle(section, config)
                 0.3,
                 Enum.EasingStyle.Back
             )
-            self:RemoveActiveFunction(config.Text or 'Toggle')
         end
 
         if config.Callback then
@@ -1370,11 +1229,6 @@ function Library:CreateToggle(section, config)
     end)
 
     toggle.Set = SetToggle
-
-    -- Initialize if default is true
-    if toggle.Enabled then
-        self:AddActiveFunction(config.Text or 'Toggle')
-    end
 
     return toggle
 end
@@ -2023,9 +1877,6 @@ function Library:CreateKeybind(section, config)
         CornerRadius = UDim.new(0, 4),
     }, keybind.KeyLabel)
 
-    -- Add to active functions when created
-    self:AddActiveFunction(config.Text or 'Keybind')
-
     -- Handle key press
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.KeyCode == keybind.Key then
@@ -2633,167 +2484,6 @@ function Library:ToggleUI()
     end
 end
 
--- New Active Functions Display
-function Library:CreateActiveFunctionsDisplay()
-    self.ActiveFunctionsFrame = CreateInstance('Frame', {
-        Name = 'ActiveFunctionsFrame',
-        Size = UDim2.new(0, 200, 0, 150),
-        Position = UDim2.new(1, -220, 0, 20),
-        BackgroundColor3 = self.Theme.Background,
-        BackgroundTransparency = 0.1,
-        BorderSizePixel = 0,
-        Visible = false,
-    }, self.ScreenGui)
-
-    CreateInstance('UICorner', {
-        CornerRadius = UDim.new(0, 8),
-    }, self.ActiveFunctionsFrame)
-
-    CreateInstance('UIStroke', {
-        Color = self.Theme.Accent,
-        Transparency = 0.6,
-        Thickness = self.StrokeThickness,
-    }, self.ActiveFunctionsFrame)
-
-    -- Header
-    local header = CreateInstance('TextLabel', {
-        Size = UDim2.new(1, 0, 0, 25),
-        Position = UDim2.new(0, 0, 0, 0),
-        BackgroundTransparency = 1,
-        Text = 'Active Functions',
-        TextColor3 = self.Theme.Accent,
-        TextSize = 14,
-        Font = self.Font,
-        TextXAlignment = Enum.TextXAlignment.Center,
-    }, self.ActiveFunctionsFrame)
-
-    -- Divider
-    CreateInstance('Frame', {
-        Size = UDim2.new(1, -20, 0, 1),
-        Position = UDim2.new(0, 10, 0, 25),
-        BackgroundColor3 = self.Theme.Border,
-        BackgroundTransparency = 0.5,
-        BorderSizePixel = 0,
-    }, self.ActiveFunctionsFrame)
-
-    -- Content area
-    self.ActiveFunctionsContent = CreateInstance('ScrollingFrame', {
-        Size = UDim2.new(1, -10, 1, -35),
-        Position = UDim2.new(0, 5, 0, 30),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        ScrollBarThickness = 2,
-        ScrollBarImageColor3 = self.Theme.Accent,
-    }, self.ActiveFunctionsFrame)
-
-    CreateInstance('UIListLayout', {
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 3),
-    }, self.ActiveFunctionsContent)
-
-    -- Floating animation
-    local floatTween1 = TweenService:Create(
-        self.ActiveFunctionsFrame,
-        TweenInfo.new(
-            3,
-            Enum.EasingStyle.Sine,
-            Enum.EasingDirection.InOut,
-            -1,
-            true
-        ),
-        { Position = UDim2.new(1, -220, 0, 30) }
-    )
-    floatTween1:Play()
-
-    -- Make draggable
-    AddDragging(self.ActiveFunctionsFrame)
-
-    -- Update content
-    self:UpdateActiveFunctions()
-end
-
-function Library:AddActiveFunction(name)
-    if not table.find(self.ActiveFunctions, name) then
-        table.insert(self.ActiveFunctions, name)
-        self:UpdateActiveFunctions()
-    end
-end
-
-function Library:RemoveActiveFunction(name)
-    local index = table.find(self.ActiveFunctions, name)
-    if index then
-        table.remove(self.ActiveFunctions, index)
-        self:UpdateActiveFunctions()
-    end
-end
-
-function Library:UpdateActiveFunctions()
-    if not self.ActiveFunctionsContent then
-        return
-    end
-
-    -- Clear existing
-    for _, child in pairs(self.ActiveFunctionsContent:GetChildren()) do
-        if child:IsA('Frame') then
-            child:Destroy()
-        end
-    end
-
-    -- Show/hide the active functions frame based on whether there are active functions
-    if #self.ActiveFunctions == 0 then
-        self.ActiveFunctionsFrame.Visible = false
-    else
-        self.ActiveFunctionsFrame.Visible = true
-    end
-
-    -- Add active functions
-    for i, func in pairs(self.ActiveFunctions) do
-        local funcFrame = CreateInstance('Frame', {
-            Size = UDim2.new(1, -5, 0, 20),
-            BackgroundColor3 = self.Theme.Secondary,
-            BackgroundTransparency = 0.3,
-            BorderSizePixel = 0,
-        }, self.ActiveFunctionsContent)
-
-        CreateInstance('UICorner', {
-            CornerRadius = UDim.new(0, 4),
-        }, funcFrame)
-
-        -- Status indicator
-        CreateInstance('Frame', {
-            Size = UDim2.new(0, 6, 0, 6),
-            Position = UDim2.new(0, 8, 0.5, -3),
-            BackgroundColor3 = Color3.fromRGB(0, 255, 0),
-            BorderSizePixel = 0,
-        }, funcFrame)
-
-        CreateInstance('UICorner', {
-            CornerRadius = UDim.new(0.5, 0),
-        }, funcFrame:GetChildren()[2])
-
-        -- Function name
-        CreateInstance('TextLabel', {
-            Size = UDim2.new(1, -25, 1, 0),
-            Position = UDim2.new(0, 20, 0, 0),
-            BackgroundTransparency = 1,
-            Text = func,
-            TextColor3 = self.Theme.Text,
-            TextSize = 11,
-            Font = self.Font,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextTruncate = Enum.TextTruncate.AtEnd,
-        }, funcFrame)
-    end
-
-    -- Update canvas size
-    self.ActiveFunctionsContent.CanvasSize = UDim2.new(
-        0,
-        0,
-        0,
-        #self.ActiveFunctions * 23
-    )
-end
-
 function Library:AddResizing()
     local resizing = false
     local startSize, startPos
@@ -3322,13 +3012,6 @@ function Library:Minimize()
     -- Shrink frame
     Tween(self.MainFrame, { Size = UDim2.new(0, 0, 0, 0) }, animationTime)
 
-    -- Move active functions frame
-    Tween(
-        self.ActiveFunctionsFrame,
-        { Position = UDim2.new(1, 50, 0, 20) },
-        animationTime
-    )
-
     wait(animationTime)
     self.MainFrame.Visible = false
 
@@ -3395,11 +3078,6 @@ function Library:Restore()
 
     -- Restore to the original size
     Tween(self.MainFrame, { Size = self.OriginalSize }, 0.3)
-    Tween(
-        self.ActiveFunctionsFrame,
-        { Position = UDim2.new(1, -220, 0, 20) },
-        0.3
-    )
 end
 
 -- Update Section Headers (Fixed to respect individual section settings)
