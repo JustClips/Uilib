@@ -1,6 +1,3 @@
-```lua
--- Eps1llon Hub Premium UI Library (Updated with Phone Support and Fixes)
--- Modern, sleek design with smooth animations and resizable interface
 
 local Library = {}
 Library.__index = Library
