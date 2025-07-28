@@ -1,268 +1,201 @@
--- Eps1llon Hub Example Script
-local Library = loadstring(
-    game:HttpGet(
-        'https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Source.lua'
-    )
-)()
+-- Example usage script for Eps1llon Hub UI Library
+-- Assume the library code is loaded from the provided URL or pasted.
 
--- Create main window with custom settings
-local Window = Library:Create({
-    Theme = 'Ocean',
-    Background = 'Blurred Stars',
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Source.lua"))()
+
+-- Create the UI with custom configuration
+local UI = Library:Create({
+    Theme = 'Ocean',  -- Choose from Dark, Light, Purple, Ocean
     ToggleKey = Enum.KeyCode.RightShift,
-    ButtonDarkness = 0.5,
+    Background = 'Blue Sky',  -- Choose from available backgrounds
+    Font = 'Gotham',  -- Choose from available fonts
+    ButtonDarkness = 0.3,  -- 0 to 1
     StrokeThickness = 1,
-    Font = 'Ubuntu',
     SectionHeaderEnabled = true,
+    SectionHeaderWhite = false,
+    HideUISettings = false,  -- Set to true to hide UI settings button
+    ElementSizes = {
+        Button = 40,
+        Toggle = 40,
+        Slider = 60,
+        Input = 40,
+        Dropdown = 40,
+        Label = 30,
+        BigDropdown = 45,
+        Spacing = 10,
+    },
     SectionHeaderConfig = {
-        Size = 22,
+        Size = 24,
         Font = Enum.Font.GothamBold,
-        Position = 'Center',
+        Position = 'Center',  -- Center, Left, Right
         UnderlineEnabled = true,
-        UnderlineSize = 0.7,
-        UnderlineThickness = 2,
+        UnderlineSize = 0.6,  -- 0 to 1
+        UnderlineThickness = 3,
     },
 })
 
--- Main Section
-local MainSection = Window:CreateSection('Main Features')
+-- Create a section
+local MainSection = UI:CreateSection("Main Section")
 
--- Player Section
-local PlayerSection = Window:CreateSection(
-    'Player',
-    Color3.fromRGB(255, 100, 100)
-)
+-- Add a button
+UI:CreateButton(MainSection, {
+    Text = "Click Me",
+    Callback = function()
+        print("Button clicked!")
+        UI:Notify({
+            Title = "Success",
+            Text = "Button was clicked successfully!",
+            Duration = 3,
+        })
+    end,
+})
 
--- Visual Section
-local VisualSection = Window:CreateSection(
-    'Visuals',
-    Color3.fromRGB(100, 255, 100)
-)
-
--- Settings Section
-local SettingsSection = Window:CreateSection('Settings')
-
--- Main Features
-Window:CreateToggle(MainSection, {
-    Text = 'Auto Farm',
+-- Add a toggle
+local toggle = UI:CreateToggle(MainSection, {
+    Text = "Enable Feature",
     Default = false,
     Callback = function(value)
-        _G.AutoFarm = value
-        while _G.AutoFarm do
-            -- Your auto farm code here
-            wait(1)
-        end
+        print("Toggle state:", value)
     end,
 })
 
-Window:CreateButton(MainSection, {
-    Text = 'Collect All Items',
-    Callback = function()
-        Window:Notify({
-            Title = 'Collection',
-            Text = 'Collecting all items...',
-            Duration = 2,
-        })
-        -- Your collection code here
-    end,
-})
-
-local selectedTarget = nil
-Window:CreateSearchBox(MainSection, {
-    Placeholder = 'Search players...',
-    Items = {}, -- Will be updated dynamically
-    OnSelected = function(playerName)
-        selectedTarget = playerName
-        Window:Notify({
-            Title = 'Target Selected',
-            Text = 'Selected: ' .. playerName,
-            Duration = 2,
-        })
-    end,
-})
-
--- Update player list
-spawn(function()
-    while true do
-        local players = {}
-        for _, player in pairs(game.Players:GetPlayers()) do
-            table.insert(players, player.Name)
-        end
-        -- Update search box items (assuming you stored the searchBox reference)
-        wait(5)
-    end
-end)
-
--- Player Settings
-Window:CreateSlider(PlayerSection, {
-    Text = 'Walk Speed',
-    Min = 16,
-    Max = 200,
-    Default = 16,
-    Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-    end,
-})
-
-Window:CreateSlider(PlayerSection, {
-    Text = 'Jump Power',
-    Min = 50,
-    Max = 300,
+-- Add a slider
+UI:CreateSlider(MainSection, {
+    Text = "Speed",
+    Min = 1,
+    Max = 100,
     Default = 50,
     Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+        print("Slider value:", value)
     end,
 })
 
-Window:CreateToggle(PlayerSection, {
-    Text = 'Infinite Jump',
-    Default = false,
-    Callback = function(value)
-        _G.InfiniteJump = value
+-- Add an input
+UI:CreateInput(MainSection, {
+    Text = "Enter Name",
+    Placeholder = "Your name...",
+    Default = "",
+    Callback = function(text, enterPressed)
+        print("Input:", text, "Enter pressed:", enterPressed)
     end,
 })
 
--- Visual Settings with Big Dropdown
-Window:CreateBigDropdown(VisualSection, {
-    Text = 'ESP Settings',
+-- Add a dropdown
+UI:CreateDropdown(MainSection, {
+    Text = "Choose Option",
+    Options = {"Option 1", "Option 2", "Option 3"},
+    Default = "Option 1",
+    Callback = function(selected)
+        print("Selected:", selected)
+    end,
+})
+
+-- Add a label
+UI:CreateLabel(MainSection, {
+    Text = "This is a label",
+    Color = Color3.fromRGB(255, 100, 100),
+})
+
+-- Add a separator
+UI:CreateSeparator(MainSection)
+
+-- Add a keybind
+UI:CreateKeybind(MainSection, {
+    Text = "Quick Action",
+    Default = Enum.KeyCode.Q,
+    Callback = function()
+        print("Keybind pressed!")
+    end,
+})
+
+-- Add a search box
+UI:CreateSearchBox(MainSection, {
+    Placeholder = "Search items...",
+    Items = {"Apple", "Banana", "Cherry", "Date", "Elderberry"},
+    OnSearch = function(searchText, items)  -- Custom search function (optional)
+        local filtered = {}
+        for _, item in pairs(items) do
+            if item:lower():find(searchText) then
+                table.insert(filtered, item)
+            end
+        end
+        return filtered
+    end,
+    OnSelected = function(selected)
+        print("Selected item:", selected)
+    end,
+})
+
+-- Create another section with custom color
+local AdvancedSection = UI:CreateSection("Advanced", Color3.fromRGB(255, 0, 0))
+
+-- Add a BigDropdown (Rayfield-style)
+local bigDropdown = UI:CreateBigDropdown(AdvancedSection, {
+    Text = "Advanced Options",
     CreateElements = function(dropdown)
+        -- Add elements inside the BigDropdown
         dropdown.AddToggle({
-            Text = 'Enable ESP',
-            Default = false,
+            Text = "Sub Toggle",
+            Default = true,
             Callback = function(value)
-                -- ESP code here
-            end,
-        })
-
-        dropdown.AddDropdown({
-            Text = 'ESP Type',
-            Options = { 'Box', 'Name', 'Health', 'Distance', 'All' },
-            Default = 'Box',
-            Callback = function(selected)
-                -- Update ESP type
+                print("Sub Toggle:", value)
             end,
         })
 
         dropdown.AddSlider({
-            Text = 'ESP Distance',
+            Text = "Sub Slider",
             Min = 0,
-            Max = 1000,
-            Default = 500,
+            Max = 10,
+            Default = 5,
             Callback = function(value)
-                -- Update ESP distance
+                print("Sub Slider:", value)
             end,
         })
 
-        dropdown.AddSeparator()
+        dropdown.AddButton({
+            Text = "Sub Button",
+            Callback = function()
+                print("Sub Button clicked!")
+            end,
+        })
+
+        dropdown.AddInput({
+            Text = "Sub Input",
+            Placeholder = "Enter...",
+            Callback = function(text)
+                print("Sub Input:", text)
+            end,
+        })
+
+        dropdown.AddDropdown({
+            Text = "Sub Dropdown",
+            Options = {"A", "B", "C"},
+            Default = "A",
+            Callback = function(selected)
+                print("Sub Selected:", selected)
+            end,
+        })
 
         dropdown.AddLabel({
-            Text = 'ESP Colors',
-            Color = Color3.fromRGB(255, 255, 0),
-        })
-
-        dropdown.AddButton({
-            Text = 'Enemy Color',
-            Callback = function()
-                -- Open color picker
-            end,
-        })
-
-        dropdown.AddButton({
-            Text = 'Team Color',
-            Callback = function()
-                -- Open color picker
-            end,
+            Text = "Sub Label",
+            Color = Color3.fromRGB(0, 255, 0),
         })
     end,
 })
 
-Window:CreateToggle(VisualSection, {
-    Text = 'Show FPS',
-    Default = true,
-    Callback = function(value)
-        -- FPS display code
-    end,
-})
+-- Example of updating theme dynamically
+wait(5)
+UI:SetTheme("Dark")
 
-Window:CreateToggle(VisualSection, {
-    Text = 'Show Ping',
-    Default = true,
-    Callback = function(value)
-        -- Ping display code
-    end,
-})
+-- Example of setting font
+UI:SetFont("ArialBold")
 
--- Settings
-Window:CreateLabel(SettingsSection, {
-    Text = 'Configuration',
-    Color = Window.Theme.Accent,
-})
-
-Window:CreateInput(SettingsSection, {
-    Text = 'Webhook URL',
-    Placeholder = 'https://discord.com/api/webhooks/...',
-    Callback = function(text)
-        _G.WebhookURL = text
-    end,
-})
-
-Window:CreateKeybind(SettingsSection, {
-    Text = 'Toggle UI',
-    Default = Enum.KeyCode.RightShift,
-    Callback = function()
-        Window:ToggleUI()
-    end,
-})
-
-Window:CreateSeparator(SettingsSection)
-
-Window:CreateButton(SettingsSection, {
-    Text = 'Save Settings',
-    Callback = function()
-        -- Save settings code
-        Window:Notify({
-            Title = 'Settings',
-            Text = 'Settings saved successfully!',
-            Duration = 3,
-        })
-    end,
-})
-
-Window:CreateButton(SettingsSection, {
-    Text = 'Load Settings',
-    Callback = function()
-        -- Load settings code
-        Window:Notify({
-            Title = 'Settings',
-            Text = 'Settings loaded successfully!',
-            Duration = 3,
-        })
-    end,
-})
-
-Window:CreateSeparator(SettingsSection)
-
-Window:CreateButton(SettingsSection, {
-    Text = 'Destroy UI',
-    Callback = function()
-        Window:Destroy()
-    end,
-})
-
--- Infinite Jump Implementation
-game:GetService('UserInputService').JumpRequest:Connect(function()
-    if _G.InfiniteJump then
-        game.Players.LocalPlayer.Character.Humanoid:ChangeState('Jumping')
-    end
-end)
-
--- Welcome notification
-Window:Notify({
-    Title = 'Eps1llon Hub',
-    Text = 'Successfully loaded! Press '
-        .. Window.ToggleKey.Name
-        .. ' to toggle.',
+-- Example of notifying
+UI:Notify({
+    Title = "Welcome",
+    Text = "UI Loaded Successfully!",
     Duration = 5,
 })
 
-print('Eps1llon Hub loaded successfully!')
+-- To destroy the UI
+-- UI:Destroy()
