@@ -302,8 +302,8 @@ function Library:Create(config)
         BackgroundTransparency = 1,
         Text = 'Eps1llon Hub',
         TextColor3 = self.Theme.Text,
-        TextSize = 24,
-        Font = Enum.Font.GothamBlack,
+        TextSize = 22,
+        Font = Enum.Font.GothamBold,
         TextXAlignment = Enum.TextXAlignment.Left,
     }, self.TitleBar)
 
@@ -627,7 +627,7 @@ function Library:Create(config)
 
     local usernameLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(1, -60, 0, 30),
-        Position = UDim2.new(0, 52, 0, 10),
+        Position = UDim2.new(0, 55, 0, 5),
         BackgroundTransparency = 1,
         Text = Player.Name,
         TextColor3 = self.Theme.Text,
@@ -638,7 +638,7 @@ function Library:Create(config)
 
     local premiumLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(1, -60, 0, 20),
-        Position = UDim2.new(0, 52, 0, 40),
+        Position = UDim2.new(0, 55, 0, 35),
         BackgroundTransparency = 1,
         Text = "Premium",
         TextColor3 = self.Theme.TextDark,
@@ -866,6 +866,57 @@ function Library:CreateBigDropdown(section, config)
         PaddingLeft = UDim.new(0, 5),
         PaddingRight = UDim.new(0, 5),
     }, bigDropdown.ContentContainer)
+
+    -- Methods to add elements to the big dropdown
+    local wrapperSection = { Content = bigDropdown.ContentContainer }
+
+    bigDropdown.AddToggle = function(toggleConfig)
+        local toggle = self:CreateToggle(wrapperSection, toggleConfig)
+        toggle.Type = 'Toggle'
+        table.insert(bigDropdown.Elements, toggle)
+        return toggle
+    end
+
+    bigDropdown.AddSlider = function(sliderConfig)
+        local slider = self:CreateSlider(wrapperSection, sliderConfig)
+        slider.Type = 'Slider'
+        table.insert(bigDropdown.Elements, slider)
+        return slider
+    end
+
+    bigDropdown.AddButton = function(buttonConfig)
+        local button = self:CreateButton(wrapperSection, buttonConfig)
+        button.Type = 'Button'
+        table.insert(bigDropdown.Elements, button)
+        return button
+    end
+
+    bigDropdown.AddInput = function(inputConfig)
+        local input = self:CreateInput(wrapperSection, inputConfig)
+        input.Type = 'Input'
+        table.insert(bigDropdown.Elements, input)
+        return input
+    end
+
+    bigDropdown.AddLabel = function(labelConfig)
+        local label = self:CreateLabel(wrapperSection, labelConfig)
+        label.Type = 'Label'
+        table.insert(bigDropdown.Elements, label)
+        return label
+    end
+
+    bigDropdown.AddDropdown = function(dropdownConfig)
+        local dropdown = self:CreateDropdown(wrapperSection, dropdownConfig)
+        dropdown.Type = 'Dropdown'
+        table.insert(bigDropdown.Elements, dropdown)
+        return dropdown
+    end
+
+    bigDropdown.AddSeparator = function()
+        local separator = self:CreateSeparator(wrapperSection)
+        table.insert(bigDropdown.Elements, separator)
+        return separator
+    end
 
     -- Update content size
     local function UpdateContentSize()
@@ -1520,7 +1571,7 @@ function Library:CreateDropdown(section, config)
     dropdown.Button = CreateInstance('TextButton', {
         Size = UDim2.new(0.65, -10, 0, 27),
         Position = UDim2.new(0.35, 5, 0, 4),
-        BackgroundTransparency = self.ButtonDarkness,
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Text = dropdown.Selected,
         TextColor3 = self.Theme.Text,
@@ -1528,8 +1579,6 @@ function Library:CreateDropdown(section, config)
         Font = self.Font,
         TextTruncate = Enum.TextTruncate.AtEnd,
     }, dropdown.Frame)
-
-    dropdown.Button:SetAttribute('OriginalBackgroundTransparency', self.ButtonDarkness)
 
     CreateInstance('UIStroke', {
         Color = self.Theme.Border,
@@ -2665,9 +2714,6 @@ function Library:CreateSection(name, customColor)
 end
 
 function Library:SelectSection(section)
-    if self.selecting then return end
-    self.selecting = true
-
     local animationTime = 0.15 -- Synchronized animation time
 
     -- Hide all sections with synchronized fade out
@@ -2921,7 +2967,6 @@ function Library:SelectSection(section)
     end
 
     self.CurrentSection = section
-    self.selecting = false
 end
 
 -- Fixed minimize function with synchronized animations
