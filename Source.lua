@@ -774,6 +774,16 @@ function Library:CreateBigDropdown(section, config)
         CornerRadius = UDim.new(0, 6),
     }, bigDropdown.HeaderContainer)
 
+    -- Add transparency gradient to make right side transparent
+    local gradient = Instance.new("UIGradient")
+    gradient.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(0.4999, 0),
+        NumberSequenceKeypoint.new(0.5, 1),
+        NumberSequenceKeypoint.new(1, 1)
+    })
+    gradient.Parent = bigDropdown.HeaderContainer
+
     -- Left side - Dropdown name
     bigDropdown.NameLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(0.5, -10, 1, 0),
