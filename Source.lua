@@ -760,7 +760,7 @@ function Library:CreateBigDropdown(section, config)
     bigDropdown.HeaderContainer = CreateInstance('Frame', {
         Size = UDim2.new(1, -10, 0, 35),
         Position = UDim2.new(0, 5, 0, 2.5),
-        BackgroundColor3 = self.Theme.Tertiary,
+        BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = self.ButtonDarkness,
         BorderSizePixel = 0,
     }, bigDropdown.Frame)
@@ -823,8 +823,8 @@ function Library:CreateBigDropdown(section, config)
     bigDropdown.ContentContainer = CreateInstance('ScrollingFrame', {
         Size = UDim2.new(1, -10, 0, 0),
         Position = UDim2.new(0, 5, 0, 42),
-        BackgroundColor3 = self.Theme.Background, -- Added background color
-        BackgroundTransparency = self.ButtonDarkness, -- Made slightly visible
+        BackgroundColor3 = self.Theme.Secondary, -- Changed to Secondary
+        BackgroundTransparency = self.ButtonDarkness, -- Kept as ButtonDarkness
         BorderSizePixel = 0,
         ScrollBarThickness = 3,
         ScrollBarImageColor3 = self.Theme.Accent,
