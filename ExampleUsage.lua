@@ -1,307 +1,268 @@
--- UILib Example Usage
--- This script demonstrates all features of the UILib library
+-- Eps1llon Hub Example Script
+local Library = loadstring(
+    game:HttpGet(
+        'https://raw.githubusercontent.com/JustClips/Uilib/refs/heads/main/Source.lua'
+    )
+)()
 
--- Load the library
-local UILib = loadstring(game:HttpGet("https://raw.githubusercontent.com/JustClips/UILib/main/Source.lua"))()
-
--- Create main window
-local Window = UILib:CreateWindow({
-    Title = "UILib Example Hub",
-    SubTitle = "v1.0.0 - Full Demo",
-    SaveFolder = "UILibExample", -- Settings will be saved here
-    IntroEnabled = true,
-    IntroText = "UILib Example",
-    IntroIcon = "rbxassetid://7733964370",
-    Icon = "rbxassetid://7733964370",
-    DisableUIToggle = false
+-- Create main window with custom settings
+local Window = Library:Create({
+    Theme = 'Ocean',
+    Background = 'Blurred Stars',
+    ToggleKey = Enum.KeyCode.RightShift,
+    ButtonDarkness = 0.5,
+    StrokeThickness = 1,
+    Font = 'Ubuntu',
+    SectionHeaderEnabled = true,
+    SectionHeaderConfig = {
+        Size = 22,
+        Font = Enum.Font.GothamBold,
+        Position = 'Center',
+        UnderlineEnabled = true,
+        UnderlineSize = 0.7,
+        UnderlineThickness = 2,
+    },
 })
 
--- ========================================
--- Tab 1: Basic Elements
--- ========================================
-local BasicTab = Window:CreateTab({
-    Name = "Basic Elements",
-    Icon = "rbxassetid://7733960981"
-})
+-- Main Section
+local MainSection = Window:CreateSection('Main Features')
 
--- Button Example
-BasicTab:AddButton({
-    Title = "Print Message",
-    Description = "Click to print a message to console",
-    Callback = function()
-        print("Hello from UILib!")
-        UILib:Notify({
-            Title = "Button Clicked",
-            Content = "Check your console for the message!",
-            Duration = 3
-        })
-    end
-})
+-- Player Section
+local PlayerSection = Window:CreateSection(
+    'Player',
+    Color3.fromRGB(255, 100, 100)
+)
 
--- Toggle Example
-local GodmodeToggle = BasicTab:AddToggle({
-    Title = "Godmode",
-    Description = "Enable godmode (example)",
+-- Visual Section
+local VisualSection = Window:CreateSection(
+    'Visuals',
+    Color3.fromRGB(100, 255, 100)
+)
+
+-- Settings Section
+local SettingsSection = Window:CreateSection('Settings')
+
+-- Main Features
+Window:CreateToggle(MainSection, {
+    Text = 'Auto Farm',
     Default = false,
     Callback = function(value)
-        if value then
-            print("Godmode enabled!")
-            -- Your godmode code here
-        else
-            print("Godmode disabled!")
-            -- Disable godmode code here
+        _G.AutoFarm = value
+        while _G.AutoFarm do
+            -- Your auto farm code here
+            wait(1)
         end
-    end
+    end,
 })
 
--- Slider Example
-local WalkspeedSlider = BasicTab:AddSlider({
-    Title = "Walkspeed",
-    Description = "Adjust your walkspeed",
+Window:CreateButton(MainSection, {
+    Text = 'Collect All Items',
+    Callback = function()
+        Window:Notify({
+            Title = 'Collection',
+            Text = 'Collecting all items...',
+            Duration = 2,
+        })
+        -- Your collection code here
+    end,
+})
+
+local selectedTarget = nil
+Window:CreateSearchBox(MainSection, {
+    Placeholder = 'Search players...',
+    Items = {}, -- Will be updated dynamically
+    OnSelected = function(playerName)
+        selectedTarget = playerName
+        Window:Notify({
+            Title = 'Target Selected',
+            Text = 'Selected: ' .. playerName,
+            Duration = 2,
+        })
+    end,
+})
+
+-- Update player list
+spawn(function()
+    while true do
+        local players = {}
+        for _, player in pairs(game.Players:GetPlayers()) do
+            table.insert(players, player.Name)
+        end
+        -- Update search box items (assuming you stored the searchBox reference)
+        wait(5)
+    end
+end)
+
+-- Player Settings
+Window:CreateSlider(PlayerSection, {
+    Text = 'Walk Speed',
     Min = 16,
     Max = 200,
     Default = 16,
-    Rounding = 0,
     Callback = function(value)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-    end
-})
-
--- Dropdown Example
-local TeamDropdown = BasicTab:AddDropdown({
-    Title = "Select Team",
-    Description = "Choose a team to join",
-    Options = {"Red Team", "Blue Team", "Green Team", "Yellow Team"},
-    Default = 1,
-    Callback = function(selected)
-        print("Selected team:", selected)
-        UILib:Notify({
-            Title = "Team Selected",
-            Content = "You selected: " .. selected,
-            Duration = 2
-        })
-    end
-})
-
--- ========================================
--- Tab 2: Advanced Elements
--- ========================================
-local AdvancedTab = Window:CreateTab({
-    Name = "Advanced",
-    Icon = "rbxassetid://7733956134"
-})
-
--- Color Picker Example
-local ColorPicker = AdvancedTab:AddColorPicker({
-    Title = "UI Color",
-    Description = "Change UI accent color",
-    Default = Color3.fromRGB(59, 130, 246),
-    Callback = function(color)
-        print("Color changed to:", color)
-        -- You could update UI elements with this color
-    end
-})
-
--- Textbox Example
-local UsernameBox = AdvancedTab:AddTextbox({
-    Title = "Target Player",
-    Description = "Enter a player's username",
-    Default = "",
-    PlaceholderText = "Enter username...",
-    Callback = function(text)
-        print("Target player set to:", text)
-        -- Your targeting code here
-    end
-})
-
--- Keybind Example
-local FlyBind = AdvancedTab:AddBind({
-    Title = "Fly Keybind",
-    Description = "Press this key to toggle fly",
-    Default = Enum.KeyCode.F,
-    Hold = false,
-    Callback = function()
-        print("Fly key pressed!")
-        -- Your fly toggle code here
     end,
-    UpdateBind = function(key)
-        print("Fly keybind changed to:", tostring(key))
-    end
 })
 
--- Section Example
-local CombatSection = AdvancedTab:AddSection({
-    Title = "Combat Settings"
+Window:CreateSlider(PlayerSection, {
+    Text = 'Jump Power',
+    Min = 50,
+    Max = 300,
+    Default = 50,
+    Callback = function(value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+    end,
 })
 
-CombatSection:AddToggle({
-    Title = "Aimbot",
-    Description = "Enable aimbot",
+Window:CreateToggle(PlayerSection, {
+    Text = 'Infinite Jump',
     Default = false,
     Callback = function(value)
-        print("Aimbot:", value and "Enabled" or "Disabled")
-    end
+        _G.InfiniteJump = value
+    end,
 })
 
-CombatSection:AddSlider({
-    Title = "FOV Size",
-    Description = "Aimbot field of view",
-    Min = 10,
-    Max = 500,
-    Default = 100,
-    Rounding = 0,
-    Callback = function(value)
-        print("FOV Size:", value)
-    end
-})
-
--- ========================================
--- Tab 3: Information
--- ========================================
-local InfoTab = Window:CreateTab({
-    Name = "Information",
-    Icon = "rbxassetid://7733964719"
-})
-
--- Label Example
-InfoTab:AddLabel({
-    Title = "Script Info",
-    Content = "UILib Example v1.0.0"
-})
-
--- Paragraph Example
-InfoTab:AddParagraph({
-    Title = "About This Script",
-    Content = "This is a demonstration of all UILib features. Each element showcases different functionality that you can use in your own scripts. Feel free to modify and experiment!"
-})
-
-InfoTab:AddParagraph({
-    Title = "Features",
-    Content = "• Modern UI Design\n• Smooth Animations\n• Auto-Save Settings\n• Customizable Elements\n• Easy to Use API"
-})
-
--- Add some spacing
-InfoTab:AddLabel({
-    Title = "",
-    Content = ""
-})
-
--- Credits section
-local CreditsSection = InfoTab:AddSection({
-    Title = "Credits"
-})
-
-CreditsSection:AddParagraph({
-    Title = "Developer",
-    Content = "UILib created by JustClips"
-})
-
-CreditsSection:AddButton({
-    Title = "GitHub Repository",
-    Description = "Open the GitHub page",
-    Callback = function()
-        setclipboard("https://github.com/JustClips/UILib")
-        UILib:Notify({
-            Title = "Copied!",
-            Content = "GitHub link copied to clipboard",
-            Duration = 2
+-- Visual Settings with Big Dropdown
+Window:CreateBigDropdown(VisualSection, {
+    Text = 'ESP Settings',
+    CreateElements = function(dropdown)
+        dropdown.AddToggle({
+            Text = 'Enable ESP',
+            Default = false,
+            Callback = function(value)
+                -- ESP code here
+            end,
         })
-    end
+
+        dropdown.AddDropdown({
+            Text = 'ESP Type',
+            Options = { 'Box', 'Name', 'Health', 'Distance', 'All' },
+            Default = 'Box',
+            Callback = function(selected)
+                -- Update ESP type
+            end,
+        })
+
+        dropdown.AddSlider({
+            Text = 'ESP Distance',
+            Min = 0,
+            Max = 1000,
+            Default = 500,
+            Callback = function(value)
+                -- Update ESP distance
+            end,
+        })
+
+        dropdown.AddSeparator()
+
+        dropdown.AddLabel({
+            Text = 'ESP Colors',
+            Color = Color3.fromRGB(255, 255, 0),
+        })
+
+        dropdown.AddButton({
+            Text = 'Enemy Color',
+            Callback = function()
+                -- Open color picker
+            end,
+        })
+
+        dropdown.AddButton({
+            Text = 'Team Color',
+            Callback = function()
+                -- Open color picker
+            end,
+        })
+    end,
 })
 
--- ========================================
--- Tab 4: Settings & Examples
--- ========================================
-local SettingsTab = Window:CreateTab({
-    Name = "Settings",
-    Icon = "rbxassetid://7733956134"
+Window:CreateToggle(VisualSection, {
+    Text = 'Show FPS',
+    Default = true,
+    Callback = function(value)
+        -- FPS display code
+    end,
 })
 
--- UI Settings Section
-local UISection = SettingsTab:AddSection({
-    Title = "UI Settings"
+Window:CreateToggle(VisualSection, {
+    Text = 'Show Ping',
+    Default = true,
+    Callback = function(value)
+        -- Ping display code
+    end,
 })
 
-UISection:AddButton({
-    Title = "Destroy UI",
-    Description = "Remove the UI completely",
+-- Settings
+Window:CreateLabel(SettingsSection, {
+    Text = 'Configuration',
+    Color = Window.Theme.Accent,
+})
+
+Window:CreateInput(SettingsSection, {
+    Text = 'Webhook URL',
+    Placeholder = 'https://discord.com/api/webhooks/...',
+    Callback = function(text)
+        _G.WebhookURL = text
+    end,
+})
+
+Window:CreateKeybind(SettingsSection, {
+    Text = 'Toggle UI',
+    Default = Enum.KeyCode.RightShift,
+    Callback = function()
+        Window:ToggleUI()
+    end,
+})
+
+Window:CreateSeparator(SettingsSection)
+
+Window:CreateButton(SettingsSection, {
+    Text = 'Save Settings',
+    Callback = function()
+        -- Save settings code
+        Window:Notify({
+            Title = 'Settings',
+            Text = 'Settings saved successfully!',
+            Duration = 3,
+        })
+    end,
+})
+
+Window:CreateButton(SettingsSection, {
+    Text = 'Load Settings',
+    Callback = function()
+        -- Load settings code
+        Window:Notify({
+            Title = 'Settings',
+            Text = 'Settings loaded successfully!',
+            Duration = 3,
+        })
+    end,
+})
+
+Window:CreateSeparator(SettingsSection)
+
+Window:CreateButton(SettingsSection, {
+    Text = 'Destroy UI',
     Callback = function()
         Window:Destroy()
+    end,
+})
+
+-- Infinite Jump Implementation
+game:GetService('UserInputService').JumpRequest:Connect(function()
+    if _G.InfiniteJump then
+        game.Players.LocalPlayer.Character.Humanoid:ChangeState('Jumping')
     end
+end)
+
+-- Welcome notification
+Window:Notify({
+    Title = 'Eps1llon Hub',
+    Text = 'Successfully loaded! Press '
+        .. Window.ToggleKey.Name
+        .. ' to toggle.',
+    Duration = 5,
 })
 
-UISection:AddToggle({
-    Title = "Rainbow UI",
-    Description = "Enable rainbow effect (example)",
-    Default = false,
-    Callback = function(value)
-        if value then
-            print("Rainbow mode enabled!")
-            -- Add rainbow effect code here
-        else
-            print("Rainbow mode disabled!")
-        end
-    end
-})
-
--- Notification Examples Section
-local NotifSection = SettingsTab:AddSection({
-    Title = "Notification Examples"
-})
-
-NotifSection:AddButton({
-    Title = "Success Notification",
-    Description = "Show a success message",
-    Callback = function()
-        UILib:Notify({
-            Title = "Success!",
-            Content = "Operation completed successfully!",
-            Duration = 3
-        })
-    end
-})
-
-NotifSection:AddButton({
-    Title = "Error Notification",
-    Description = "Show an error message",
-    Callback = function()
-        UILib:Notify({
-            Title = "Error!",
-            Content = "Something went wrong!",
-            Duration = 3
-        })
-    end
-})
-
-NotifSection:AddButton({
-    Title = "Long Notification",
-    Description = "Show a longer notification",
-    Callback = function()
-        UILib:Notify({
-            Title = "Information",
-            Content = "This is a longer notification that demonstrates how the notification system handles longer text content.",
-            Duration = 5
-        })
-    end
-})
-
--- ========================================
--- Dynamic Updates Example
--- ========================================
-
--- Example of updating elements after creation
-task.wait(2)
-GodmodeToggle:UpdateToggle(true) -- Enable godmode toggle after 2 seconds
-
--- Example of updating dropdown options
-task.wait(5)
-TeamDropdown:UpdateDropdown("Blue Team") -- Change selected team after 5 seconds
-
--- Show welcome notification
-UILib:Notify({
-    Title = "Welcome!",
-    Content = "UILib loaded successfully. Explore all the features!",
-    Duration = 5
-})
-
-print("UILib Example loaded! Press RightShift to toggle UI visibility.")
+print('Eps1llon Hub loaded successfully!')
