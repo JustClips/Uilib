@@ -1382,7 +1382,7 @@ function Library:CreateSlider(section, config)
 
     slider.SliderFrame = CreateInstance('Frame', {
         Size = UDim2.new(1, -20, 0, 4),
-        Position = UDim2.new(0, 10, 0, 33),
+        Position = UDim2.new(0, 10, 0.5, -2),  -- Centered vertically
         BackgroundColor3 = self.Theme.Tertiary,
         BorderSizePixel = 0,
     }, slider.Frame)
