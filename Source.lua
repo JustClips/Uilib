@@ -1,3 +1,4 @@
+```lua
 -- Eps1llon Hub Premium UI Library (Updated with Phone Support and Fixes)
 -- Modern, sleek design with smooth animations and resizable interface
 
@@ -886,6 +887,16 @@ function Library:CreateBigDropdown(section, config)
                 elementType == 'Dropdown' and bigDropdown.FirstElement.Selected
             then
                 bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Selected
+                bigDropdown.PreviewText.TextColor3 = self.Theme.Text
+            elseif
+                elementType == 'Button' and bigDropdown.FirstElement.Button
+            then
+                bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Button.Text or 'Button'
+                bigDropdown.PreviewText.TextColor3 = self.Theme.Text
+            elseif
+                elementType == 'Label' and bigDropdown.FirstElement.Label
+            then
+                bigDropdown.PreviewText.Text = bigDropdown.FirstElement.Label.Text or 'Label'
                 bigDropdown.PreviewText.TextColor3 = self.Theme.Text
             else
                 bigDropdown.PreviewText.Text = '...'
@@ -2447,6 +2458,22 @@ function Library:CreateSettingsPanel()
         Thickness = 2,
     }, self.SettingsPanel)
 
+    -- Add background image to settings panel (same as main UI)
+    CreateInstance('ImageLabel', {
+        Name = 'SettingsBackgroundImage',
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Image = Backgrounds[self.CurrentBackground],
+        ImageTransparency = 0.8,
+        ScaleType = Enum.ScaleType.Stretch,
+        ZIndex = -2,
+    }, self.SettingsPanel)
+
+    CreateInstance('UICorner', {
+        CornerRadius = UDim.new(0, 8),
+    }, self.SettingsPanel.SettingsBackgroundImage)
+
     -- Settings Title Bar
     local settingsTitleBar = CreateInstance('Frame', {
         Size = UDim2.new(1, 0, 0, 35),
@@ -3612,6 +3639,9 @@ function Library:SetBackground(backgroundName)
         self.BackgroundImage.Image = Backgrounds[backgroundName]
         self.MinimizedFrame.MinimizedBackgroundImage.Image =
             Backgrounds[backgroundName]
+        if self.SettingsPanel:FindFirstChild('SettingsBackgroundImage') then
+            self.SettingsPanel.SettingsBackgroundImage.Image = Backgrounds[backgroundName]
+        end
     end
 end
 
