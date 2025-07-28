@@ -612,6 +612,45 @@ function Library:Create(config)
         self:SetupToggleKeybind()
     end
 
+    -- Add user profile circle
+    local profileContainer = CreateInstance('Frame', {
+        Size = UDim2.new(0, 200, 0, 60),
+        Position = UDim2.new(0, 10, 1, -70),
+        BackgroundTransparency = 1,
+    }, self.MainFrame)
+
+    local avatarCircle = CreateInstance('ImageLabel', {
+        Size = UDim2.new(0, 50, 0, 50),
+        BackgroundTransparency = 1,
+        Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=48&h=48",
+    }, profileContainer)
+
+    CreateInstance('UICorner', {
+        CornerRadius = UDim.new(1, 0),
+    }, avatarCircle)
+
+    local usernameLabel = CreateInstance('TextLabel', {
+        Size = UDim2.new(1, -60, 0, 30),
+        Position = UDim2.new(0, 60, 0, 0),
+        BackgroundTransparency = 1,
+        Text = Player.Name,
+        TextColor3 = self.Theme.Text,
+        TextSize = 16,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Font = self.Font,
+    }, profileContainer)
+
+    local premiumLabel = CreateInstance('TextLabel', {
+        Size = UDim2.new(1, -60, 0, 20),
+        Position = UDim2.new(0, 60, 0, 30),
+        BackgroundTransparency = 1,
+        Text = "Premium",
+        TextColor3 = self.Theme.TextDark,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Font = self.Font,
+    }, profileContainer)
+
     return self
 end
 
@@ -756,37 +795,38 @@ function Library:CreateBigDropdown(section, config)
         }, bigDropdown.Frame)
     end
 
-    -- Header container (the main pill that's always visible) - Fixed colors
+    -- Header container (the main pill that's always visible) - Fixed with transparent background
     bigDropdown.HeaderContainer = CreateInstance('Frame', {
         Size = UDim2.new(1, -10, 0, 35),
         Position = UDim2.new(0, 5, 0, 2.5),
-        BackgroundColor3 = self.Theme.Secondary,
-        BackgroundTransparency = self.ButtonDarkness,
+        BackgroundTransparency = 1,
         BorderSizePixel = 0,
     }, bigDropdown.Frame)
 
-    bigDropdown.HeaderContainer:SetAttribute(
+    CreateInstance('UICorner', {
+        CornerRadius = UDim.new(0, 6),
+    }, bigDropdown.HeaderContainer)
+
+    -- Left side - Dropdown name with background
+    bigDropdown.NameLabelBackground = CreateInstance('Frame', {
+        Size = UDim2.new(0.5, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundColor3 = self.Theme.Secondary,
+        BackgroundTransparency = self.ButtonDarkness,
+        BorderSizePixel = 0,
+    }, bigDropdown.HeaderContainer)
+
+    bigDropdown.NameLabelBackground:SetAttribute(
         'OriginalBackgroundTransparency',
         self.ButtonDarkness
     )
 
     CreateInstance('UICorner', {
         CornerRadius = UDim.new(0, 6),
-    }, bigDropdown.HeaderContainer)
+    }, bigDropdown.NameLabelBackground)
 
-    -- Add transparency gradient to make right side transparent
-    local gradient = Instance.new("UIGradient")
-    gradient.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0),
-        NumberSequenceKeypoint.new(0.4999, 0),
-        NumberSequenceKeypoint.new(0.5, 1),
-        NumberSequenceKeypoint.new(1, 1)
-    })
-    gradient.Parent = bigDropdown.HeaderContainer
-
-    -- Left side - Dropdown name
     bigDropdown.NameLabel = CreateInstance('TextLabel', {
-        Size = UDim2.new(0.5, -10, 1, 0),
+        Size = UDim2.new(1, -20, 1, 0),
         Position = UDim2.new(0, 10, 0, 0),
         BackgroundTransparency = 1,
         Text = config.Text or 'Dropdown',
@@ -794,9 +834,9 @@ function Library:CreateBigDropdown(section, config)
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left,
         Font = self.Font,
-    }, bigDropdown.HeaderContainer)
+    }, bigDropdown.NameLabelBackground)
 
-    -- Right side container for preview content
+    -- Right side container for preview content - transparent
     bigDropdown.PreviewContainer = CreateInstance('Frame', {
         Size = UDim2.new(0.5, -10, 1, 0),
         Position = UDim2.new(0.5, 0, 0, 0),
@@ -1099,7 +1139,7 @@ function Library:CreateBigDropdown(section, config)
 
     bigDropdown.HeaderContainer.MouseEnter:Connect(function()
         Tween(
-            bigDropdown.HeaderContainer,
+            bigDropdown.NameLabelBackground,
             { BackgroundTransparency = self.ButtonDarkness - 0.2 },
             0.2
         )
@@ -1110,7 +1150,7 @@ function Library:CreateBigDropdown(section, config)
 
     bigDropdown.HeaderContainer.MouseLeave:Connect(function()
         Tween(
-            bigDropdown.HeaderContainer,
+            bigDropdown.NameLabelBackground,
             { BackgroundTransparency = self.ButtonDarkness },
             0.2
         )
@@ -2546,9 +2586,6 @@ function Library:CreateSettingsPanel()
 
     -- Add all UI settings to the panel
     self:AddUISettingsToSection(settingsSection)
-
-    -- Make settings panel draggable
-    AddDragging(self.SettingsPanel, settingsTitleBar)
 end
 
 function Library:ToggleSettingsPanel()
