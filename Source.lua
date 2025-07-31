@@ -184,7 +184,6 @@ function Library:Create(config)
     self.StrokeThickness = config.StrokeThickness or 1
     self.Font = Fonts[config.Font] or Fonts.Ubuntu
     self.SectionHeaderEnabled = config.SectionHeaderEnabled ~= false
-    self.SectionHeaderWhite = config.SectionHeaderWhite or false
     self.HideUISettings = config.HideUISettings or false
 
     -- Size Customization Options (New)
@@ -207,9 +206,6 @@ function Library:Create(config)
             Font = Enum.Font.GothamBold,
             Color = nil,
             Position = 'Center',
-            UnderlineEnabled = true,
-            UnderlineSize = 0.5,
-            UnderlineThickness = 2,
         }
 
     -- Create ScreenGui
@@ -269,23 +265,6 @@ function Library:Create(config)
         CornerRadius = UDim.new(0, 8),
     }, self.BackgroundImage)
 
-    -- Edge glow effect (made shorter)
-    self.EdgeGlow = CreateInstance('ImageLabel', {
-        Name = 'EdgeGlow',
-        Size = UDim2.new(1, 10, 1, 10),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundTransparency = 1,
-        Image = 'rbxasset://textures/ui/GuiImagePlaceholder.png',
-        ImageColor3 = self.Theme.Accent,
-        ImageTransparency = 0.9,
-        ZIndex = -1,
-    }, self.MainFrame)
-
-    CreateInstance('UICorner', {
-        CornerRadius = UDim.new(0, 10),
-    }, self.EdgeGlow)
-
     -- Title Bar
     self.TitleBar = CreateInstance('Frame', {
         Name = 'TitleBar',
@@ -294,11 +273,20 @@ function Library:Create(config)
         BorderSizePixel = 0,
     }, self.MainFrame)
 
+    -- Logo
+    self.Logo = CreateInstance('ImageLabel', {
+        Size = UDim2.new(0, 28, 0, 28),
+        Position = UDim2.new(0, 10, 0.5, -14),
+        BackgroundTransparency = 1,
+        Image = 'rbxassetid://121222463346446',
+        ScaleType = Enum.ScaleType.Fit,
+    }, self.TitleBar)
+
     -- Title
     self.Title = CreateInstance('TextLabel', {
         Name = 'Title',
         Size = UDim2.new(0, 200, 1, 0),
-        Position = UDim2.new(0, 15, 0, 0),
+        Position = UDim2.new(0, 45, 0, 0),
         BackgroundTransparency = 1,
         Text = 'Eps1llon Hub',
         TextColor3 = self.Theme.Text,
@@ -627,7 +615,7 @@ function Library:Create(config)
 
     local usernameLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(1, -60, 0, 30),
-        Position = UDim2.new(0, 55, 0, 5),
+        Position = UDim2.new(0, 52, 0, 5),
         BackgroundTransparency = 1,
         Text = Player.Name,
         TextColor3 = self.Theme.Text,
@@ -638,7 +626,7 @@ function Library:Create(config)
 
     local premiumLabel = CreateInstance('TextLabel', {
         Size = UDim2.new(1, -60, 0, 20),
-        Position = UDim2.new(0, 55, 0, 35),
+        Position = UDim2.new(0, 52, 0, 35),
         BackgroundTransparency = 1,
         Text = "Premium",
         TextColor3 = self.Theme.TextDark,
@@ -1285,8 +1273,8 @@ function Library:CreateSlider(section, config)
     }, slider.Frame)
 
     slider.SliderFrame = CreateInstance('Frame', {
-        Size = UDim2.new(1, -20, 0, 4),
-        Position = UDim2.new(0, 10, 0.5, -2),  -- Centered vertically
+        Size = UDim2.new(1, -20, 0, 6),
+        Position = UDim2.new(0, 10, 0.5, -3),  -- Centered vertically
         BackgroundColor3 = self.Theme.Tertiary,
         BorderSizePixel = 0,
     }, slider.Frame)
@@ -1315,12 +1303,12 @@ function Library:CreateSlider(section, config)
     }, slider.Fill)
 
     slider.Knob = CreateInstance('Frame', {
-        Size = UDim2.new(0, 12, 0, 12),
+        Size = UDim2.new(0, 16, 0, 16),
         Position = UDim2.new(
             (slider.Value - slider.Min) / (slider.Max - slider.Min),
-            -6,
+            -8,
             0.5,
-            -6
+            -8
         ),
         BackgroundColor3 = self.Theme.Text,
         BorderSizePixel = 0,
@@ -1344,10 +1332,8 @@ function Library:CreateSlider(section, config)
             1
         )
 
-        slider.Value = math.floor(
-            slider.Min + (slider.Max - slider.Min) * percentage
-        )
-        slider.ValueLabel.Text = tostring(slider.Value)
+        slider.Value = slider.Min + (slider.Max - slider.Min) * percentage
+        slider.ValueLabel.Text = string.format("%.1f", slider.Value)
 
         -- Smooth tweening for slider components
         Tween(
@@ -1358,7 +1344,7 @@ function Library:CreateSlider(section, config)
         )
         Tween(
             slider.Knob,
-            { Position = UDim2.new(percentage, -6, 0.5, -6) },
+            { Position = UDim2.new(percentage, -8, 0.5, -8) },
             0.1,
             Enum.EasingStyle.Quad
         )
@@ -2177,7 +2163,6 @@ function Library:SetTheme(themeName)
 
         -- Update main elements
         self.MainFrame.BackgroundColor3 = self.Theme.Background
-        self.EdgeGlow.ImageColor3 = self.Theme.Accent
         self.TopDivider.BackgroundColor3 = self.Theme.Border
         self.VerticalDivider.BackgroundColor3 = self.Theme.Border
         self.MinimizedFrame.BackgroundColor3 = self.Theme.Background
@@ -2189,10 +2174,9 @@ function Library:SetTheme(themeName)
                 descendant.BackgroundColor3 = self.Theme.SectionHighlight
             elseif descendant.Name == 'SectionHeader' then
                 if
-                    not self.SectionHeaderWhite
-                    and not descendant.Parent.Parent.CustomColor
+                    not descendant.Parent.Parent.CustomColor
                 then
-                    descendant.TextColor3 = self.Theme.Accent
+                    descendant.TextColor3 = Color3.fromRGB(255, 255, 255)
                 end
             elseif
                 descendant:IsA('TextLabel')
@@ -2437,6 +2421,9 @@ function Library:CreateSettingsPanel()
 
     -- Add all UI settings to the panel
     self:AddUISettingsToSection(settingsSection)
+
+    -- Make settings panel draggable
+    AddDragging(self.SettingsPanel, settingsTitleBar)
 end
 
 function Library:ToggleSettingsPanel()
@@ -2496,6 +2483,24 @@ function Library:AddResizing()
         BorderSizePixel = 0,
     }, self.MainFrame)
 
+    -- Add curved line for resize indicator
+    self.ResizeCurve = CreateInstance('Frame', {
+        Size = UDim2.new(0, 20, 0, 20),
+        AnchorPoint = Vector2.new(1, 1),
+        Position = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+    }, self.MainFrame)
+
+    CreateInstance('UICorner', {
+        CornerRadius = UDim.new(0, 8),
+    }, self.ResizeCurve)
+
+    CreateInstance('UIStroke', {
+        Color = Color3.fromRGB(255, 255, 255),
+        Transparency = 0.6,
+        Thickness = 2,
+    }, self.ResizeCurve)
+
     self.ResizeHandle.MouseEnter:Connect(function()
         Mouse.Icon = 'rbxasset://SystemCursors/SizeNWSE'
     end)
@@ -2511,6 +2516,8 @@ function Library:AddResizing()
             resizing = true
             startSize = self.MainFrame.AbsoluteSize
             startPos = UserInputService:GetMouseLocation()
+            Tween(self.ResizeCurve, { Size = UDim2.new(0, 25, 0, 25) }, 0.2)
+            Tween(self.ResizeCurve.UIStroke, { Transparency = 0.4 }, 0.2)
         end
     end)
 
@@ -2518,6 +2525,8 @@ function Library:AddResizing()
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             resizing = false
             Mouse.Icon = ''
+            Tween(self.ResizeCurve, { Size = UDim2.new(0, 20, 0, 20) }, 0.2)
+            Tween(self.ResizeCurve.UIStroke, { Transparency = 0.6 }, 0.2)
         end
     end)
 
@@ -2547,7 +2556,7 @@ function Library:AddResizing()
     end)
 end
 
-function Library:CreateSection(name, customColor)
+function Library:CreateSection(name, customColor, iconAsset)
     local section = {}
     section.Name = name
     section.Elements = {}
@@ -2569,6 +2578,17 @@ function Library:CreateSection(name, customColor)
         CornerRadius = UDim.new(0, 6),
     }, section.Button)
 
+    -- Section Icon if provided
+    if iconAsset then
+        CreateInstance('ImageLabel', {
+            Size = UDim2.new(0, 20, 0, 20),
+            Position = UDim2.new(0, 5, 0.5, -10),
+            BackgroundTransparency = 1,
+            Image = iconAsset,
+            ScaleType = Enum.ScaleType.Fit,
+        }, section.Button)
+    end
+
     -- Section Highlight (left line)
     section.Highlight = CreateInstance('Frame', {
         Name = 'Highlight',
@@ -2585,8 +2605,8 @@ function Library:CreateSection(name, customColor)
 
     -- Section Label
     section.Label = CreateInstance('TextLabel', {
-        Size = UDim2.new(1, -20, 1, 0),
-        Position = UDim2.new(0, 15, 0, 0),
+        Size = iconAsset and UDim2.new(1, -35, 1, 0) or UDim2.new(1, -20, 1, 0),
+        Position = iconAsset and UDim2.new(0, 30, 0, 0) or UDim2.new(0, 15, 0, 0),
         BackgroundTransparency = 1,
         Text = name,
         TextColor3 = self.Theme.TextDark,
@@ -2628,10 +2648,7 @@ function Library:CreateSection(name, customColor)
         -- Use custom color if provided, otherwise use default
         local headerColor = customColor
             or self.SectionHeaderConfig.Color
-            or (
-                self.SectionHeaderWhite and Color3.fromRGB(255, 255, 255)
-                or self.Theme.Accent
-            )
+            or Color3.fromRGB(255, 255, 255)
 
         section.Header = CreateInstance('TextLabel', {
             Name = 'SectionHeader',
@@ -2648,35 +2665,8 @@ function Library:CreateSection(name, customColor)
 
         -- Store header config state
         section.HeaderConfig = {
-            UnderlineEnabled = self.SectionHeaderConfig.UnderlineEnabled,
             Color = headerColor,
         }
-
-        -- Header Underline
-        if section.HeaderConfig.UnderlineEnabled then
-            section.HeaderUnderline = CreateInstance('Frame', {
-                Size = UDim2.new(
-                    self.SectionHeaderConfig.UnderlineSize,
-                    0,
-                    0,
-                    self.SectionHeaderConfig.UnderlineThickness
-                ),
-                Position = UDim2.new(
-                    (1 - self.SectionHeaderConfig.UnderlineSize) / 2,
-                    0,
-                    0,
-                    35
-                ),
-                BackgroundColor3 = headerColor,
-                BackgroundTransparency = 0.3,
-                BorderSizePixel = 0,
-                Visible = false,
-            }, section.Header)
-
-            CreateInstance('UICorner', {
-                CornerRadius = UDim.new(0, 1),
-            }, section.HeaderUnderline)
-        end
     end
 
     -- Section Selection
@@ -2727,14 +2717,6 @@ function Library:SelectSection(section)
                     animationTime,
                     Enum.EasingStyle.Quad
                 )
-                if s.HeaderUnderline and s.HeaderConfig.UnderlineEnabled then
-                    Tween(
-                        s.HeaderUnderline,
-                        { BackgroundTransparency = 1 },
-                        animationTime,
-                        Enum.EasingStyle.Quad
-                    )
-                end
             end
 
             -- Fade out all content elements at the same time
@@ -2823,9 +2805,6 @@ function Library:SelectSection(section)
                     s.Highlight.Size = UDim2.new(0, 3, 1, -10)
                     if s.Header then
                         s.Header.Visible = false
-                        if s.HeaderUnderline then
-                            s.HeaderUnderline.Visible = false
-                        end
                     end
                 end)
             end
@@ -2848,18 +2827,8 @@ function Library:SelectSection(section)
     end
     if section.Header then
         section.Header.Visible = true
-        if
-            section.HeaderUnderline and section.HeaderConfig.UnderlineEnabled
-        then
-            section.HeaderUnderline.Visible = true
-        end
         -- Reset header transparency
         section.Header.TextTransparency = 0
-        if
-            section.HeaderUnderline and section.HeaderConfig.UnderlineEnabled
-        then
-            section.HeaderUnderline.BackgroundTransparency = 0.3
-        end
     end
 
     -- Animate highlight appearing
@@ -2870,24 +2839,6 @@ function Library:SelectSection(section)
             { Size = UDim2.new(0, 3, 1, -10) },
             animationTime * 1.5
         )
-    end
-
-    -- Animate header underline
-    if section.HeaderUnderline and section.HeaderConfig.UnderlineEnabled then
-        section.HeaderUnderline.Size = UDim2.new(
-            0,
-            0,
-            0,
-            self.SectionHeaderConfig.UnderlineThickness
-        )
-        Tween(section.HeaderUnderline, {
-            Size = UDim2.new(
-                self.SectionHeaderConfig.UnderlineSize,
-                0,
-                0,
-                self.SectionHeaderConfig.UnderlineThickness
-            ),
-        }, animationTime * 2, Enum.EasingStyle.Back)
     end
 
     -- Animate section button
@@ -2984,9 +2935,6 @@ function Library:Minimize()
         if section.Header then
             section.Header.Visible = false
         end
-        if section.HeaderUnderline then
-            section.HeaderUnderline.Visible = false
-        end
         section.Content.Visible = false
     end
 
@@ -3000,7 +2948,6 @@ function Library:Minimize()
     end
     Tween(self.TopDivider, { BackgroundTransparency = 1 }, animationTime)
     Tween(self.VerticalDivider, { BackgroundTransparency = 1 }, animationTime)
-    Tween(self.EdgeGlow, { ImageTransparency = 1 }, animationTime)
     Tween(self.BackgroundImage, { ImageTransparency = 1 }, animationTime)
 
     -- Hide all section buttons
@@ -3046,7 +2993,6 @@ function Library:Restore()
     end
     self.TopDivider.BackgroundTransparency = 0.5
     self.VerticalDivider.BackgroundTransparency = 0.5
-    self.EdgeGlow.ImageTransparency = 0.9
     self.BackgroundImage.ImageTransparency = 0.8
 
     -- Show all sections
@@ -3061,12 +3007,6 @@ function Library:Restore()
         self.CurrentSection.Content.Visible = true
         if self.CurrentSection.Header then
             self.CurrentSection.Header.Visible = true
-            if
-                self.CurrentSection.HeaderUnderline
-                and self.CurrentSection.HeaderConfig.UnderlineEnabled
-            then
-                self.CurrentSection.HeaderUnderline.Visible = true
-            end
         end
         -- Restore current section highlighting
         self.CurrentSection.Button.BackgroundTransparency = 0.1
@@ -3094,51 +3034,6 @@ function Library:UpdateSectionHeaders()
                 headerAlignment = Enum.TextXAlignment.Right
             end
             section.Header.TextXAlignment = headerAlignment
-
-            -- Update header config
-            section.HeaderConfig.UnderlineEnabled =
-                self.SectionHeaderConfig.UnderlineEnabled
-
-            if section.HeaderUnderline then
-                section.HeaderUnderline.Visible = section.HeaderConfig.UnderlineEnabled
-                    and section.Header.Visible
-                section.HeaderUnderline.Size = UDim2.new(
-                    self.SectionHeaderConfig.UnderlineSize,
-                    0,
-                    0,
-                    self.SectionHeaderConfig.UnderlineThickness
-                )
-                section.HeaderUnderline.Position = UDim2.new(
-                    (1 - self.SectionHeaderConfig.UnderlineSize) / 2,
-                    0,
-                    0,
-                    35
-                )
-            elseif section.HeaderConfig.UnderlineEnabled then
-                -- Create underline if it doesn't exist but is now enabled
-                section.HeaderUnderline = CreateInstance('Frame', {
-                    Size = UDim2.new(
-                        self.SectionHeaderConfig.UnderlineSize,
-                        0,
-                        0,
-                        self.SectionHeaderConfig.UnderlineThickness
-                    ),
-                    Position = UDim2.new(
-                        (1 - self.SectionHeaderConfig.UnderlineSize) / 2,
-                        0,
-                        0,
-                        35
-                    ),
-                    BackgroundColor3 = section.HeaderConfig.Color,
-                    BackgroundTransparency = 0.3,
-                    BorderSizePixel = 0,
-                    Visible = section.Header.Visible,
-                }, section.Header)
-
-                CreateInstance('UICorner', {
-                    CornerRadius = UDim.new(0, 1),
-                }, section.HeaderUnderline)
-            end
         end
     end
 end
@@ -3256,28 +3151,6 @@ function Library:AddUISettingsToSection(section)
         Default = 'GothamBold',
         Callback = function(font)
             self.SectionHeaderConfig.Font = Fonts[font]
-            self:UpdateSectionHeaders()
-        end,
-    })
-
-    -- Underline Toggle
-    self:CreateToggle(section, {
-        Text = 'Header Underline',
-        Default = self.SectionHeaderConfig.UnderlineEnabled,
-        Callback = function(enabled)
-            self.SectionHeaderConfig.UnderlineEnabled = enabled
-            self:UpdateSectionHeaders()
-        end,
-    })
-
-    -- Underline Size Slider
-    self:CreateSlider(section, {
-        Text = 'Underline Size',
-        Min = 10,
-        Max = 100,
-        Default = self.SectionHeaderConfig.UnderlineSize * 100,
-        Callback = function(value)
-            self.SectionHeaderConfig.UnderlineSize = value / 100
             self:UpdateSectionHeaders()
         end,
     })
